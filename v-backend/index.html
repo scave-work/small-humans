@@ -458,6 +458,10 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .pl-liste{border-radius:12px}
 .pan-tete .pl-liste .pl-opt{border-radius:8px}
 .mus-panneau{border-radius:12px}
+/* Colonnes de la liste des titres et de la page (v46) : Chrome ignorait les largeurs des cellules (3 colonnes égales), elles sont donc réglées sur <col> ; styles fixés sur le plus long (« electro-melodique » ≈ 130 px) */
+@media (min-width:1101px){.pistes .c-titre{width:54%}.pistes .c-genre{width:150px}}
+@media (min-width:1180px){.mus{grid-template-columns:minmax(0,min(25.5vw,440px)) minmax(0,1fr) minmax(0,min(22.5vw,440px));column-gap:clamp(20px,2vw,48px)}}
+@media (min-width:1180px) and (min-height:560px){.mus-gauche{display:flex;flex-direction:column}.mus-gauche .platine{margin:auto}}   /* anneau centré verticalement dans sa colonne */
 </style>
 </head>
 <body data-vue="intro">
@@ -536,6 +540,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
         <div class="pistes-zone">
         <table class="pistes">
           <caption class="vh">Les titres</caption>
+          <colgroup><col class="c-titre"><col class="c-artiste"><col class="c-genre"></colgroup>
           <thead class="vh"><tr><th scope="col">Titre</th><th scope="col">Artiste</th><th scope="col">Genre</th></tr></thead>
           <tbody id="pistes"></tbody>
         </table>
@@ -1088,7 +1093,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 45';
+const BUILD = 'v-backend 24 oct, 46';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1448,6 +1453,22 @@ function initPlaylists() {
   });
   document.addEventListener('pointerdown', e => { if (!$('#plListe').hidden && !e.target.closest('#plListe, #plBtn')) fermerListePl(); });
   $('#plVue').addEventListener('change', majBoutonPl);
+  // Survol d'un texte coupé (« … ») : le nom complet défile ; au départ du survol il revient au début
+  (() => {
+    const SEL = '.p-jouer, .p-artiste, .lect-titre, .lect-artiste, .pan-t b, .pan-t i';
+    let cur = null, raf = 0, att = 0;
+    const arret = () => { if (!cur) return; clearTimeout(att); cancelAnimationFrame(raf); cur.scrollLeft = 0; cur.style.textOverflow = ''; cur = null; };
+    document.addEventListener('mouseover', e => {
+      const el = e.target.closest ? e.target.closest(SEL) : null;
+      if (el === cur) return;
+      arret();
+      if (!el || el.scrollWidth <= el.clientWidth + 1 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      cur = el; el.style.textOverflow = 'clip';
+      const dist = el.scrollWidth - el.clientWidth;
+      att = setTimeout(() => { const t0 = performance.now(); const pas = t => { if (cur !== el) return; el.scrollLeft = Math.min(dist, (t - t0) * 0.07); if (el.scrollLeft < dist) raf = requestAnimationFrame(pas); }; raf = requestAnimationFrame(pas); }, 300);
+    });
+    document.addEventListener('mouseout', e => { if (!e.relatedTarget) arret(); });
+  })();
   $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) { M.plActive = n; sauverPl(); majSelecteur(); panneau(); } });
   $('#plSuppr').addEventListener('click', supprimerPl);
   $('#plMenu').addEventListener('click', () => { if ($('#menuPl').hidden) ouvrirActions($('#plMenu')); else fermerMenu(); });
