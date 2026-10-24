@@ -446,6 +446,18 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .pan-t i{font-size:13px;color:var(--acier)}
 .pan-n{color:#6B7AA0}
 .pan-aide{padding:10px 14px;color:#6B7AA0;border-top:0}
+/* Arrondis (v45) : pilule pour les petits contrôles, léger pour les listes et les panneaux, vignettes droites */
+.filtres button,.mus-outils input[type=search],.mus-outils button,.pan-tete button,.pan-tete .pl-btn{border-radius:999px}
+.filtres button{padding:3px 14px}
+.mus-corps .mus-outils input[type=search]{padding:3px 16px}
+.mus-corps .mus-outils button{padding:3px 14px}
+.lect-boutons button{border-radius:50%}
+.pistes tr td:first-child{border-radius:8px 0 0 8px}
+.pistes tr td:last-child{border-radius:0 8px 8px 0}
+.pan-item{border-radius:8px}
+.pl-liste{border-radius:12px}
+.pan-tete .pl-liste .pl-opt{border-radius:8px}
+.mus-panneau{border-radius:12px}
 </style>
 </head>
 <body data-vue="intro">
@@ -1076,7 +1088,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 44';
+const BUILD = 'v-backend 24 oct, 45';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
