@@ -420,6 +420,16 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 tr.indispo .p-jouer,tr.indispo .p-artiste,tr.indispo .p-genre,.pan-item.indispo .pan-vig,.pan-item.indispo .pan-t b{opacity:.45}
 .p-yt,.pan-item.indispo .pan-t i a{color:var(--accent);text-decoration:none;font-size:12px;margin-left:8px;white-space:nowrap}
 .p-yt:hover,.pan-item.indispo .pan-t i a:hover{text-decoration:underline}
+.inter{display:flex;gap:8px;align-items:center;color:var(--acier);cursor:pointer;min-height:32px;font-size:15px;position:relative}
+.inter input{position:absolute;opacity:0;width:0;height:0}
+.inter-p{width:34px;height:20px;border-radius:999px;background:#1A2B4A;position:relative;flex:none;transition:background .15s}
+.inter-p::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--ink);transition:transform .15s,background .15s}
+.inter input:checked + .inter-p{background:var(--accent)}
+.inter input:checked + .inter-p::after{transform:translateX(14px);background:var(--accent-ink)}
+.inter input:focus-visible + .inter-p{outline:2px solid var(--accent);outline-offset:2px}
+.top-h{margin:12px 0 6px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--acier);font-weight:500}
+.aj-ligne .top-n{color:var(--acier);min-width:2.2em;text-align:right;flex:none}
+.aj-ligne .top-c{color:var(--accent);flex:none}
 .mx-c{min-width:28px;min-height:28px;padding:0;background:none;border:0;color:var(--acier);font-size:17px;cursor:pointer}
 .mx-c:hover{color:var(--accent)}
 .mx-c.fait{color:var(--accent);cursor:default}
@@ -575,6 +585,8 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
           <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
           <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
+          <label class="inter" title="Désactivé : la roulette tire au hasard. Activé : elle tire plus souvent ce que tu écoutes en entier"><input id="pond" type="checkbox" role="switch"><span class="inter-p" aria-hidden="true"></span>Roulette pondérée</label>
+          <button id="topBtn" type="button" aria-haspopup="dialog" aria-expanded="false">Mon top</button>
           <button id="toutAj" type="button" hidden>Tout ajouter</button>
           <button id="ajBtn" type="button" aria-haspopup="dialog" aria-expanded="false">À ajouter</button>
         </div>
@@ -606,6 +618,7 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
         <p class="pan-aide" id="panAide">Glisse des titres de la liste ici. Dans la playlist : glisse pour ranger, tire vers la droite pour retirer.</p>
       </aside>
       <div class="aj-panneau" id="ajPanneau" role="dialog" aria-label="Titres à ajouter" hidden></div>
+      <div class="aj-panneau" id="topPanneau" role="dialog" aria-label="Mon top d’écoute" hidden></div>
     </div>
   </section>
 </main>
@@ -1135,7 +1148,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 61';
+const BUILD = 'v-backend 24 oct, 62';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1242,6 +1255,11 @@ function construireMusique(D) {
   $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(M.cur, true); });
   M.alea = !!mem.lire('alea', false); $('#alea').setAttribute('aria-pressed', String(M.alea));
   $('#alea').addEventListener('click', e => { M.alea = !M.alea; e.currentTarget.setAttribute('aria-pressed', String(M.alea)); mem.ecrire('alea', M.alea); });
+  M.pond = !!mem.lire('pond', false); $('#pond').checked = M.pond;
+  $('#pond').addEventListener('change', e => { M.pond = e.target.checked; mem.ecrire('pond', M.pond); mlg(M.pond ? 'Roulette selon tes goûts : activée.' : 'Roulette au hasard complet.'); });
+  $('#topBtn').addEventListener('click', () => { $('#topPanneau').hidden ? ouvrirTop() : fermerTop(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#topPanneau').hidden) fermerTop(); });
+  document.addEventListener('pointerdown', e => { const pn = $('#topPanneau'); if (!pn.hidden && !pn.contains(e.target) && e.target !== $('#topBtn')) fermerTop(); });
   $('#aPrec').addEventListener('click', () => afficherPage(M.page - 1));
   $('#aSuiv').addEventListener('click', () => afficherPage(M.page + 1));
   $('#plus').addEventListener('click', () => { M.montre += PAGE; tableau(); });
@@ -1253,8 +1271,64 @@ function construireMusique(D) {
 }
 function hasard() {   // un titre au hasard dans la liste filtrée, lu tout de suite
   if (!M.liste.length) return;
-  let t; do { t = M.liste[Math.floor(Math.random() * M.liste.length)]; } while (M.liste.length > 1 && M.cur && t === M.cur);
+  let t; do { t = tirer(M.liste); } while (M.liste.length > 1 && M.cur && t === M.cur);
   lancer(t);
+}
+/* ---------- score d'écoute : gardé dans CE navigateur (clé sh-mus-ecoutes), jamais publié ----------
+   écoute complète +2, passé avant 30 s −2, ♥ « À ajouter » ou playlist +3 ; l'artiste et le style cumulent les scores de leurs titres. */
+const lireEc = () => { const o = mem.lire('ecoutes', {}); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; };
+function noterEc(id, champ) {   // champ : 'n' = écouté en entier, 's' = passé trop vite
+  if (!ID_YT.test(String(id))) return; const o = lireEc(); const e = o[id] || { n: 0, s: 0 }; e[champ] = (e[champ] || 0) + 1; o[id] = e; mem.ecrire('ecoutes', o);
+}
+function scores() {
+  const o = lireEc(), bon = new Set(M.ajouts.map(x => x.youtube)); Object.values(M.pl).forEach(l => l.forEach(i => bon.add(i)));
+  const st = new Map(), sa = new Map(), sg = new Map();
+  new Set([...Object.keys(o), ...bon]).forEach(id => {
+    const e = o[id] || { n: 0, s: 0 }, v = 2 * (e.n || 0) - 2 * (e.s || 0) + (bon.has(id) ? 3 : 0); st.set(id, v);
+    const tr = M.parId.get(id); if (tr) { if (tr.artiste) sa.set(tr.artiste, (sa.get(tr.artiste) || 0) + v); sg.set(tr.genre, (sg.get(tr.genre) || 0) + v); }
+  });
+  return { st, sa, sg, o };
+}
+function tirer(liste) {   // au hasard ; si « Roulette selon mes goûts » est activé : plus de chances pour les titres, artistes et styles qu'on écoute
+  if (!M.pond || liste.length < 2) return liste[Math.floor(Math.random() * liste.length)];
+  const S = scores(), w = liste.map(t => Math.max(0.1, 1 + (S.st.get(t.youtube) || 0) + 0.3 * (S.sa.get(t.artiste) || 0) + 0.1 * (S.sg.get(t.genre) || 0)));
+  let r = Math.random() * w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < liste.length; i++) { r -= w[i]; if (r <= 0) return liste[i]; }
+  return liste[liste.length - 1];
+}
+function fermerTop() { $('#topPanneau').hidden = true; $('#topBtn').setAttribute('aria-expanded', 'false'); }
+function dessinerTop() {
+  const pn = $('#topPanneau'); pn.textContent = '';
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
+  const S = scores(), tete = el('div', 'aj-tete'); tete.appendChild(el('h3', '', 'Mon top d’écoute'));
+  const fer = el('button', 'aj-x', '✕'); fer.type = 'button'; fer.setAttribute('aria-label', 'Fermer'); fer.addEventListener('click', fermerTop); tete.appendChild(fer); pn.appendChild(tete);
+  const tops = Object.entries(S.o).filter(([, e]) => e.n > 0).sort((a, b) => b[1].n - a[1].n).slice(0, 20);
+  if (!tops.length) pn.appendChild(el('p', 'aj-aide', 'Rien pour l’instant : un titre compte une écoute quand tu l’écoutes en entier.'));
+  else {
+    pn.appendChild(el('p', 'top-h', 'Titres les plus écoutés en entier'));
+    tops.forEach(([id, e], i) => {
+      const tr = M.parId.get(id), l = el('div', 'aj-ligne');
+      const pl = el('button', '', '▶'); pl.type = 'button'; pl.setAttribute('aria-label', 'Écouter'); pl.disabled = !tr || M.indispo.has(id); pl.addEventListener('click', () => { if (tr) lancer(tr); });
+      const t = el('div', 'aj-t', tr ? tr.titre : id); if (tr && tr.artiste) t.appendChild(el('small', '', '  ' + tr.artiste));
+      l.append(el('span', 'top-n', String(i + 1)), pl, t, el('span', 'top-c', '×' + e.n)); pn.appendChild(l);
+    });
+    const classe = (m, titre) => {
+      const r = [...m.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 5); if (!r.length) return;
+      pn.appendChild(el('p', 'top-h', titre)); r.forEach(([nom, v], i) => { const l = el('div', 'aj-ligne'); l.append(el('span', 'top-n', String(i + 1)), el('div', 'aj-t', nom), el('span', 'top-c', v + ' pts')); pn.appendChild(l); });
+    };
+    classe(S.sa, 'Artistes (score)'); classe(S.sg, 'Styles (score)');
+  }
+  const bas = el('div', 'aj-bas');
+  const ex = el('button', 'aj-prim', 'Exporter'); ex.type = 'button'; ex.disabled = !tops.length;
+  ex.addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(S.o, null, 2)], { type: 'application/json' })); a.download = 'ecoutes_' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); });
+  const rz = el('button', '', 'Remettre à zéro'); rz.type = 'button'; rz.disabled = !Object.keys(S.o).length;
+  rz.addEventListener('click', () => { if (confirm('Effacer tout ton historique d’écoute (compteurs et scores) dans ce navigateur ?')) { mem.ecrire('ecoutes', {}); dessinerTop(); } });
+  bas.append(ex, rz); pn.appendChild(bas);
+  pn.appendChild(el('p', 'aj-aide', 'Gardé dans ce navigateur seulement, rien n’est publié. Écoute en entier +2, passé avant 30 s −2, ♥ ou playlist +3.'));
+}
+function ouvrirTop() {
+  const pn = $('#topPanneau'), b = $('#topBtn').getBoundingClientRect(); fermerAj(); dessinerTop(); pn.hidden = false; $('#topBtn').setAttribute('aria-expanded', 'true');
+  const w = pn.offsetWidth; pn.style.top = Math.round(b.bottom + 8) + 'px'; pn.style.left = Math.max(8, Math.min(Math.round(b.left), innerWidth - w - 8)) + 'px';
 }
 /* playlists de style « officielles » : une par genre, calculées d'après les tags (sans mix ni titres illisibles), jamais enregistrées ; les modifier crée une copie locale « style (perso) » */
 const PFX = '♫ ';
@@ -1357,7 +1431,8 @@ function lancer(tr, ctx) {   // titre choisi par l'utilisateur : on le met dans 
   if (change || i < 0) reconstruire(tr); else choisir(i);
   jouerYT(tr);
 }
-function suivant(sens) {   // « À suivre » d'abord ; sinon suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif
+function suivant(sens, auto) {   // « À suivre » d'abord ; sinon suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif ; auto = fin naturelle du titre
+  if (!auto && M.cur && M.charge && M.joue) { try { if (PY.getCurrentTime() < 30) noterEc(M.cur.youtube, 's'); } catch (e) {} }   // passé avant 30 s : score en baisse
   if (sens > 0 && M.file.length) { const t = M.file.shift(); lancer(t, 'bib'); majFile(); return; }
   const km = M.vueMix && M.mix && M.cur ? M.mix.items.findIndex(x => x.youtube === M.cur.youtube) : -1;   // on lit dans le Mix : suivant / précédent restent dans le Mix
   if (km >= 0) { const nx = mixVoisin(km, sens); if (nx) jouerMix(nx); return; }
@@ -1380,7 +1455,7 @@ function chargerApi() {
   window.onYouTubeIframeAPIReady = () => {
     PY = new YT.Player('ytCible', { width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, modestbranding: 1, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3 },
       events: { onReady: () => { apiPrete = true; PY.setVolume(VOLP); if (attente) { PY.loadVideoById(attente.youtube); attente = null; } },
-                onStateChange: e => { if (e.data === 1 || e.data === 2) { M.joue = e.data === 1; majBoutonLire(); } if (e.data === 0) { M.joue = false; majBoutonLire(); suivant(1); } },
+                onStateChange: e => { if (e.data === 1 || e.data === 2) { M.joue = e.data === 1; majBoutonLire(); } if (e.data === 0) { M.joue = false; majBoutonLire(); if (M.cur) noterEc(M.cur.youtube, 'n'); suivant(1, true); } },
                 onError: e => erreurVideo(e.data) } });
   };
   const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api'; sc.async = true;
@@ -1803,7 +1878,7 @@ function roulette() {
   if (M.roule) return;   // déjà en train de tourner
   const choix = M.biblio.filter(t => t !== M.cur && !M.file.includes(t));
   if (!choix.length) { mlg('Aucun autre titre à tirer dans cette liste.'); return; }
-  const tr = choix[Math.floor(Math.random() * choix.length)];
+  const tr = tirer(choix);
   if (REDUIT) { M.lueur = maintenant(); enfiler(tr); return; }
   M.lueur = -1;
   M.roule = { t0: maintenant(), d: 2.4, a0: M.rot, total: TAU * (3 + Math.random() * 2), tr };
