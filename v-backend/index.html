@@ -417,6 +417,9 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .pan-item.bloque .pan-vig,.pan-item.bloque .pan-t b{opacity:.45}
 .pan-item.bloque .pan-t i a{color:var(--accent);text-decoration:none}
 .pan-item.bloque .pan-t i a:hover{text-decoration:underline}
+tr.indispo .p-jouer,tr.indispo .p-artiste,tr.indispo .p-genre,.pan-item.indispo .pan-vig,.pan-item.indispo .pan-t b{opacity:.45}
+.p-yt,.pan-item.indispo .pan-t i a{color:var(--accent);text-decoration:none;font-size:12px;margin-left:8px;white-space:nowrap}
+.p-yt:hover,.pan-item.indispo .pan-t i a:hover{text-decoration:underline}
 .mx-c{min-width:28px;min-height:28px;padding:0;background:none;border:0;color:var(--acier);font-size:17px;cursor:pointer}
 .mx-c:hover{color:var(--accent)}
 .mx-c.fait{color:var(--accent);cursor:default}
@@ -1132,7 +1135,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 60';
+const BUILD = 'v-backend 24 oct, 61';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1270,10 +1273,11 @@ function modifiable(nom) {   // renvoie le nom d'une playlist qu'on peut modifie
   return copie;
 }
 function pistesDe(nom) { return (listeDe(nom) || []).map(id => M.parId.get(id)).filter(Boolean); }
-function biblio() {   // la bibliothèque filtrée (genre, recherche, mix)
+function biblioAff() {   // la liste affichée : bibliothèque filtrée (genre, recherche, mix), avec les titres indisponibles (grisés, lien YouTube)
   const q = norm(M.q.trim());
-  return M.tous.filter(t => (M.mix || !t.mix) && !M.indispo.has(t.youtube) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
+  return M.tous.filter(t => (M.mix || !t.mix) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
 }
+function biblio() { return biblioAff().filter(t => !M.indispo.has(t.youtube)); }   // la liste jouable : anneau, suivant, roulette
 function contexte() {   // la liste qui sert à l'anneau et à « suivant » : la bibliothèque filtrée, ou la playlist si on lit depuis elle
   return M.ctx === 'pl' && existe(M.plActive) ? pistesDe(M.plActive).filter(t => !M.indispo.has(t.youtube)) : M.biblio;
 }
@@ -1298,9 +1302,14 @@ function reconstruire(courant, garder) {   // « garder » = ne pas toucher au t
   if (M.D.titres.length) choisir(i >= 0 ? M.D.titres.indexOf(courant) : 0, true);
   else { M.cur = null; $('#ecTitre').textContent = 'Aucun titre'; $('#ecArtiste').textContent = ''; $('#lTitre').textContent = 'Aucun titre'; $('#lArtiste').textContent = ''; }
 }
+function lienYT(id) {   // lien « YouTube ↗ » pour un titre qui ne se lit pas dans le site
+  const a = document.createElement('a'); a.className = 'p-yt'; a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(id); a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'YouTube ↗';
+  a.addEventListener('click', e => e.stopPropagation()); a.addEventListener('pointerdown', e => e.stopPropagation()); return a;
+}
 function tableau() {
   const tb = $('#pistes'); tb.textContent = '';
-  M.biblio.slice(0, M.montre).forEach(tr => {
+  const aff = biblioAff();
+  aff.slice(0, M.montre).forEach(tr => {
     const row = document.createElement('tr'); row.dataset.id = tr.youtube;
     row.innerHTML = '<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button><button type="button" class="p-plus" aria-label="Ajouter à la playlist ouverte" title="Ajouter à la playlist ouverte">＋</button></td><td class="p-artiste"></td><td class="p-genre"></td>';
     row.querySelector('.p-jouer').textContent = tr.titre + (tr.mix ? ' (mix/set)' : ''); row.querySelector('.p-jouer').title = tr.titre;
@@ -1308,11 +1317,12 @@ function tableau() {
     row.querySelector('.p-genre').textContent = tr.genre;
     row.querySelector('.p-plus').addEventListener('click', e => { e.stopPropagation(); const nom = plCourante(true); if (nom) ajouterA(nom, tr); });
     if (M.cur && M.cur.youtube === tr.youtube) row.classList.add('courant');
-    row.addEventListener('click', () => { if (DR.bloque) return; lancer(tr, 'bib'); });
+    if (M.indispo.has(tr.youtube)) { row.classList.add('indispo'); row.querySelector('.p-titre').appendChild(lienYT(tr.youtube)); }
+    row.addEventListener('click', () => { if (DR.bloque) return; if (M.indispo.has(tr.youtube)) { mlg('Ce titre ne se lit que sur YouTube : utilise « YouTube ↗ ».'); return; } lancer(tr, 'bib'); });
     row.addEventListener('pointerdown', e => armerDrag(e, tr, -1));
     tb.appendChild(row);
   });
-  $('#plus').hidden = M.biblio.length <= M.montre;
+  $('#plus').hidden = aff.length <= M.montre;
   const filtre = !!(M.q.trim() || M.genreFiltre), bt = $('#toutAj');   // « tout ajouter » : seulement quand la liste est filtrée
   bt.hidden = !filtre || !M.biblio.length; bt.textContent = `Tout ajouter (${M.biblio.length})`;
 }
@@ -1566,7 +1576,8 @@ function panneau() {   // dessine la liste de la playlist ouverte
     li.innerHTML = '<span class="pan-n"></span><img class="pan-vig" alt="" loading="lazy" draggable="false"><span class="pan-t"><b></b><i></i></span><button type="button" class="pan-x" aria-label="Retirer de la playlist" title="Retirer">✕</button>';
     li.querySelector('.pan-n').textContent = String(n); li.querySelector('.pan-vig').src = 'https://i.ytimg.com/vi/' + encodeURIComponent(id) + '/mqdefault.jpg'; li.querySelector('b').textContent = tr.titre; li.querySelector('i').textContent = tr.artiste || '';
     li.querySelector('.pan-x').addEventListener('click', e => { e.stopPropagation(); retirerIdx(nom, i); });
-    li.addEventListener('click', () => { if (DR.bloque) return; lancer(tr, 'pl'); });
+    if (M.indispo.has(id)) { li.classList.add('indispo'); li.querySelector('i').appendChild(lienYT(id)); }
+    li.addEventListener('click', () => { if (DR.bloque) return; if (M.indispo.has(id)) { mlg('Ce titre ne se lit que sur YouTube : utilise « YouTube ↗ ».'); return; } lancer(tr, 'pl'); });
     li.addEventListener('pointerdown', e => armerDrag(e, tr, i));
     ul.appendChild(li);
   });
