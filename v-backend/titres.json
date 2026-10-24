@@ -16572,6 +16572,20 @@
 "mix": false
 },
 {
+"youtube": "KmMiDCpefbw",
+"titre": "Soft Sand",
+"artiste": "We Paint the Skies",
+"genre": "ambient",
+"tags": [
+"ambient",
+"chill",
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "-eR6v2zcy4c",
 "titre": "Tournent les violons",
 "artiste": "Jean-Jacques Goldman",
@@ -16579,6 +16593,32 @@
 "tags": [
 "pop-indie",
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "DUP_ew2FSDw",
+"titre": "The Summit",
+"artiste": "Aio",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique",
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "kE2wZVZPwoA",
+"titre": "COSMIC RAGE",
+"artiste": "You Us We Them",
+"genre": "hard-edm",
+"tags": [
+"hard-edm",
+"bass"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16605,6 +16645,18 @@
 "tags": [
 "electro-pop",
 "electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "keBJZR5AlT8",
+"titre": "Closer To The Dream",
+"artiste": "MR TOUT LE MONDE",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16650,6 +16702,19 @@
 "mix": false
 },
 {
+"youtube": "FhSAa4W207g",
+"titre": "Hold You Dear",
+"artiste": "Tourbillon",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique",
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "jEIpk3DObFA",
 "titre": "Makina Time",
 "artiste": "Dimitri Vegas & Like Mike, Marlon Hoffstadt, Dj Konik, Dimitri Vegas, Like Mike",
@@ -16688,6 +16753,18 @@
 "mix": false
 },
 {
+"youtube": "vua460qGmZE",
+"titre": "Maximal Classique",
+"artiste": "FlexFab, Manu Kann",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "js7b0RsraXE",
 "titre": "Breach",
 "artiste": "Rone",
@@ -16695,6 +16772,31 @@
 "tags": [
 "electronica",
 "house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "XupJ7uMrucc",
+"titre": "T'INNAMORI",
+"artiste": "Moyo",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "fVtMfB4ixHw",
+"titre": "Racines",
+"artiste": "KAS:ST, Index Ñuul Kukk",
+"genre": "house-techno",
+"tags": [
+"house-techno",
+"folk-world"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16738,6 +16840,18 @@
 "mix": false
 },
 {
+"youtube": "D0r42-2jaFs",
+"titre": "BALANCED",
+"artiste": "Mindserver Unlimited",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "JTCiz-SUBPs",
 "titre": "⁠Beto’s Horns - Ezra Collective remix",
 "artiste": "Fred again.., CA7RIEL & Paco Amoroso, Ezra Collective",
@@ -16764,6 +16878,54 @@
 "mix": false
 },
 {
+"youtube": "4vle7UhPx5U",
+"titre": "Imbued",
+"artiste": "Echo Wolf",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "iLY9xY7d6AY",
+"titre": "UNVEILED",
+"artiste": "LYSTRO",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "0q4ITPC79i4",
+"titre": "Sex Scene",
+"artiste": "Austin Coven",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_UUGweyhQi0",
+"titre": "keep sweetly tearing pieces from my heart",
+"artiste": "skullstorm",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "CWK-6UnpqYU",
 "titre": "The Ketchup Song (Aserejé) - Techno Mix",
 "artiste": "Seeko, New Beat Order, KROMA",
@@ -16776,12 +16938,110 @@
 "mix": true
 },
 {
+"youtube": "9pICOv2DJ0E",
+"titre": "Grateful",
+"artiste": "Mollotone",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "5UrXmPbHSUg",
+"titre": "care for you",
+"artiste": "noko.",
+"genre": "chill",
+"tags": [
+"chill",
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "wheVQcfrEF8",
+"titre": "Deux Voyages",
+"artiste": "Salmon & the Laundry Bear",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "z7Y8laB_1ng",
+"titre": "TITAN",
+"artiste": "Ben C, Kalsx, Cybek",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "HWMNJ_Ht3rs",
+"titre": "Don't let go",
+"artiste": "Tinrex, KristeNicole",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ZbNuycCnFBc",
+"titre": "Arrakis",
+"artiste": "Headphone Activist",
+"genre": "ambient",
+"tags": [
+"ambient",
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "eqIJhjDKx6U",
 "titre": "LAVENDER",
 "artiste": "RXRXBBIT",
 "genre": "bass",
 "tags": [
 "bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "onzAqCLBrZ4",
+"titre": "Deeper Ecstasy",
+"artiste": "Landis",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "8OpbpB1YoXc",
+"titre": "call u back",
+"artiste": "[yaku]",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16800,12 +17060,37 @@
 "mix": false
 },
 {
+"youtube": "FmNi5wNSHmk",
+"titre": "When You Touch Me",
+"artiste": "CJDJ",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "asr6_eNCuoU",
 "titre": "Noosphere",
 "artiste": "Guillaume David",
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lbxyG5oFHVk",
+"titre": "Glow, Pt. One",
+"artiste": "Wojciech Golczewski",
+"genre": "ambient",
+"tags": [
+"ambient",
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16830,6 +17115,31 @@
 "genre": "electro-pop",
 "tags": [
 "electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "VI_k8hB8uNo",
+"titre": "Skekzi",
+"artiste": "Minismus",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "FHv24MgZoNs",
+"titre": "No Turning Back",
+"artiste": "Guillaume David",
+"genre": "ost",
+"tags": [
+"ost",
+"epic"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16886,6 +17196,19 @@
 "mix": false
 },
 {
+"youtube": "qVvVD8A-vSc",
+"titre": "Metroplex - Meet The Resistance",
+"artiste": "Michael McCann",
+"genre": "ost",
+"tags": [
+"ost",
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "MxsuFYPkZMs",
 "titre": "Imagination",
 "artiste": "Whales",
@@ -16904,6 +17227,42 @@
 "genre": "ost",
 "tags": [
 "ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "8Z2oe7trS8w",
+"titre": "Could Never Be Famous",
+"artiste": "Louis Sévigny",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "-edt6PLGQ4M",
+"titre": "Through The Night",
+"artiste": "Cinetic Spheres",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "NZUoWCHAICc",
+"titre": "Frozen",
+"artiste": "Cloud Architect",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16940,6 +17299,30 @@
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "8qeF9M9A1bM",
+"titre": "Leaving the World Behind",
+"artiste": "Patrik Andrén, Johan Söderqvist, Embark Studios",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "fywaJHH_4-8",
+"titre": "roundnround",
+"artiste": "Conrad., Perrin Xthona",
+"genre": "house-techno",
+"tags": [
+"house-techno"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -16994,9 +17377,33 @@
 "mix": false
 },
 {
+"youtube": "TPzc5VbVUug",
+"titre": "Sakatomi Plaza",
+"artiste": "Celestial Aeon Project, Everrune, All Tomorrow's Futures",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "QjPP8xVXVGk",
 "titre": "Pirate Bay",
 "artiste": "Savant, Twistex",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "IHHLrjMdp8U",
+"titre": "Witchcraft",
+"artiste": "Savant",
 "genre": "bass",
 "tags": [
 "bass"
@@ -17118,6 +17525,18 @@
 "mix": false
 },
 {
+"youtube": "w0oiK2tR0HY",
+"titre": "Out of perspectives",
+"artiste": "Infinite Reflections",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "jchVgcG3-0Y",
 "titre": "Treacherous",
 "artiste": "Guillaume David",
@@ -17125,6 +17544,18 @@
 "tags": [
 "ost",
 "epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "OtUECgwFDKM",
+"titre": "Sacred Machinery",
+"artiste": "Archotechna",
+"genre": "ost",
+"tags": [
+"ost"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17180,6 +17611,18 @@
 "mix": false
 },
 {
+"youtube": "9BS-0EdcYuo",
+"titre": "conversations",
+"artiste": "gjør",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "W2imWEraKsE",
 "titre": "Baddadan (feat. IRAH, Flowdan, Trigga & Takura)",
 "artiste": "Chase & Status, Bou, Flowdan, IRAH, Trigga, Takura",
@@ -17229,6 +17672,18 @@
 "mix": false
 },
 {
+"youtube": "zHAF-Gd72l8",
+"titre": "Pledge",
+"artiste": "Olik",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "qsDLF-YRCVU",
 "titre": "Drive Me Thru",
 "artiste": "Synapson",
@@ -17265,12 +17720,49 @@
 "mix": false
 },
 {
+"youtube": "Eu7b0GpD1cY",
+"titre": "Kyro",
+"artiste": "Stilhed",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "9Fm8c9eINjU",
+"titre": "this will destroy me",
+"artiste": "my head is empty",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "JVB4ZgGj4o4",
 "titre": "Suantraí",
 "artiste": "Anúna, Michael McGlynn, Aisling Mcglynn",
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "xuptd_KlAkk",
+"titre": "Mizzle Blues",
+"artiste": "Echo Fuji, Free Flow Flava",
+"genre": "funk-jazz",
+"tags": [
+"funk-jazz",
+"hiphop"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17308,6 +17800,42 @@
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "qOQSdX8d0hA",
+"titre": "you",
+"artiste": "widx.",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "GncWeNh9d_U",
+"titre": "Northern Latitudes",
+"artiste": "Silent Travelers",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "IXkCzFr2Pyc",
+"titre": "Ephemer",
+"artiste": "Adieu Aru, MALO",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17363,12 +17891,49 @@
 "mix": false
 },
 {
+"youtube": "u0casQZ4fYc",
+"titre": "creation",
+"artiste": "jacal",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Ap04u5P2k3A",
 "titre": "Magic and Mischief",
 "artiste": "Frida Johansson, Henrik Oja",
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lMEd_YmbR6k",
+"titre": "Solar Movement",
+"artiste": "Luminist",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "y8DTgBhyj0Y",
+"titre": "Amazing",
+"artiste": "La Femme",
+"genre": "pop-indie",
+"tags": [
+"pop-indie",
+"synthwave"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17400,6 +17965,42 @@
 "mix": false
 },
 {
+"youtube": "u0unpUshfW0",
+"titre": "Tenebris",
+"artiste": "Norvik",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ueScVA4Dw_U",
+"titre": "Cumulonimbus",
+"artiste": "Sky's Memoirs",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "9qVi6SR63t0",
+"titre": "Somnum",
+"artiste": "Science Of Sleeping",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "7EKuymIYCtE",
 "titre": "To The Dancers On The Ice",
 "artiste": "Emilie Simon",
@@ -17420,6 +18021,18 @@
 "tags": [
 "electronica",
 "house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "SB9-5sUpLdM",
+"titre": "The Enchantment",
+"artiste": "Those Who Ride With Giants",
+"genre": "epic",
+"tags": [
+"epic"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17510,12 +18123,48 @@
 "mix": false
 },
 {
+"youtube": "ogX7FPMbQ6g",
+"titre": "Good For You",
+"artiste": "Whim Therapy",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "sc8U-VD5qr4",
+"titre": "Dead Internet",
+"artiste": "Whim Therapy, YMNK",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "00w-Gzn5ei0",
 "titre": "L'idée de toi",
 "artiste": "satine",
 "genre": "pop-indie",
 "tags": [
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "b9-9IgHETSs",
+"titre": "No 1",
+"artiste": "ANTNK, DJ Traytex",
+"genre": "house-techno",
+"tags": [
+"house-techno"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17542,6 +18191,30 @@
 "tags": [
 "dub-reggae",
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_IPPpPbvgp4",
+"titre": "Cosmic Microwave",
+"artiste": "Bahrambient, Unusual Cosmic Process",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "9_n4uEl6AOI",
+"titre": "Groendub",
+"artiste": "Blundetto, Pupajim",
+"genre": "dub-reggae",
+"tags": [
+"dub-reggae"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17599,6 +18272,18 @@
 "mix": false
 },
 {
+"youtube": "Bi2xIZlG1YU",
+"titre": "Pégase",
+"artiste": "Makoto San",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "99z1_IMJNl8",
 "titre": "Flutes",
 "artiste": "Hot Chip",
@@ -17612,12 +18297,49 @@
 "mix": false
 },
 {
+"youtube": "ZHBJPJR1t_Q",
+"titre": "From the Sky",
+"artiste": "Yoe Mase, Wind Awake",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "ESfMmYNuHUk",
 "titre": "105 BPM Live Music",
 "artiste": "MEZERG",
 "genre": "funk-jazz",
 "tags": [
 "funk-jazz"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Uuhyq4A4B_w",
+"titre": "Pixelated",
+"artiste": "Toa5t",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "eiCLmQxl9oA",
+"titre": "Kaval Sviri - HYPERTECHNO",
+"artiste": "Acid Bozkurt",
+"genre": "hard-edm",
+"tags": [
+"hard-edm",
+"folk-world"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17684,9 +18406,33 @@
 "mix": false
 },
 {
+"youtube": "f2xoHI_apTE",
+"titre": "Humain",
+"artiste": "Cédric Moulié, Alain Damasio",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "J01xMXBYXNc",
 "titre": "Surface",
 "artiste": "Infinite Reflections",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "L1YAW9797o0",
+"titre": "Equal Areas in Unequal Times",
+"artiste": "Bahrambient, Retland",
 "genre": "ambient",
 "tags": [
 "ambient"
@@ -17727,6 +18473,45 @@
 "genre": "electro-pop",
 "tags": [
 "electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "55oTmR7sQAg",
+"titre": "Ancient Rites",
+"artiste": "Daridel",
+"genre": "folk-world",
+"tags": [
+"folk-world",
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "vvP00Bq-iaQ",
+"titre": "Up, Up and Away",
+"artiste": "Vindsvept",
+"genre": "ost",
+"tags": [
+"ost",
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "WEdtTYMo8Rw",
+"titre": "Morrison's Jig - Harvey Dhar Remix",
+"artiste": "Aaron Dolan, Harvey Dhar",
+"genre": "folk-world",
+"tags": [
+"folk-world",
+"house-techno"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17784,12 +18569,60 @@
 "mix": false
 },
 {
+"youtube": "uyg9SLKYcwg",
+"titre": "Tree of Life",
+"artiste": "David A. Molina",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "qE29tYHIgIU",
+"titre": "the bride (slowed)",
+"artiste": "Piedkies",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "4rAQ-ZnqXAc",
+"titre": "Undefined",
+"artiste": "Adrianou",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "0A7grnYo-bM",
 "titre": "Hyperloop (AIR242)",
 "artiste": "Dave Winnel",
 "genre": "trance-psy",
 "tags": [
 "trance-psy"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "njwGuU69fjU",
+"titre": "Osblo",
+"artiste": "Kozuku",
+"genre": "electronica",
+"tags": [
+"electronica"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17820,12 +18653,84 @@
 "mix": false
 },
 {
+"youtube": "GCA7_u5a0DA",
+"titre": "Launching - Radio Edit",
+"artiste": "Sofinski",
+"genre": "trance-psy",
+"tags": [
+"trance-psy"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "zrgJi9W5YYI",
+"titre": "Profundity - Radio Edit",
+"artiste": "Punchim",
+"genre": "trance-psy",
+"tags": [
+"trance-psy"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "ahokmuD-71Q",
 "titre": "Get Down to the Beat (Future Horizons 385)",
 "artiste": "Astiko",
 "genre": "trance-psy",
 "tags": [
 "trance-psy"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "HXLhWeAimvg",
+"titre": "Glory",
+"artiste": "Riro",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "vl62JFscdHs",
+"titre": "Madagascar",
+"artiste": "MDTX",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "BylOme7CHpA",
+"titre": "Pixie Hollow",
+"artiste": "Bodikhuu",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "j9VAuos6VZM",
+"titre": "Skyline's The Limit",
+"artiste": "Smeeagain",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17870,12 +18775,48 @@
 "mix": false
 },
 {
+"youtube": "JuvtS7jMAfI",
+"titre": "Through One Purple Window",
+"artiste": "5l33p",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "6SsUreJBPPg",
 "titre": "Black Ice",
 "artiste": "Subtronics, Rezz",
 "genre": "bass",
 "tags": [
 "bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "bWtXIUz76rI",
+"titre": "leaving home",
+"artiste": "Canblaster",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "aeAHRpeLB5Y",
+"titre": "Equilibrium",
+"artiste": "NXRTHSTXR, Astrxplaya",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17919,6 +18860,18 @@
 "mix": false
 },
 {
+"youtube": "mm9B06px3aw",
+"titre": "Magic Forest",
+"artiste": "Humans From Mars",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "ekUH_UyHtk0",
 "titre": "cry",
 "artiste": "vowl., Kol",
@@ -17937,6 +18890,18 @@
 "genre": "electro-melodique",
 "tags": [
 "electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "o3xaVhjhdRk",
+"titre": "Won't Stop",
+"artiste": "SUNZZ",
+"genre": "hard-edm",
+"tags": [
+"hard-edm"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17992,6 +18957,66 @@
 "mix": false
 },
 {
+"youtube": "oyWthB52q_g",
+"titre": "insomnia",
+"artiste": "SØINS, Meltone, pandora.",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "XLP2HuATeQo",
+"titre": "Clarity",
+"artiste": "Philip Ayers",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "O5IYUzwiO2g",
+"titre": "Slowdown",
+"artiste": "Thomas Brett",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "YwTrD41Lfz0",
+"titre": "Inukshuk",
+"artiste": "Crépon, Faites leur des disques",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "QEg1F8HMQc0",
+"titre": "Unexpected",
+"artiste": "Emrod",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "8vPXJbhmTWs",
 "titre": "In My Mind",
 "artiste": "ILLENIUM, Excision, HALIENE",
@@ -18041,6 +19066,30 @@
 "mix": false
 },
 {
+"youtube": "85WmiFVJt7g",
+"titre": "Metamorphosis",
+"artiste": "Kazuma Okabayashi",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Z2gwPya63m4",
+"titre": "Flooded",
+"artiste": "Be Still the Earth, Stilhed",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "yGDcBmlIzww",
 "titre": "Lost Umbrella",
 "artiste": "INABAKUMORI",
@@ -18072,6 +19121,18 @@
 "tags": [
 "ost",
 "epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "gha8JfCUjVI",
+"titre": "Journey",
+"artiste": "BORDER 242",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18128,6 +19189,18 @@
 "mix": false
 },
 {
+"youtube": "BlTWXKDbEiU",
+"titre": "Just Be",
+"artiste": "Jeremiah Fraites, Superposition, Formless, Ram Dass",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "sBSFqRg4tW4",
 "titre": "For – Peter – Toilet Brushes – More",
 "artiste": "Nils Frahm",
@@ -18159,6 +19232,42 @@
 "genre": "house-techno",
 "tags": [
 "house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "uVgmdztbKuE",
+"titre": "Breathing",
+"artiste": "KIDSØ",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "gzazGM_t3MY",
+"titre": "Holding Pattern",
+"artiste": "Jeff Roy",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "bL3OBNSk7Kc",
+"titre": "Ocean",
+"artiste": "Borna.J",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18240,6 +19349,18 @@
 "mix": false
 },
 {
+"youtube": "UUo85ZSjS1Y",
+"titre": "Don't Let Me Down (feat. Prima)",
+"artiste": "Cajama, Prima",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "9QVhlqbY2gs",
 "titre": "Lord & Master - Gentlemens Club Remix",
 "artiste": "Apashe, Gentlemens Club",
@@ -18306,6 +19427,18 @@
 "genre": "hiphop",
 "tags": [
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "1TKX4WRaM_g",
+"titre": "Sketches by Moonlight",
+"artiste": "Matt Tondut, Harry Waters",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18409,6 +19542,55 @@
 "mix": false
 },
 {
+"youtube": "VDfVKvg1pzs",
+"titre": "Fast As You Can",
+"artiste": "Thomas Barrandon",
+"genre": "ost",
+"tags": [
+"ost",
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "npzIVQgUTao",
+"titre": "Skytrack (Global Monorail Development)",
+"artiste": "Martin Glass",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_mAW2SHxqsc",
+"titre": "Radiant Abyss",
+"artiste": "LUNIQ.",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "3ipmJbBttWk",
+"titre": "Glaciers",
+"artiste": "Taranaki",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "pG0q_zo6WAU",
 "titre": "Beyond Beliefs",
 "artiste": "Ben Böhmer",
@@ -18470,6 +19652,18 @@
 "mix": false
 },
 {
+"youtube": "vYNoRBk_zKU",
+"titre": "Modus",
+"artiste": "De la Suda",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "UJrMB4QhNok",
 "titre": "My Tears Are Becoming a Sea",
 "artiste": "M83",
@@ -18494,9 +19688,82 @@
 "mix": false
 },
 {
+"youtube": "89ytZofjQPU",
+"titre": "Those Winter Sundays",
+"artiste": "Have a Cigar",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "fn1RqdAJ7ik",
+"titre": "The Third Expansion",
+"artiste": "Rigoberto Rodriguez",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "ESwEkJECjWg",
 "titre": "Children of the Omnissiah",
 "artiste": "Guillaume David",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "xn-Qinpb5R8",
+"titre": "Matsutake",
+"artiste": "Amos Roddy",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "7LkTI1p4Kgs",
+"titre": "Room 6",
+"artiste": "36",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "3bbatpmqNsE",
+"titre": "Aaron",
+"artiste": "The Album Leaf, Jimmy Lavalle",
+"genre": "ambient",
+"tags": [
+"ambient",
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "gisjMzDhHxY",
+"titre": "Painting Bertil",
+"artiste": "Uno Helmersson",
 "genre": "ost",
 "tags": [
 "ost"
@@ -18537,6 +19804,18 @@
 "tags": [
 "dub-reggae",
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "0tM7wz18drk",
+"titre": "Pieces of Me",
+"artiste": "beaurial",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18591,6 +19870,18 @@
 "mix": false
 },
 {
+"youtube": "W7THt12-J6U",
+"titre": "Reminiscence",
+"artiste": "Can Bora Tanzer",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "4c44cgGoZNw",
 "titre": "unjaded (ov) - Mad Zach Remix",
 "artiste": "deadmau5, Mad Zach",
@@ -18634,6 +19925,18 @@
 "genre": "house-techno",
 "tags": [
 "house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "C0QjqOPuZpo",
+"titre": "Wanderer",
+"artiste": "Tiki Taka, Nhyx",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18714,6 +20017,44 @@
 "mix": false
 },
 {
+"youtube": "OHMDjR-FuZo",
+"titre": "Parade I",
+"artiste": "Moshimoss",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "urun9RWSoG4",
+"titre": "Elfenreigen",
+"artiste": "Kveld",
+"genre": "folk-world",
+"tags": [
+"folk-world",
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "yIXjYMtl92o",
+"titre": "End Of Infinity",
+"artiste": "IOTO",
+"genre": "electronica",
+"tags": [
+"electronica",
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "6RRC64o8U0o",
 "titre": "Alternate World (Alternate Life)",
 "artiste": "Son Lux, Kishi Bashi",
@@ -18772,6 +20113,18 @@
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "D_H44FlBd_c",
+"titre": "Materia",
+"artiste": "Grand Soleil",
+"genre": "folk-world",
+"tags": [
+"folk-world"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18877,6 +20230,18 @@
 "mix": false
 },
 {
+"youtube": "Bx2TsHLqWfU",
+"titre": "Novae",
+"artiste": "Matt Tondut",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "iuDS_jYYero",
 "titre": "Winter's Eve",
 "artiste": "Kishi Bashi",
@@ -18919,6 +20284,18 @@
 "genre": "hiphop",
 "tags": [
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "zo6dQWmnw7I",
+"titre": "Dharma",
+"artiste": "Techno Para Dos, Alondra Máynez",
+"genre": "house-techno",
+"tags": [
+"house-techno"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18976,6 +20353,18 @@
 "mix": false
 },
 {
+"youtube": "576Wru0353c",
+"titre": "Song II: \"Lapa ië\"",
+"artiste": "John Robert Matz",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "LK4DY_5-DnI",
 "titre": "The Grid",
 "artiste": "Daft Punk",
@@ -19019,6 +20408,19 @@
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Qye4ENJEfVg",
+"titre": "BTM Blau",
+"artiste": "Hainbach",
+"genre": "ambient",
+"tags": [
+"ambient",
+"electronica"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19074,12 +20476,36 @@
 "mix": false
 },
 {
+"youtube": "8sw6dSbCyo8",
+"titre": "Alborada do alén",
+"artiste": "Moura, Elena Vázquez",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "F09clUHW5Do",
 "titre": "Skyline Ninja",
 "artiste": "kiLLa Laharl, Free Flow Flava",
 "genre": "dub-reggae",
 "tags": [
 "dub-reggae"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "1jAq9zvA2lo",
+"titre": "Appearance",
+"artiste": "Sensitizer, Unusual Cosmic Process",
+"genre": "trance-psy",
+"tags": [
+"trance-psy"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19146,12 +20572,36 @@
 "mix": false
 },
 {
+"youtube": "rO0SB42veTk",
+"titre": "Décollage",
+"artiste": "Bisou",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "LK8oErg0rG0",
 "titre": "Amber",
 "artiste": "Fardust",
 "genre": "electro-melodique",
 "tags": [
 "electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "XGBdWaueS4k",
+"titre": "Asylum",
+"artiste": "Bodykit, WHITECRXW",
+"genre": "bass",
+"tags": [
+"bass"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19354,6 +20804,55 @@
 "mix": false
 },
 {
+"youtube": "CIrv9nZK8lo",
+"titre": "Ardarroch",
+"artiste": "Angus MacRae",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "RIKcI88LVys",
+"titre": "Edvard Munch",
+"artiste": "ASAM, The New Hippies",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lzWvUbkNt-g",
+"titre": "Mood",
+"artiste": "Danger",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "BoST3zQw8GI",
+"titre": "This is not the end",
+"artiste": "Oh Hiroshima",
+"genre": "rock-metal",
+"tags": [
+"rock-metal",
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "QPAMbFWwByU",
 "titre": "Tight",
 "artiste": "Kaskade, Madge",
@@ -19372,6 +20871,18 @@
 "genre": "synthwave",
 "tags": [
 "synthwave"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "uo6q8FmN2qs",
+"titre": "Waves",
+"artiste": "Panda Dub",
+"genre": "dub-reggae",
+"tags": [
+"dub-reggae"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19414,6 +20925,30 @@
 "mix": false
 },
 {
+"youtube": "zF_rAtoSOvQ",
+"titre": "Suspension",
+"artiste": "Blue Carbon",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "NOKCbY-uYSk",
+"titre": "Apex",
+"artiste": "Vijunns",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "MBGKQ_rloBA",
 "titre": "Healing",
 "artiste": "Free Flow Flava",
@@ -19432,6 +20967,42 @@
 "genre": "electro-pop",
 "tags": [
 "electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "4EKf969QnFk",
+"titre": "Champagne tastes different after the Gulag",
+"artiste": "Hot Sugar",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Ohlv6BQTvSA",
+"titre": "Amaranthine",
+"artiste": "Dan Caine, Musicformessier",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "WLlj0ytSYKI",
+"titre": "Futura Nova",
+"artiste": "Ministry of Ambience",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19486,12 +21057,48 @@
 "mix": false
 },
 {
+"youtube": "pb6I6AGZgOk",
+"titre": "Tones no3",
+"artiste": "CALM TRANSMISSIONS",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "bS1sIFA4ztc",
 "titre": "Alchemy",
 "artiste": "Robot Koch, Snakes of Russia",
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "7ZrD-z6Tbf4",
+"titre": "Distance",
+"artiste": "Mothra",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "VutEiUt0Kmo",
+"titre": "Sea",
+"artiste": "Mothra",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19523,6 +21130,42 @@
 "mix": false
 },
 {
+"youtube": "VHYA1niQw6o",
+"titre": "Oblivion",
+"artiste": "Hollowz, zmb.rchv",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "FMAAloInvbw",
+"titre": "Aura",
+"artiste": "Open Ocean",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "sv4Fs_RqGjU",
+"titre": "Peur",
+"artiste": "Sensitizer",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "2H5uWRjFsGc",
 "titre": "Tubthumping",
 "artiste": "Chumbawamba",
@@ -19548,9 +21191,45 @@
 "mix": false
 },
 {
+"youtube": "5YGMSw95S2w",
+"titre": "Tayutau",
+"artiste": "Pulse Mandala",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Nqfp0MLrfWQ",
 "titre": "Dendrometry",
 "artiste": "Klangphonics",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "v5cfCgpNgSs",
+"titre": "Patient Zero",
+"artiste": "Cosmo Vitelli",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "DLC_ncmyHek",
+"titre": "Solhverv",
+"artiste": "Sullen Sky",
 "genre": "ambient",
 "tags": [
 "ambient"
@@ -19616,6 +21295,30 @@
 "tags": [
 "hiphop",
 "chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "KPKK6SDrJt8",
+"titre": "Claims",
+"artiste": "Nuages",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "h1D2zGYRDhk",
+"titre": "New Horizons",
+"artiste": "Michele Nobler, Applefish",
+"genre": "trance-psy",
+"tags": [
+"trance-psy"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19719,6 +21422,30 @@
 "mix": false
 },
 {
+"youtube": "KnpRg4ZGOcc",
+"titre": "Fundament (Part 1)",
+"artiste": "Slim Vic, Plasmafuse",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_3IUjSgiC3U",
+"titre": "Broken",
+"artiste": "Yung City",
+"genre": "hiphop",
+"tags": [
+"hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Eb4M-mWTYKQ",
 "titre": "This One Is for You (Rip Dad)",
 "artiste": "Yung City",
@@ -19767,6 +21494,18 @@
 "mix": false
 },
 {
+"youtube": "hg7KTlU0h0E",
+"titre": "Les Indes Galantes",
+"artiste": "Jersey",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Lr7X2l_rr-w",
 "titre": "Magnetic Storm",
 "artiste": "Wojciech Golczewski",
@@ -19774,6 +21513,18 @@
 "tags": [
 "ost",
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "4FhTFj8NxTg",
+"titre": "Above The Euromechopolis",
+"artiste": "OGRE Sound",
+"genre": "synthwave",
+"tags": [
+"synthwave"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19806,6 +21557,42 @@
 "mix": false
 },
 {
+"youtube": "2UOg4zsMv4o",
+"titre": "wherever you hide, the party finds you",
+"artiste": "Iliona",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "q1JCMVg86M0",
+"titre": "NOVEMBRE13_",
+"artiste": "JoyCut",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "BGOvjNRYWk4",
+"titre": "Connection",
+"artiste": "Hakaisu",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Q3RCT5uDIsE",
 "titre": "Spinnerei",
 "artiste": "Planet Caravan",
@@ -19824,6 +21611,30 @@
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "5xsbFJ2QvJ0",
+"titre": "Lapis Lazuli",
+"artiste": "Suntapes",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "fOVYSkX7nl4",
+"titre": "From Yesler",
+"artiste": "Jonathan Warman",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19891,6 +21702,18 @@
 "mix": false
 },
 {
+"youtube": "yLxulqDx__o",
+"titre": "clocks",
+"artiste": "Koaraktor",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "SzM66axfl1M",
 "titre": "Sharkattack",
 "artiste": "Stupeflip",
@@ -19921,6 +21744,18 @@
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "orwt1m0naYw",
+"titre": "Espace",
+"artiste": "Le trottoir",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20019,6 +21854,18 @@
 "tags": [
 "house-techno",
 "neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "XV0le3Oav1o",
+"titre": "Je t'aime encore",
+"artiste": "Leo Roi",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20171,6 +22018,18 @@
 "mix": false
 },
 {
+"youtube": "F-kEXrem0mo",
+"titre": "Aufgabe - Remix",
+"artiste": "Herr Lang, Der Weltensegler",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "T3wyU0HM_Js",
 "titre": "Synthopia Prime",
 "artiste": "Gramatik, Luxas",
@@ -20178,6 +22037,31 @@
 "tags": [
 "funk-jazz",
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "yYWSh3YmhWY",
+"titre": "Beautiful",
+"artiste": "Scattle",
+"genre": "edm",
+"tags": [
+"edm"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "GmLVaulrTAA",
+"titre": "Gypsy Tax Fiddle Dub",
+"artiste": "Celtic Reggae Revolution",
+"genre": "dub-reggae",
+"tags": [
+"dub-reggae",
+"folk-world"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20244,12 +22128,36 @@
 "mix": false
 },
 {
+"youtube": "Mq8cbVgHsZI",
+"titre": "Homo Deus",
+"artiste": "Felsmann + Tiley",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "8tzvIJUgxAc",
 "titre": "Martins Jig",
 "artiste": "Soma Games",
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "BmM3s2x4XWs",
+"titre": "Hubris (feat. Deryn Cullen)",
+"artiste": "Aakaash Rao, Deryn Cullen",
+"genre": "epic",
+"tags": [
+"epic"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20298,6 +22206,43 @@
 "genre": "electro-melodique",
 "tags": [
 "electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "e-JBFjKrTj4",
+"titre": "Birdy Island - Kupla Remix",
+"artiste": "Howie Lee, Kupla",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique",
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "yCEyeipzcm8",
+"titre": "Winter",
+"artiste": "Ferven",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Ocw4slxbFmc",
+"titre": "The Anthill",
+"artiste": "Federico Bisozzi, Tomat",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20485,6 +22430,90 @@
 "mix": false
 },
 {
+"youtube": "SO3uCzWg-ck",
+"titre": "Rainy Night",
+"artiste": "Chillhop Guitar",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "prcSvU3AGvU",
+"titre": "Bus Fare",
+"artiste": "Jenova 7",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "aiN6qYwPMAw",
+"titre": "Duel With A Soul",
+"artiste": "A Forest Mighty Black",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "RwvGSiAI4VA",
+"titre": "Voy a Pararme",
+"artiste": "Juan Habitual",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "nNSfyzkAY-g",
+"titre": "The Quiet Life",
+"artiste": "Singularis",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ThKPap6c-Hg",
+"titre": "Summer Tape",
+"artiste": "The Cancel",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "CNnSuzq_x4U",
+"titre": "Roger against les machines",
+"artiste": "Boztown",
+"genre": "hiphop",
+"tags": [
+"hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "SgISwwhf708",
 "titre": "On the Boardwalk",
 "artiste": "Gramatik",
@@ -20583,6 +22612,18 @@
 "mix": false
 },
 {
+"youtube": "CdqIE2_zxyw",
+"titre": "Morgenfrisk",
+"artiste": "Der Waldläufer, Lauge",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "uHb_XPmFMnE",
 "titre": "Walkabout",
 "artiste": "Chelsea McGough",
@@ -20655,6 +22696,91 @@
 "mix": false
 },
 {
+"youtube": "vPBbxYwvsbA",
+"titre": "Watch Out for Puddles",
+"artiste": "Nathan Bianchi",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "rkghKpLRj18",
+"titre": "Hunt or Be Hunted - From \"The Witcher 3\"",
+"artiste": "The Pink Rabbit",
+"genre": "ost",
+"tags": [
+"ost",
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lr6rf3f949I",
+"titre": "TKATC",
+"artiste": "The Kids and the Cosmos, Message To Bears",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "t5OsVT_KK9k",
+"titre": "Can't Hide From Truth",
+"artiste": "Gothic Storm",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "MyeFhdwblJk",
+"titre": "The Way It Was - From \"The Last of Us\"",
+"artiste": "Not Tomorrow Night",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "nVKhhvgGOkI",
+"titre": "Wrong",
+"artiste": "Fall Therapy",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Efv2i6fPSK0",
+"titre": "What We Fight For",
+"artiste": "Lorenzo Ferrara",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "jjEuIvrunnw",
 "titre": "Ezio's Family - From \"Assassin's Creed 2\"",
 "artiste": "Anthony Hames",
@@ -20667,12 +22793,48 @@
 "mix": false
 },
 {
+"youtube": "yvt8965K6Gw",
+"titre": "1040 Ad",
+"artiste": "Daniel & Mikael Tjernberg",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "YG011LjiesE",
+"titre": "Night Sky",
+"artiste": "Kieldfal",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "HAGkPoysT7I",
 "titre": "Termination of Desires (From \"Genshin Impact\")",
 "artiste": "Rayden",
 "genre": "ost",
 "tags": [
 "ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "L7jrNXan3n8",
+"titre": "Frescobaldi's Toccata (Orchestral Session)",
+"artiste": "Rob Dougan",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20730,6 +22892,19 @@
 "mix": false
 },
 {
+"youtube": "OK5VoPQwJ_Y",
+"titre": "I - Live",
+"artiste": "KAUAN",
+"genre": "rock-metal",
+"tags": [
+"rock-metal",
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Q8_OrhM03IY",
 "titre": "Lapsenmuisto",
 "artiste": "KAUAN",
@@ -20749,6 +22924,18 @@
 "genre": "ost",
 "tags": [
 "ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Ee2Hu57gI-o",
+"titre": "Sleepless Wake",
+"artiste": "Alexandra Hamilton-Ayres",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20780,6 +22967,30 @@
 "mix": false
 },
 {
+"youtube": "cY9bSUsJ0w8",
+"titre": "ava_",
+"artiste": "DARK, The Surrealist",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "0QccE1qPsNQ",
+"titre": "4am",
+"artiste": "58918012",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "WW06F64uEjs",
 "titre": "Ogive II - Tribute to Erik Satie",
 "artiste": "Nhyx",
@@ -20804,12 +23015,36 @@
 "mix": false
 },
 {
+"youtube": "pTSCe64uO4s",
+"titre": "i miss the old days",
+"artiste": "Kyoshin",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "2Ek2zabUdxM",
 "titre": "Counter Attack Mankind",
 "artiste": "Feora",
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "S8WhAQY6QAo",
+"titre": "Grand Escape (Weathering With You)",
+"artiste": "Kayou. Beats",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20876,12 +23111,72 @@
 "mix": false
 },
 {
+"youtube": "T2mgjOpootY",
+"titre": "Pact II",
+"artiste": "Artisan",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "o3WU6GlOsE4",
+"titre": "The Fountain",
+"artiste": "Beautify Junkyards",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "XEhO0Z5UY-E",
+"titre": "A Long Time Ago",
+"artiste": "Anthony Lo Re",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "otIfSXYSy3w",
+"titre": "United",
+"artiste": "Noble Lummox",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "ggKg17gUmm0",
 "titre": "Griztronics II (Another Level)",
 "artiste": "GRiZ, Subtronics",
 "genre": "bass",
 "tags": [
 "bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "b_JSmT1mhhA",
+"titre": "Abysmal",
+"artiste": "Open Ocean",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20913,6 +23208,18 @@
 "mix": false
 },
 {
+"youtube": "yyHzNUZnzsw",
+"titre": "I Did It All",
+"artiste": "Junus Orca, Kamandi",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "mMYwnQIxEro",
 "titre": "Movement 3",
 "artiste": "SOFA, French 79, Benjamin Faugloire",
@@ -20931,6 +23238,30 @@
 "genre": "hard-edm",
 "tags": [
 "hard-edm"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "0ZZSXT-IbWc",
+"titre": "Atlaga",
+"artiste": "Stavros Zacharias",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "-k0xn_6Nx5Y",
+"titre": "Pipes",
+"artiste": "Varsity Star",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20961,12 +23292,96 @@
 "mix": false
 },
 {
+"youtube": "dL8mipU44jY",
+"titre": "Vogel Im Kafig",
+"artiste": "LBLVNC",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "waVAL9Tlqqo",
+"titre": "Winter Falls",
+"artiste": "Tryt0n",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "jWCiqrbLsKU",
+"titre": "Skogsljus",
+"artiste": "Syrus M. Schwartz",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "cWryv4yuBfE",
+"titre": "Orchid - Christine Remix",
+"artiste": "Dizkodeath",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "7XU8kjPELqI",
+"titre": "Somnambulant",
+"artiste": "First Light Circus",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "4JzZ5zqjAyQ",
+"titre": "Sooke",
+"artiste": "Jonathan Warman, Brightsand",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "H7azfIj4IDk",
 "titre": "In the Forest",
 "artiste": "Beautiful Death",
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "OqoQPtbSidw",
+"titre": "Northern Lights - Owsey Remix",
+"artiste": "Koresma, Owsey",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20988,6 +23403,18 @@
 "youtube": "AbKocWzdA60",
 "titre": "Climb Together",
 "artiste": "Audiomachine",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "a0Q_eJF9cOU",
+"titre": "New Dawn",
+"artiste": "Artur Kordas",
 "genre": "epic",
 "tags": [
 "epic"
@@ -21022,6 +23449,18 @@
 "mix": false
 },
 {
+"youtube": "W_rby0_wn9U",
+"titre": "It All Starts With You",
+"artiste": "Rémi Boubal",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "LFE7JeF56SY",
 "titre": "Dying Alone",
 "artiste": "Hammock",
@@ -21046,12 +23485,36 @@
 "mix": false
 },
 {
+"youtube": "ie4jPKeXMk4",
+"titre": "Moments We Shared",
+"artiste": "Borukon",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Q0mPTcDMez4",
 "titre": "Lucy, The God Of Time",
 "artiste": "Codly, Sakuzyo",
 "genre": "ost",
 "tags": [
 "ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "FPbuJJgZ6f8",
+"titre": "Stacy Mode",
+"artiste": "Garçons",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21095,6 +23558,18 @@
 "mix": false
 },
 {
+"youtube": "XAPtTatQozk",
+"titre": "No Clearings, No Wide Open Fields",
+"artiste": "Floor Overhead",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "H0Eo1qN-5I0",
 "titre": "Aesthetic",
 "artiste": "Enmarta",
@@ -21131,12 +23606,60 @@
 "mix": false
 },
 {
+"youtube": "DXvD2v2PusQ",
+"titre": "Breathe",
+"artiste": "Cheprox",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "WArTxjJ7CGM",
+"titre": "Ice Cream",
+"artiste": "Actium",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "P-WvHvrqiJ4",
+"titre": "Digital Delusion",
+"artiste": "Jimmy Svensson",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "pLmKuUSuJEE",
 "titre": "Holocene",
 "artiste": "Klangphonics, Anna Metko",
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "kgYPUGTwp9k",
+"titre": "The Nation",
+"artiste": "EMMX",
+"genre": "electronica",
+"tags": [
+"electronica"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21243,6 +23766,30 @@
 "mix": false
 },
 {
+"youtube": "d1OzkmH9xhY",
+"titre": "Event Horizon",
+"artiste": "Applefish",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "QVIgBKr_z0g",
+"titre": "running out of time",
+"artiste": "NON",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "yU0Vnmhgm2E",
 "titre": "Crew",
 "artiste": "Test Shot Starfish",
@@ -21250,6 +23797,18 @@
 "tags": [
 "bass",
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "q1Nb8l-5SmU",
+"titre": "Coquette",
+"artiste": "Kuoga., Ivy",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21268,9 +23827,57 @@
 "mix": false
 },
 {
+"youtube": "dseWxl8kDs8",
+"titre": "World Above",
+"artiste": "Noma",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "hTjscDyEnLo",
+"titre": "The Brook",
+"artiste": "Oils",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "gI59yNu7lVM",
+"titre": "Chase of the Forgotten Days",
+"artiste": "Emil Nilsson, Epic Music World",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "xO14yLi03IE",
 "titre": "Origin",
 "artiste": "Astera",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "0qbNikk4QUk",
+"titre": "Temple of Holographic Synergy",
+"artiste": "Pulse Mandala",
 "genre": "ambient",
 "tags": [
 "ambient"
@@ -21349,6 +23956,18 @@
 "genre": "pop-indie",
 "tags": [
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "esIBXqpPxtk",
+"titre": "i don't feel part of the world anymore",
+"artiste": "itssvd, CORBAL, Shiloh Dynasty",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21477,6 +24096,30 @@
 "mix": false
 },
 {
+"youtube": "pQVlwbdjbWQ",
+"titre": "Afterlife",
+"artiste": "WOODJU",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "AvY97V4Zufw",
+"titre": "cirrus",
+"artiste": "palence",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "5t7nOV5622g",
 "titre": "Floodgate",
 "artiste": "Ryan Teague",
@@ -21501,12 +24144,72 @@
 "mix": false
 },
 {
+"youtube": "oBd1wB3ujD8",
+"titre": "Barren",
+"artiste": "McLarnan",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "sr3htPkcJ2M",
+"titre": "Refugees - Frieder Nagel Rework",
+"artiste": "Laura Masotto, Roger Goula, Frieder Nagel",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "4aRQR5_vQTY",
+"titre": "Meditation on Elisa Window",
+"artiste": "Michele Nobler",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "eXD0IPa3Kdw",
+"titre": "Eros",
+"artiste": "YAN",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "zkb3Ppfj88Q",
 "titre": "Across the Shifting Abyss",
 "artiste": "Dahlia's Tear",
 "genre": "epic",
 "tags": [
 "epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Q8YvkFT_gUM",
+"titre": "Vanir",
+"artiste": "Matt Tondut, Javi Lobe",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21562,6 +24265,42 @@
 "mix": false
 },
 {
+"youtube": "8q1_PafrnGA",
+"titre": "Rose of Jericho",
+"artiste": "Within The Void",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "9KORQQ69OGg",
+"titre": "LIMBO",
+"artiste": "The Retuses",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "wCas2mTX1jU",
+"titre": "An Incoherent Meditation On A Fucked Up Year",
+"artiste": "What After This?",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "UxleVjH34qQ",
 "titre": "Doom",
 "artiste": "Imagine Music",
@@ -21574,9 +24313,33 @@
 "mix": false
 },
 {
+"youtube": "UiRpVX8s6lI",
+"titre": "I Saw a Ghost Last Night...",
+"artiste": "Leonell Cassio",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "8wTGz-cGjro",
 "titre": "13 Angels Standing Guard 'Round The Side Of Your Bed - Jody Wisternoff & James Grant Remix",
 "artiste": "Silver Mt. Zion, Jody Wisternoff, James Grant",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "xQS1Vb5PfPI",
+"titre": "Reborn",
+"artiste": "Cihangir Aslan",
 "genre": "electronica",
 "tags": [
 "electronica"
@@ -21598,6 +24361,18 @@
 "mix": false
 },
 {
+"youtube": "7XVFzmchZ1Q",
+"titre": "Gods of the Artificial",
+"artiste": "GHOST DATA",
+"genre": "synthwave",
+"tags": [
+"synthwave"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "MTCxFpiz2b4",
 "titre": "Lettre à mon ex",
 "artiste": "KIK",
@@ -21610,12 +24385,120 @@
 "mix": false
 },
 {
+"youtube": "L4GdW4lqPGA",
+"titre": "Khnum (feat. Earthlinger)",
+"artiste": "Caster, Earthlinger",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "5bieOfjDmrE",
+"titre": "Cycles",
+"artiste": "Matt Tondut, Dear Gravity",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "8qS6MGJEXBg",
+"titre": "Down",
+"artiste": "RandBox",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "wYmW-WKJ1Pk",
 "titre": "The Peerless Pool",
 "artiste": "The Hardy Tree",
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "U1lri6k9GKg",
+"titre": "Greenpath",
+"artiste": "TPR",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "SYoZDzv9H9c",
+"titre": "Far out",
+"artiste": "Lunar Ship",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ozFztsecU30",
+"titre": "Seeking Solace",
+"artiste": "Arcane",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "v0T4hg9Tdks",
+"titre": "Lost",
+"artiste": "briantdream",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "1vORdtTDfKs",
+"titre": "Isolator",
+"artiste": "Death Stare",
+"genre": "bass",
+"tags": [
+"bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "nL-JKftCo08",
+"titre": "Life On Tape",
+"artiste": "Freya Arde, Jens Heuler",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21646,12 +24529,60 @@
 "mix": false
 },
 {
+"youtube": "SvRSA4PTnk0",
+"titre": "My Birthday Suit",
+"artiste": "Hexsystem",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "m69jjBMfuuo",
 "titre": "Kinetic Theory",
 "artiste": "Martin Rott",
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "aPLObJKah40",
+"titre": "Streetlight",
+"artiste": "Tokari",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "mlYEx7-PxUY",
+"titre": "Rebirth",
+"artiste": "AVI-AVI",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "DdLAxsOKuiQ",
+"titre": "Ocean Waves - Instrumental Mix",
+"artiste": "Coffee Date, QORA",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21670,6 +24601,18 @@
 "mix": false
 },
 {
+"youtube": "zMeFpTok7C0",
+"titre": "Connected Mind",
+"artiste": "Fractal Man",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Wmjpp0_6kb0",
 "titre": "Look At Me!",
 "artiste": "XXXTENTACION",
@@ -21682,12 +24625,96 @@
 "mix": false
 },
 {
+"youtube": "yBQBnayt1nI",
+"titre": "Dream//Expanse",
+"artiste": "Superposition",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "h63NteO7mxs",
 "titre": "The Voyage",
 "artiste": "Thurnin",
 "genre": "ost",
 "tags": [
 "ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "8LeW6i5XA7Q",
+"titre": "Pressure",
+"artiste": "58918012",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "qnxoSPaft0Y",
+"titre": "Séance",
+"artiste": "Saucy, Christopher Larkin",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "8qJaYY7tQEQ",
+"titre": "Kosmic Headroom",
+"artiste": "Poulson Sq.",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "cdJHY1B5Nmg",
+"titre": "Bramble Cottage",
+"artiste": "Foxwood",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "MoC8cGdKkdY",
+"titre": "Can I Hold You Anymore?",
+"artiste": "Laura Escudé, Jamie Lidell",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "sLfyalpNtUU",
+"titre": "21 Hands II",
+"artiste": "Alfonso Peduto",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21881,6 +24908,30 @@
 "mix": false
 },
 {
+"youtube": "Wj2khaMPtp8",
+"titre": "Intro",
+"artiste": "SEB",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ZfysszbLLRE",
+"titre": "Valkyr's Demise",
+"artiste": "Opus Overtone",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Bd-s3PArA8U",
 "titre": "The Anatomy of Clouds (Yann Tiersen Remix)",
 "artiste": "Michael Price, Yann Tiersen",
@@ -21906,6 +24957,66 @@
 "mix": false
 },
 {
+"youtube": "S6X9hCy9xHU",
+"titre": "Light in the Attic",
+"artiste": "Erasmus Talbot",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "j621vrq6KVk",
+"titre": "The Right to Destroy Myself",
+"artiste": "OKADA",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "oY8U6W600h4",
+"titre": "Theo",
+"artiste": "Fraunhofer Diffraction",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "6_XtHpSLNcg",
+"titre": "wait for me",
+"artiste": "jives",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "nfWjU45fp4w",
+"titre": "Menu - Limbo Orchestrated",
+"artiste": "Variable Star, Martin Stig Andersen",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "RgLFVbdltFM",
 "titre": "Gone Now",
 "artiste": "Carpenter Brut, Pencey Sloe",
@@ -21918,9 +25029,33 @@
 "mix": false
 },
 {
+"youtube": "IKK9XZwrMqQ",
+"titre": "PTSD",
+"artiste": "Mujuice",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "kCkT5F7q234",
 "titre": "Repetition",
 "artiste": "Max Cooper",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "mYk4yrA7mSM",
+"titre": "Faces",
+"artiste": "Alex Yarmak",
 "genre": "electronica",
 "tags": [
 "electronica"
@@ -21954,6 +25089,30 @@
 "mix": false
 },
 {
+"youtube": "Yn7hb0OtQvA",
+"titre": "Terminus",
+"artiste": "meganeko",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "PwtUD_cL5vA",
+"titre": "Tide",
+"artiste": "Eelke Kleijn",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "SbjgkxDds2c",
 "titre": "Tant qu'on aura de l'amour",
 "artiste": "Les Cowboys Fringants",
@@ -21961,6 +25120,30 @@
 "tags": [
 "folk-world",
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "1IUNz7tzkZs",
+"titre": "Dawn",
+"artiste": "Human Is Alive",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "43NCob2tIUI",
+"titre": "Traversed",
+"artiste": "Be Still the Earth",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22030,12 +25213,36 @@
 "mix": false
 },
 {
+"youtube": "cTUHJqUVYWM",
+"titre": "Circle 10",
+"artiste": "Foam and Sand",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "uP9-0roszFc",
 "titre": "Roman Empire - (Stripped) [Instrumental]",
 "artiste": "MISSIO",
 "genre": "pop-indie",
 "tags": [
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "z_RjNw3LaG4",
+"titre": "Cyber Fire",
+"artiste": "Vosto",
+"genre": "synthwave",
+"tags": [
+"synthwave"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22060,6 +25267,18 @@
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "-QYc50r80JE",
+"titre": "Contorted Figures",
+"artiste": "Arigto",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22104,6 +25323,18 @@
 "mix": false
 },
 {
+"youtube": "rml4VQB8qL4",
+"titre": "A Call to Prayer",
+"artiste": "Estas Tonne, Zola Dubnikova",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "wLBR9Gf6o0M",
 "titre": "Europa, Pt. 1 - Max Cooper Remix",
 "artiste": "Jim Wallis, Max Cooper",
@@ -22122,6 +25353,30 @@
 "genre": "electro-melodique",
 "tags": [
 "electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "hEuLLOL83Ps",
+"titre": "Genesis",
+"artiste": "David A. Molina",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "E16mqJJHQ9c",
+"titre": "purple",
+"artiste": "this valve controls",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22176,6 +25431,18 @@
 "mix": false
 },
 {
+"youtube": "DJ8JFA9O0Jo",
+"titre": "God's Country",
+"artiste": "Feral",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "a4tOGMxBLpQ",
 "titre": "Comptine d'un autre été l'après-midi",
 "artiste": "Lofi Fruits Music, Chill Fruits Music",
@@ -22183,6 +25450,18 @@
 "tags": [
 "chill",
 "neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "NwGNQzUEJ5c",
+"titre": "Spaziergang im All",
+"artiste": "Deorbiting",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22225,9 +25504,33 @@
 "mix": false
 },
 {
+"youtube": "N3DUO0D7WQA",
+"titre": "Danke für nichts",
+"artiste": "Elènne",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "WiYDkWq_Wtk",
 "titre": "Daughter",
 "artiste": "Subheim, Hecq",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "mIVoxqJsUIk",
+"titre": "Cold, Sweater (Rework Iday)",
+"artiste": "Ihar Komar, iday",
 "genre": "ambient",
 "tags": [
 "ambient"
@@ -22261,12 +25564,72 @@
 "mix": false
 },
 {
+"youtube": "ktolOuCqVZY",
+"titre": "Chronon",
+"artiste": "Lotte Pen",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "fTfMDb93d6Y",
 "titre": "Medela",
 "artiste": "Ben Lukas Boysen",
 "genre": "neoclassique",
 "tags": [
 "neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lNXlxFOJI4k",
+"titre": "Space and Subconscious",
+"artiste": "Carbon Killer",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "FM4cRlGxH4M",
+"titre": "Departure",
+"artiste": "Matt Tondut, Brightsand",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "kAt9_JUnoO8",
+"titre": "Alive",
+"artiste": "Mansij, Max B Groove",
+"genre": "house-techno",
+"tags": [
+"house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "1ziocJnC6Xc",
+"titre": "Opa Gäärd",
+"artiste": "Melokind",
+"genre": "folk-world",
+"tags": [
+"folk-world"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22303,6 +25666,18 @@
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "zLPMlwhaHUM",
+"titre": "Bloom",
+"artiste": "SPEECHLESS, liliomsaal",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22364,6 +25739,31 @@
 "genre": "french-touch",
 "tags": [
 "french-touch"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "xjiZ9Osmusw",
+"titre": "Forest Choir",
+"artiste": "Aether",
+"genre": "folk-world",
+"tags": [
+"folk-world",
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "a_-7iiNbzEQ",
+"titre": "Dreamcatcher",
+"artiste": "Solar Heavy",
+"genre": "electronica",
+"tags": [
+"electronica"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22443,12 +25843,132 @@
 "mix": false
 },
 {
+"youtube": "Ur-TmhKv8vs",
+"titre": "Mist",
+"artiste": "Blumerle",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "q5dUNiFIEfQ",
+"titre": "September Rain",
+"artiste": "Michelle Qureshi",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Glm9tdh4K9s",
+"titre": "Dune",
+"artiste": "Project Divinity",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "rDQLCTT8FjY",
+"titre": "Red Wine",
+"artiste": "Hiyo",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "EQo1aPDR5Ug",
+"titre": "Recuerdos del Futuro",
+"artiste": "Ishtarka",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lBiGYHRj_sA",
+"titre": "Places",
+"artiste": "Nuages",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "QMEQyLDBruk",
+"titre": "Minecraft",
+"artiste": "SØLYS",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "mHJTYNA6b-I",
 "titre": "Aura",
 "artiste": "Wojciech Golczewski",
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ji1-u_oCxHk",
+"titre": "Emerge - Message to Bears Reinterpretation",
+"artiste": "Liam J Hennessy, Message To Bears",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "pn0bxEsrL0A",
+"titre": "36 Hours",
+"artiste": "Lisandro Rodríguez",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": true
+},
+{
+"youtube": "X4THWCLjORI",
+"titre": "Streams and Puddles",
+"artiste": "Celestial Aeon Project",
+"genre": "ost",
+"tags": [
+"ost"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22485,6 +26005,30 @@
 "genre": "house-techno",
 "tags": [
 "house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "KfSyXiOrojw",
+"titre": "Ukiyo",
+"artiste": "Ferven",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "UREJHiIGsgI",
+"titre": "Daybreak",
+"artiste": "Kennedy One",
+"genre": "electronica",
+"tags": [
+"electronica"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22545,6 +26089,18 @@
 "genre": "folk-world",
 "tags": [
 "folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "LILj9AbaH-g",
+"titre": "Cyberpunk 2077 Kerrys Song - TFM Remix",
+"artiste": "The Flaming Maniac",
+"genre": "synthwave",
+"tags": [
+"synthwave"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22625,6 +26181,18 @@
 "mix": false
 },
 {
+"youtube": "mLLcwKTdCxk",
+"titre": "Soft you",
+"artiste": "Mounika.",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "xRQoS_YLhk8",
 "titre": "Hope",
 "artiste": "Genamusic",
@@ -22668,6 +26236,18 @@
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "gz05MgcBLoM",
+"titre": "Some Things I've Been Thinking About Lately",
+"artiste": "Fine-Sir-1584660650",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22734,6 +26314,42 @@
 "mix": false
 },
 {
+"youtube": "_p4ZoN_eTUE",
+"titre": "Confrontation",
+"artiste": "Bastian Benjamin",
+"genre": "epic",
+"tags": [
+"epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ttXakiQFcD0",
+"titre": "Harbor",
+"artiste": "Broken Peak",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_u8VdOFDEW8",
+"titre": "Hanakoa",
+"artiste": "Remi Solati",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "pKTmas8mL5M",
 "titre": "La révolution - Main Theme",
 "artiste": "Saycet",
@@ -22752,6 +26368,30 @@
 "genre": "edm",
 "tags": [
 "edm"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "CdUiiNf0ytg",
+"titre": "Views",
+"artiste": "Else",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "lMcMtsaZ6TY",
+"titre": "Hanamachi Girl",
+"artiste": "Masa Takumi",
+"genre": "funk-jazz",
+"tags": [
+"funk-jazz"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22892,6 +26532,18 @@
 "mix": false
 },
 {
+"youtube": "jP661MP9fs4",
+"titre": "Mirror Dub",
+"artiste": "Vibronics",
+"genre": "dub-reggae",
+"tags": [
+"dub-reggae"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "KQT32vW61eI",
 "titre": "Mystery of Love",
 "artiste": "Sufjan Stevens",
@@ -22919,6 +26571,18 @@
 "youtube": "3t6Nhr5444I",
 "titre": "Have a Great Day",
 "artiste": "Christophe Beck",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "xNjpRiPviIM",
+"titre": "Tony!",
+"artiste": "Brooke Blair, Will Blair",
 "genre": "ost",
 "tags": [
 "ost"
@@ -23014,6 +26678,42 @@
 "mix": false
 },
 {
+"youtube": "l9f7XFJg_jw",
+"titre": "Feel",
+"artiste": "Lauge, Sensitizer",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "SDSir-sCLEo",
+"titre": "Ice Fishing Alone",
+"artiste": "Andy Salvanos",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "vyozSWjn-7M",
+"titre": "Hibernation Station",
+"artiste": "Hilyard",
+"genre": "chill",
+"tags": [
+"chill"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Fx1FEwtcXXo",
 "titre": "Nara",
 "artiste": "Sofiane Pamart",
@@ -23032,6 +26732,18 @@
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ZQ6zsh-K4ZY",
+"titre": "Alone",
+"artiste": "Raz",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -23099,6 +26811,18 @@
 "mix": false
 },
 {
+"youtube": "1hB0Bn_J5ic",
+"titre": "Hollowed Out",
+"artiste": "Like Saturn",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "5IR4x-5eyE4",
 "titre": "Optimistic Nihilism",
 "artiste": "Epic Mountain",
@@ -23147,6 +26871,18 @@
 "mix": false
 },
 {
+"youtube": "e_uaKOxRPvE",
+"titre": "Underwater",
+"artiste": "Human Is Alive",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "wn06Qkd4XHI",
 "titre": "Stjernestøv",
 "artiste": "AURORA",
@@ -23166,6 +26902,30 @@
 "genre": "pop-indie",
 "tags": [
 "pop-indie",
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_gFKRDyfK0I",
+"titre": "Peace",
+"artiste": "Human Is Alive",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "QqQVjTruOmQ",
+"titre": "Light Trails",
+"artiste": "Ken Verheecke",
+"genre": "ambient",
+"tags": [
 "ambient"
 ],
 "source": "spotify",
@@ -23217,6 +26977,18 @@
 "tags": [
 "house-techno",
 "neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "XWTDkIBu9V8",
+"titre": "Je t'aime à l'envers",
+"artiste": "QQUN",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -23394,6 +27166,18 @@
 "mix": false
 },
 {
+"youtube": "4uOC0B81m-k",
+"titre": "Heroes & Legends",
+"artiste": "Nhyx",
+"genre": "electronica",
+"tags": [
+"electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "yrKQIIcfzys",
 "titre": "Breathe In",
 "artiste": "Rone, Yael Naim",
@@ -23425,6 +27209,18 @@
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "xMur_be7DIY",
+"titre": "Barrowburn",
+"artiste": "Kieldfal",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -23721,8 +27517,32 @@
 "mix": false
 },
 {
+"youtube": "o5l-aR2YIW4",
+"titre": "Through Fire For You",
+"artiste": "Frida Johansson, Henrik Oja",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "oWTwTzcB2V0",
 "titre": "Crash and Burn Again",
+"artiste": "Frida Johansson, Henrik Oja",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "DlHcIBU3p7k",
+"titre": "Grind Down",
 "artiste": "Frida Johansson, Henrik Oja",
 "genre": "electro-pop",
 "tags": [
@@ -23829,6 +27649,30 @@
 "mix": false
 },
 {
+"youtube": "ZNMX8OLKms8",
+"titre": "Sleeping Woods",
+"artiste": "Broken Peak",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "infRVocuAQg",
+"titre": "The Faint Glimmer of Light Reminds Me You're Still Here",
+"artiste": "Good Weather For An Airstrike",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "wcE8gsrmLu8",
 "titre": "House Atreides",
 "artiste": "Hans Zimmer",
@@ -23860,6 +27704,18 @@
 "genre": "pop-indie",
 "tags": [
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "Jx5paCPl5xw",
+"titre": "Parkbench",
+"artiste": "Dear Gravity",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -23938,6 +27794,30 @@
 "mix": false
 },
 {
+"youtube": "pQHLDv8LqHI",
+"titre": "Please Stay",
+"artiste": "Matt Tondut, Good Weather For An Airstrike",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "RXbCHbd6Xjk",
+"titre": "Falling, Slowly",
+"artiste": "Antarctic Wastelands, Manuel Zito",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "jEMtTnSvsKw",
 "titre": "End of Time",
 "artiste": "K-391, Alan Walker, Ahrix",
@@ -23992,6 +27872,18 @@
 "genre": "pop-indie",
 "tags": [
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "iPY3ENEroCg",
+"titre": "A Wall Made of Air",
+"artiste": "Wreath",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
