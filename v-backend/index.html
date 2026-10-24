@@ -885,7 +885,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 8';
+const BUILD = 'v-backend 24 oct, 9';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -900,11 +900,11 @@ function construireMusique(D) {
   const f = $('#filtres'); f.textContent = '';
   [null, ...M.genresOrdre].forEach(gn => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = gn ? `${gn} (${cnt[gn]})` : 'Tous'; b.setAttribute('aria-pressed', String(gn === M.genreFiltre));
-    b.addEventListener('click', () => { M.genreFiltre = gn; M.montre = PAGE; [...f.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); reconstruire(null); hasard(); });
+    b.addEventListener('click', () => { M.genreFiltre = gn; M.montre = PAGE; [...f.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); reconstruire(M.cur, true); });
     f.appendChild(b);
   });
-  $('#q').addEventListener('input', e => { M.q = e.target.value; M.montre = PAGE; reconstruire(null); });
-  $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(null); });
+  $('#q').addEventListener('input', e => { M.q = e.target.value; M.montre = PAGE; reconstruire(M.cur, true); });
+  $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(M.cur, true); });
   M.alea = !!mem.lire('alea', false); $('#alea').setAttribute('aria-pressed', String(M.alea));
   $('#alea').addEventListener('click', e => { M.alea = !M.alea; e.currentTarget.setAttribute('aria-pressed', String(M.alea)); mem.ecrire('alea', M.alea); });
   $('#aPrec').addEventListener('click', () => afficherPage(M.page - 1));
@@ -937,12 +937,13 @@ function afficherPage(page) {   // un anneau = une « page » de N_ANNEAU titres
   $('#aInfo').textContent = `Anneau ${M.page + 1} / ${pages} · titres ${M.page * N_ANNEAU + 1}–${Math.min(n, (M.page + 1) * N_ANNEAU)} sur ${n}`;
   $('#aPrec').disabled = M.page <= 0; $('#aSuiv').disabled = M.page >= pages - 1;
 }
-function reconstruire(courant) {   // liste filtrée recalculée ; l'anneau affiche la page qui contient le titre courant
+function reconstruire(courant, garder) {   // liste filtrée recalculée ; « garder » = ne pas toucher au titre en cours de lecture (changement de filtre ou de vue)
   M.liste = liste();
   const i = courant ? M.liste.indexOf(courant) : -1;
-  M.cur = i >= 0 ? courant : null;
+  if (!garder) M.cur = i >= 0 ? courant : null;
   afficherPage(i >= 0 ? Math.floor(i / N_ANNEAU) : 0);
   tableau();
+  if (garder) { if (!M.cur && M.D.titres.length) choisir(0, true); return; }
   if (M.D.titres.length) choisir(i >= 0 ? M.D.titres.indexOf(courant) : 0, true);
   else { M.cur = null; $('#ecTitre').textContent = 'Aucun titre'; $('#ecArtiste').textContent = ''; $('#lTitre').textContent = 'Aucun titre'; $('#lArtiste').textContent = ''; }
 }
@@ -1052,18 +1053,18 @@ function majSelecteur() {
   sel.value = M.vue || '';
   $('#plRen').hidden = $('#plSup').hidden = !M.vue;
 }
-function changerVue(nom) { M.vue = nom && M.pl[nom] ? nom : null; M.montre = PAGE; sauverPl(); majSelecteur(); reconstruire(M.cur); }
+function changerVue(nom) { M.vue = nom && M.pl[nom] ? nom : null; M.montre = PAGE; sauverPl(); majSelecteur(); reconstruire(M.cur, true); }
 function nomLibre(base) { let n = base, k = 2; while (M.pl[n]) n = `${base} (${k++})`; return n; }
 function creerPl(nom) { nom = (nom || '').trim().slice(0, 80); if (!nom) return null; nom = nomLibre(nom); M.pl[nom] = []; sauverPl(); return nom; }
 function ajouterA(nom, tr) {
   const l = M.pl[nom]; if (!l) return;
   if (l.includes(tr.youtube)) { mlg(`« ${tr.titre} » est déjà dans « ${nom} ».`); return; }
   l.push(tr.youtube); sauverPl(); majSelecteur(); mlg(`Ajouté à « ${nom} ».`);
-  if (M.vue === nom) reconstruire(M.cur);
+  if (M.vue === nom) reconstruire(M.cur, true);
 }
 function retirerDe(nom, tr) {
   M.pl[nom] = (M.pl[nom] || []).filter(i => i !== tr.youtube); sauverPl(); majSelecteur(); mlg(`Retiré de « ${nom} ».`);
-  if (M.vue === nom) reconstruire(M.cur === tr ? null : M.cur);
+  if (M.vue === nom) reconstruire(M.cur, true);
 }
 function fermerMenu() { $('#menuPl').hidden = true; }
 function ouvrirMenu(ancre, tr) {
@@ -1086,11 +1087,11 @@ function initPlaylists() {
   $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) changerVue(n); });
   $('#plRen').addEventListener('click', () => {
     const ancien = M.vue; if (!ancien) return; const n = (prompt('Nouveau nom ?', ancien) || '').trim().slice(0, 80); if (!n || n === ancien) return;
-    const nom = M.pl[n] ? nomLibre(n) : n; const nouv = {}; Object.keys(M.pl).forEach(k => { nouv[k === ancien ? nom : k] = M.pl[k]; }); M.pl = nouv; M.vue = nom; sauverPl(); majSelecteur(); reconstruire(M.cur);
+    const nom = M.pl[n] ? nomLibre(n) : n; const nouv = {}; Object.keys(M.pl).forEach(k => { nouv[k === ancien ? nom : k] = M.pl[k]; }); M.pl = nouv; M.vue = nom; sauverPl(); majSelecteur(); reconstruire(M.cur, true);
   });
   $('#plSup').addEventListener('click', () => {
     const nom = M.vue; if (!nom || !confirm(`Supprimer la playlist « ${nom} » ? (les morceaux restent dans la bibliothèque)`)) return;
-    delete M.pl[nom]; M.vue = null; sauverPl(); majSelecteur(); M.montre = PAGE; reconstruire(M.cur);
+    delete M.pl[nom]; M.vue = null; sauverPl(); majSelecteur(); M.montre = PAGE; reconstruire(M.cur, true);
   });
   $('#plSauve').addEventListener('click', () => {
     if (!M.liste.length) { mlg('La liste affichée est vide.'); return; }
