@@ -193,8 +193,15 @@ tr.cache{display:none}
 .lect-prog-boite{padding:12px 0;cursor:pointer;touch-action:none}
 .mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .mus-gauche,.filtres,.mus-outils{min-width:0;max-width:100%}
-.ec-titre{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;max-width:100%}
-@media (min-width:761px){.platine{width:min(380px,max(220px,calc(100svh - 600px)))}}
+.ec-titre{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;max-width:100%;font-size:clamp(13px,1.15vw,19px);letter-spacing:.12em}
+@media (min-width:761px){.platine{width:min(100%,460px,max(240px,calc(100svh - 330px)))}}
+.mus-corps{padding-top:0}
+.mus-corps .filtres{flex-wrap:wrap;overflow:visible;gap:6px 8px;margin:0 0 10px;padding:0}
+.mus-corps .filtres button{min-height:32px;padding:3px 11px;font-size:15px}
+.mus-corps .mus-outils{margin:0 0 14px}
+.pistes{font-size:clamp(16px,14px + .45vw,21px)}
+.pistes td{padding-top:.08em;padding-bottom:.08em}
+.pistes .p-titre{width:46%}.pistes .p-artiste{width:30%}.pistes .p-genre{width:16%}
 .plus{margin:16px 0;min-height:44px;padding:8px 18px;background:var(--nuit);color:var(--ink)}
 .lect-note{grid-column:1/-1;font-size:var(--t-small);color:var(--acier);margin-top:-6px}
 .lect-yt{color:var(--acier);white-space:nowrap}
@@ -284,13 +291,6 @@ tr.cache{display:none}
           <h2 id="mus-titre" data-entree style="--d:0">Musique</h2>
           <p id="mus-chapeau" data-entree style="--d:1">Mes favoris, rangés par genre. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.</p>
         </div>
-        <div class="filtres" id="filtres" role="group" aria-label="Filtrer par genre" data-entree style="--d:2"></div>
-        <div class="mus-outils" data-entree style="--d:2">
-          <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
-          <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
-          <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
-          <button id="melange" type="button">Mélanger l’anneau</button>
-        </div>
         <div class="platine" id="platineBoite" data-entree style="--d:2">
           <canvas id="platine" role="img" aria-label="Anneau de la playlist : une cellule par titre, la cellule allumée est le titre en cours"></canvas>
           <div class="moyeu" aria-live="polite"><p class="ec-titre" id="ecTitre"></p><p class="ec-artiste" id="ecArtiste"></p></div>
@@ -314,6 +314,13 @@ tr.cache{display:none}
         </div>
       </div>
       <div class="mus-corps">
+        <div class="filtres" id="filtres" role="group" aria-label="Filtrer par genre" data-entree style="--d:2"></div>
+        <div class="mus-outils" data-entree style="--d:2">
+          <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
+          <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
+          <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
+          <button id="melange" type="button">Mélanger l’anneau</button>
+        </div>
         <table class="pistes">
           <caption class="vh">Les titres</caption>
           <thead class="vh"><tr><th scope="col">Titre</th><th scope="col">Artiste</th><th scope="col">Genre</th><th scope="col">Lien</th></tr></thead>
@@ -1015,7 +1022,7 @@ function celluleSous(e) {
 }
 platCv.addEventListener('pointermove', e => { M.survol = celluleSous(e); platCv.style.cursor = M.survol >= 0 ? 'pointer' : 'default'; platCv.title = M.survol >= 0 ? `${M.D.titres[M.survol].titre} · ${M.D.titres[M.survol].artiste}` : ''; });
 platCv.addEventListener('pointerleave', () => { M.survol = -1; });
-platCv.addEventListener('click', e => { const i = celluleSous(e); if (i >= 0) choisir(i); });
+platCv.addEventListener('click', e => { const i = celluleSous(e); if (i >= 0) lancer(M.D.titres[i]); });
 function avancerLecture(dt) {
   if (!M.D) return;
   let f = 0;
