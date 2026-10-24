@@ -608,7 +608,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const BAT = 60 / 72;            // un temps à 72 BPM = 0,833 s
 const FIN = 15;                 // durée de l'intro
 const P = new URLSearchParams(location.search);
-const T_FIXE = P.has('t') ? parseFloat(P.get('t')) : null;
+const T_FIXE = P.has('t') && !P.has('ajout') ? parseFloat(P.get('t')) : null;   // ?t=6 fige l'intro (test) ; ignoré quand le favori « + Site » envoie un titre
 const mqReduit = matchMedia('(prefers-reduced-motion: reduce)');
 let REDUIT = mqReduit.matches;
 
@@ -1117,7 +1117,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 51';
+const BUILD = 'v-backend 24 oct, 52';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1130,8 +1130,8 @@ const ID_YT = /^[\w-]{11}$/;
 const lireAjouts = () => { const a = mem.lire('ajouts', []); return Array.isArray(a) ? a.filter(x => x && ID_YT.test(String(x.youtube)) && typeof x.titre === 'string') : []; };
 function recevoirAjout(D) {   // le favori ouvre le site avec ?ajout=ID&t=titre&c=chaîne : on range le titre puis on nettoie l'adresse
   const p = new URLSearchParams(location.search), id = p.get('ajout'); if (id === null) return '';
-  const titre = (p.get('t') || 'Sans titre').slice(0, 200), chaine = (p.get('c') || '').slice(0, 100);
-  ['ajout', 't', 'c'].forEach(k => p.delete(k)); history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
+  const titre = (p.get('ajt') || p.get('t') || 'Sans titre').slice(0, 200), chaine = (p.get('ajc') || p.get('c') || '').slice(0, 100);
+  ['ajout', 'ajt', 'ajc', 't', 'c'].forEach(k => p.delete(k)); history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
   if (!ID_YT.test(id)) return 'Adresse de vidéo invalide : rien ajouté.';
   if (D.titres.some(t => t.youtube === id)) return `Déjà dans ta bibliothèque : ${titre}`;
   const l = lireAjouts(); if (l.some(x => x.youtube === id)) return `Déjà dans « À ajouter » : ${titre}`;
@@ -1150,8 +1150,8 @@ function codeFavori() {   // le favori : lit l'adresse et le titre de la page Yo
     "if(/youtube\\.com|youtu\\.be/.test(h)){var m=u.match(/[?&]v=([\\w-]{11})/)||u.match(/youtu\\.be\\/([\\w-]{11})/);" +
     "if(!m){alert('Pas de vidéo sur cette page.');return}" +
     "var c='';try{c=(document.querySelector('ytd-video-owner-renderer #channel-name a')||{}).textContent||''}catch(e){}" +
-    "t=t.replace(/^\\(\\d+\\)\\s*/,'').replace(/\\s*-\\s*YouTube$/,'');" +
-    "window.open(b+'?vue=musique&ajout='+m[1]+'&t='+encodeURIComponent(t)+'&c='+encodeURIComponent(c.trim()))}" +
+    "var h1=document.querySelector('ytd-watch-metadata h1');t=(h1&&h1.textContent.trim())||t.replace(/^\\(\\d+\\)\\s*/,'').replace(/\\s*-\\s*YouTube$/,'');" +
+    "window.open(b+'?vue=musique&ajout='+m[1]+'&ajt='+encodeURIComponent(t)+'&ajc='+encodeURIComponent(c.trim()))}" +
     "else if(/spotify\\.com/.test(h)){t=t.replace(/\\s*\\|\\s*Spotify$/,'').replace(/\\s*[-–]\\s*(Titre, paroles et vidéo de|song and lyrics by|Song, Lyrics, and Music Video by)\\s*/i,' ');" +
     "window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(t))}" +
     "else{alert('Ouvre une vidéo YouTube ou un titre Spotify.')}})()";
@@ -1196,7 +1196,7 @@ function ouvrirAj() {
   const w = pn.offsetWidth; pn.style.top = Math.round(b.bottom + 8) + 'px'; pn.style.left = Math.max(8, Math.min(Math.round(b.left), innerWidth - w - 8)) + 'px';
 }
 function initAjouts(msg) {
-  majAjBtn(); if (msg) { mlg(msg); M.infoAj = msg; ouvrirAj(); }   // le message s'affiche aussi en haut du panneau, ouvert tout de suite
+  majAjBtn(); if (msg) { mlg(msg); M.infoAj = msg; const att = setInterval(() => { if ($('#musique').classList.contains('active')) { clearInterval(att); setTimeout(ouvrirAj, 700); } }, 250); setTimeout(() => clearInterval(att), 8000); }   // le message s'affiche aussi en haut du panneau, ouvert tout de suite
   $('#ajBtn').addEventListener('click', () => { $('#ajPanneau').hidden ? ouvrirAj() : fermerAj(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#ajPanneau').hidden) fermerAj(); });
   document.addEventListener('pointerdown', e => { const pn = $('#ajPanneau'); if (!pn.hidden && !pn.contains(e.target) && e.target !== $('#ajBtn')) fermerAj(); });
