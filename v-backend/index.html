@@ -1132,7 +1132,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 59';
+const BUILD = 'v-backend 24 oct, 60';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1540,7 +1540,7 @@ function dessinerMix() {
     li.querySelector('.pan-n').textContent = String(i + 1); li.querySelector('.pan-vig').src = 'https://i.ytimg.com/vi/' + encodeURIComponent(it.youtube) + '/mqdefault.jpg';
     li.querySelector('b').textContent = it.titre || '…'; li.querySelector('i').textContent = it.artiste || '';
     if (it.bloque) {
-      li.classList.add('bloque');
+      li.classList.add('bloque'); li.querySelector('.mx-c').style.visibility = 'hidden';   // inutile d'ajouter à sa bibliothèque un titre qu'on ne pourra pas lire ici
       const a = document.createElement('a'); a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(it.youtube); a.target = '_blank'; a.rel = 'noopener'; a.textContent = ' · Écouter sur YouTube ↗';
       a.addEventListener('click', e => e.stopPropagation()); a.addEventListener('pointerdown', e => e.stopPropagation()); li.querySelector('i').appendChild(a);
     }
