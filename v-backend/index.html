@@ -118,6 +118,9 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .tableau .action:not(.entrer){padding-left:0;text-decoration:underline;text-underline-offset:.2em}
 .tableau:hover canvas{transform:scale(1.015)}
 .tableau:hover h3{color:var(--accent)}
+.tableau.ouvert{cursor:pointer}
+.tableau.ouvert:hover canvas{filter:brightness(1.18)}
+.tableau.ouvert:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
 .tableau h3{transition:color .18s ease}
 @media (max-width:600px){
   #galerie .tableaux{grid-template-columns:1fr;row-gap:28px}
@@ -980,12 +983,15 @@ function construireGalerie(D) {
     cv.setAttribute('aria-label', { musique: 'Une platine vue de dessus', cinema: 'Une bobine de film vue de dessus', ecriture: 'Une phrase écrite en rond autour d’un encrier', tech: 'Une galette de silicium dont les puces s’allument' }[p.id] || p.nom);
     li.querySelector('h3').textContent = p.nom; li.querySelector('p').textContent = p.phrase;
     const etat = li.querySelector('.etat');
-    if (p.ouvert) { bt.textContent = 'Entrer'; bt.classList.add('entrer'); bt.setAttribute('aria-label', `Entrer : ${p.nom}`); }
-    else { bt.textContent = 'En construction'; bt.setAttribute('aria-label', `${p.nom} : en construction`); }
-    bt.addEventListener('click', () => {
-      if (p.ouvert) { location.hash = p.id; return; }
-      etat.textContent = 'Cette salle n’est pas encore ouverte.';
-    });
+    if (p.ouvert) {   // salle ouverte : toute la carte est le lien, plus de bouton « Entrer » (décision de Simon, 24 oct)
+      li.classList.add('ouvert'); li.tabIndex = 0; li.setAttribute('role', 'link'); li.setAttribute('aria-label', `Entrer : ${p.nom}`);
+      bt.remove();
+      li.addEventListener('click', () => { location.hash = p.id; });
+      li.addEventListener('keydown', e => { if (e.key === 'Enter') location.hash = p.id; });
+    } else {
+      bt.textContent = 'En construction'; bt.setAttribute('aria-label', `${p.nom} : en construction`);
+      bt.addEventListener('click', () => { etat.textContent = 'Cette salle n’est pas encore ouverte.'; });
+    }
     ul.appendChild(li);
     return { p, cv, g: null, w: 0, h: 0 };
   });
@@ -1004,7 +1010,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 29';
+const BUILD = 'v-backend 24 oct, 30';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
