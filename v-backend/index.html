@@ -190,6 +190,8 @@ tr.cache{display:none}
 .mus-outils input[type=search]{flex:1 1 220px;min-height:40px;padding:6px 12px;background:var(--nuit);color:var(--ink);border:1px solid #22314F;font:inherit}
 .mus-outils .case{display:flex;gap:6px;align-items:center;color:var(--acier);min-height:40px}
 .mus-outils button{min-height:40px;padding:6px 14px;background:var(--nuit);color:var(--ink)}
+.lect-prog-boite{padding:12px 0;cursor:pointer;touch-action:none}
+.mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .mus-gauche,.filtres,.mus-outils{min-width:0;max-width:100%}
 .ec-titre{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;max-width:100%}
 @media (min-width:761px){.platine{width:min(380px,max(220px,calc(100svh - 600px)))}}
@@ -286,6 +288,7 @@ tr.cache{display:none}
         <div class="mus-outils" data-entree style="--d:2">
           <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
+          <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
           <button id="melange" type="button">Mélanger l’anneau</button>
         </div>
         <div class="platine" id="platineBoite" data-entree style="--d:2">
@@ -300,7 +303,7 @@ tr.cache{display:none}
           <button id="suiv" type="button" aria-label="Titre suivant"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13.6 3H16v14h-2.4zM3 3v14l9.4-7z"/></svg></button>
         </div>
         <div class="lect-info"><p class="lect-titre" id="lTitre"></p><p class="lect-artiste" id="lArtiste"></p></div>
-        <div class="lect-prog-boite">
+        <div class="lect-prog-boite" id="lProgBoite" role="slider" tabindex="0" aria-label="Position dans le titre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div class="lect-prog" id="lProg" aria-hidden="true"></div>
         </div>
         <a class="lect-yt" id="lYt" href="#" target="_blank" rel="noopener">Écouter sur YouTube</a>
@@ -859,15 +862,22 @@ function construireMusique(D) {
   const f = $('#filtres'); f.textContent = '';
   [null, ...M.genresOrdre].forEach(gn => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = gn ? `${gn} (${cnt[gn]})` : 'Tous'; b.setAttribute('aria-pressed', String(gn === M.genreFiltre));
-    b.addEventListener('click', () => { M.genreFiltre = gn; M.montre = PAGE; [...f.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); reconstruire(null); });
+    b.addEventListener('click', () => { M.genreFiltre = gn; M.montre = PAGE; [...f.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); reconstruire(null); hasard(); });
     f.appendChild(b);
   });
   $('#q').addEventListener('input', e => { M.q = e.target.value; M.montre = PAGE; reconstruire(null); });
   $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(null); });
   $('#melange').addEventListener('click', () => reconstruire(null));
+  M.alea = !!mem.lire('alea', false); $('#alea').setAttribute('aria-pressed', String(M.alea));
+  $('#alea').addEventListener('click', e => { M.alea = !M.alea; e.currentTarget.setAttribute('aria-pressed', String(M.alea)); mem.ecrire('alea', M.alea); });
   $('#plus').addEventListener('click', () => { M.montre += PAGE; tableau(); });
   $('#lProg').innerHTML = '<i></i>'.repeat(40);
   reconstruire(null);
+}
+function hasard() {   // un titre au hasard dans la liste filtrée, lu tout de suite
+  if (!M.liste.length) return;
+  let t; do { t = M.liste[Math.floor(Math.random() * M.liste.length)]; } while (M.liste.length > 1 && M.cur && t === M.cur);
+  lancer(t);
 }
 function liste() {
   const q = norm(M.q.trim());
@@ -921,7 +931,7 @@ function lancer(tr) {   // titre choisi par l'utilisateur : on le met dans l'ann
   if (i < 0) reconstruire(tr); else choisir(i);
   jouerYT(tr);
 }
-function suivant(sens) { const n = M.D.titres.length; if (!n) return; const i = (M.courant + sens + n) % n; choisir(i); jouerYT(M.D.titres[i]); }
+function suivant(sens) { if (M.alea && sens > 0) { hasard(); return; } const n = M.D.titres.length; if (!n) return; const i = (M.courant + sens + n) % n; choisir(i); jouerYT(M.D.titres[i]); }
 $('#suiv').addEventListener('click', () => suivant(1));
 $('#prec').addEventListener('click', () => suivant(-1));
 function majBoutonLire() { $('#lire').setAttribute('aria-label', M.joue ? 'Pause' : 'Lecture'); $('#lireIcone').setAttribute('d', M.joue ? 'M4 3h4v14H4zM12 3h4v14h-4z' : 'M5 3l12 7-12 7z'); }
@@ -954,6 +964,19 @@ function erreurVideo(code) {   // vidéo supprimée ou non intégrable : on la m
   const n = M.D.titres.length, nxt = n > 1 ? M.D.titres[(M.courant + 1) % n] : null;
   reconstruire(nxt); if (M.cur) jouerYT(M.cur);
 }
+/* ---------- position dans le titre : clic, glisser ou flèches ---------- */
+const boiteProg = $('#lProgBoite'); let glisse = false;
+function fraction(e) { const r = $('#lProg').getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); }
+function aller(f) { if (!PY || !apiPrete || !M.charge) return; try { const d = PY.getDuration(); if (d > 0) PY.seekTo(f * d, true); } catch (e) {} }
+boiteProg.addEventListener('pointerdown', e => { glisse = true; try { boiteProg.setPointerCapture(e.pointerId); } catch (x) {} M.seekF = fraction(e); aller(M.seekF); });
+boiteProg.addEventListener('pointermove', e => { if (glisse) { M.seekF = fraction(e); aller(M.seekF); } });
+['pointerup', 'pointercancel'].forEach(n => boiteProg.addEventListener(n, () => { glisse = false; M.seekF = null; }));
+boiteProg.addEventListener('keydown', e => {
+  if (!PY || !apiPrete || !M.charge) return;
+  const d = PY.getDuration(), t = PY.getCurrentTime(); if (!(d > 0)) return;
+  if (e.key === 'ArrowRight') { PY.seekTo(Math.min(d, t + 5), true); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { PY.seekTo(Math.max(0, t - 5), true); e.preventDefault(); }
+});
 /* ---------- volume (musique + sons d'interface) ---------- */
 function reglerVolume(v) { VOLP = Math.max(0, Math.min(100, v)); VOLN = VOLP / 100; $('#volVal').textContent = String(VOLP); mem.ecrire('vol', VOLP); if (PY && apiPrete) { try { PY.setVolume(VOLP); } catch (e) {} } }
 $('#vol').value = String(VOLP); $('#volVal').textContent = String(VOLP);
@@ -996,7 +1019,7 @@ platCv.addEventListener('click', e => { const i = celluleSous(e); if (i >= 0) ch
 function avancerLecture(dt) {
   if (!M.D) return;
   let f = 0;
-  if (PY && apiPrete && M.charge) { try { const d = PY.getDuration(); f = d > 0 ? PY.getCurrentTime() / d : 0; } catch (e) {} }
+  if (PY && apiPrete && M.charge) { try { const d = PY.getDuration(); f = d > 0 ? PY.getCurrentTime() / d : 0; } catch (e) {} if (M.seekF != null) f = M.seekF; $('#lProgBoite').setAttribute('aria-valuenow', String(Math.round(cl(f) * 100))); }
   const n = Math.floor(cl(f) * 40), it = $('#lProg').children;
   for (let k = 0; k < it.length; k++) { const on = k < n || (k === 0 && f > 0); if (it[k].classList.contains('on') !== on) it[k].classList.toggle('on', on); }
 }
