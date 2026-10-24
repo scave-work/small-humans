@@ -1161,7 +1161,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 69';
+const BUILD = 'v-backend 24 oct, 71';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1250,7 +1250,7 @@ function construireMusique(D) {
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
   M.parId = new Map(M.tous.map(t => [t.youtube, t]));
   M.pl = nettoyerPl(mem.lire('playlists', {})); M.plActive = mem.lire('vuePl', null); construireOff(); if (!existe(M.plActive)) M.plActive = null; M.ctx = 'bib';
-  M.genreFiltre = null; M.famille = null; M.detail = !!mem.lire('detail', false); M.q = ''; M.mix = false; M.montre = PAGE;
+  M.genreFiltre = null; M.famille = null; M.detail = false; M.q = ''; M.mix = false; M.montre = PAGE;
   const cnt = {}; M.tous.forEach(t => { cnt[t.genre] = (cnt[t.genre] || 0) + 1; });
   M.genresOrdre = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x]);
   /* grandes familles : regroupent les tags détaillés, sans rien retagger (un titre est dans la famille de son tag) ; « Détail » déplie les tags */
@@ -1265,7 +1265,7 @@ function construireMusique(D) {
     const maj = () => { M.montre = PAGE; dessinerFiltres(); reconstruire(M.cur, true); };
     bouton('Tous', null, !M.famille && !M.genreFiltre, () => { M.famille = null; M.genreFiltre = null; maj(); });
     FAMILLES.forEach(F => { if (fam[F.id]) bouton(F.id, fam[F.id], M.famille === F.id, () => { M.famille = M.famille === F.id ? null : F.id; M.genreFiltre = null; maj(); }, 'fam'); });
-    const d = bouton('Détail', null, M.detail, () => { M.detail = !M.detail; mem.ecrire('detail', M.detail); dessinerFiltres(); }, 'det'); d.textContent = M.detail ? 'Détail ▴' : 'Détail ▾';
+    const d = bouton('Détail', null, M.detail, () => { M.detail = !M.detail; dessinerFiltres(); }, 'det'); d.textContent = M.detail ? 'Détail ▴' : 'Détail ▾';
     if (M.detail) {
       f.appendChild(Object.assign(document.createElement('div'), { className: 'filtres-saut' }));
       M.genresOrdre.filter(g => !M.famille || familleDe(g) === M.famille).forEach(g => bouton(g, cnt[g], g === M.genreFiltre, () => { M.genreFiltre = M.genreFiltre === g ? null : g; if (M.genreFiltre) M.famille = familleDe(g); maj(); }));
@@ -1655,6 +1655,8 @@ function dessinerMix() {
   const b = document.createElement('b'); b.textContent = dec ? `Découverte · départ : ${dec.lib}` : `Mix de « ${M.mix.de} »`; tete.appendChild(b);
   const bt = (txt, f) => { const e = document.createElement('button'); e.type = 'button'; e.textContent = txt; e.addEventListener('click', f); tete.appendChild(e); return e; };
   if (dec) {
+    const lf = document.createElement('span'); lf.className = 'mx-lf'; lf.textContent = 'Partir de :'; tete.appendChild(lf);
+    [['Tout', null]].concat(FAMILLES.map(F => [F.id, F.id])).forEach(([n, f]) => { const e = bt(n, () => ouvrirDec(true, f)); e.className = 'mx-fam' + ((dec.fam || null) === f ? ' on' : ''); });
     const chips = document.createElement('div'); chips.className = 'mx-chips';
     dec.seeds.forEach(s => {
       const c = document.createElement('span'); c.className = 'mx-chip' + (dec.res.has(s.youtube) ? (dec.res.get(s.youtube) ? '' : ' vide') : ' att'); c.title = dec.res.has(s.youtube) && !dec.res.get(s.youtube) ? 'YouTube ne propose pas de Mix pour ce titre' : (s.artiste ? s.artiste + ' — ' : '') + s.titre;
@@ -1668,8 +1670,6 @@ function dessinerMix() {
       const m = document.createElement('p'); m.className = 'mx-cpt'; m.textContent = `${fait} / ${N_DEPARTS} Mix chargés…${dec.vides ? ` (${dec.vides} titre${dec.vides > 1 ? 's' : ''} sans Mix chez YouTube, remplacé${dec.vides > 1 ? 's' : ''})` : ''}`; tete.appendChild(m);
     }
     bt('⟳ Autres départs', () => ouvrirDec(true));
-    const lf = document.createElement('span'); lf.className = 'mx-lf'; lf.textContent = 'Partir de :'; tete.appendChild(lf);
-    [['Tout', null]].concat(FAMILLES.map(F => [F.id, F.id])).forEach(([n, f]) => { const e = bt(n, () => ouvrirDec(true, f)); e.className = 'mx-fam' + ((dec.fam || null) === f ? ' on' : ''); });
     bt('＋ Titre en cours comme départ', () => { const c = M.cur; if (!c || dec.seeds.some(s => s.youtube === c.youtube)) return; dec.seeds.push({ youtube: c.youtube, titre: c.titre, artiste: c.artiste || '' }); panneau(); chargerDec(M.mix); });
     const lab = document.createElement('label'); lab.className = 'inter mx-voir'; lab.innerHTML = '<input type="checkbox" role="switch"><span class="inter-p" aria-hidden="true"></span>Cacher ce que j’ai déjà';
     const cb = lab.querySelector('input'); cb.checked = !dec.voir; cb.addEventListener('change', () => { dec.voir = !cb.checked; fusionDec(M.mix); panneau(); remplirInfos(M.mix.items); }); tete.appendChild(lab);
