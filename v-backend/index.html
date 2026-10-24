@@ -404,6 +404,10 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .lect-yt{font-size:14px;text-decoration:none}
 .lect-yt:hover{text-decoration:underline}
 .mus-outils .case input{accent-color:var(--accent)}
+.mus-corps .mus-outils{gap:6px 8px}   /* la ligne de recherche à l'échelle des tags (15 px, 32 px de haut) */
+.mus-corps .mus-outils input[type=search],.mus-corps .mus-outils .case,.mus-corps .mus-outils button{min-height:32px;font-size:15px}
+.mus-corps .mus-outils input[type=search]{padding:3px 11px}
+.mus-corps .mus-outils button{padding:3px 11px}
 .filtres button{background:#0E1727;color:var(--acier)}
 .filtres button:hover{background:#15223A;color:var(--ink)}
 .filtres button[aria-pressed="true"]{background:rgba(111,168,255,.18);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -421,7 +425,19 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .pan-tete button{background:transparent;color:var(--acier);min-width:36px;min-height:36px}
 .pan-tete button:hover{background:#15223A;color:var(--ink)}
 .pan-compte{margin:0 14px 10px;font-size:14px;color:#8190B3}
-#plSuppr:disabled{display:none}   /* playlists de style : on ne les supprime pas, donc pas de ✕ */
+#plVue{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none}   /* le vrai <select> reste la source de vérité, caché : le menu natif s'ouvrait en blanc */
+.pan-tete{position:relative}
+.pan-tete button:disabled{opacity:.5}
+.pan-tete .pl-btn{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;min-height:44px;padding:4px;font-size:20px;font-weight:600;letter-spacing:.01em;color:var(--ink);background:transparent}
+.pan-tete .pl-btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pan-tete .pl-btn::after{content:"▾";flex:none;font-size:14px;color:var(--acier)}
+.pan-tete .pl-btn:hover{background:#15223A}
+.pl-liste{position:absolute;z-index:30;left:10px;right:10px;top:calc(100% + 4px);max-height:min(62vh,440px);overflow-y:auto;padding:6px;background:#0B1322;box-shadow:0 10px 28px rgba(0,0,0,.55);scrollbar-width:thin;scrollbar-color:#22314F transparent}
+.pl-liste[hidden]{display:none}
+.pl-liste .pl-grp{padding:10px 10px 4px;font-size:13px;color:#8190B3}
+.pan-tete .pl-liste .pl-opt{display:block;width:100%;min-width:0;min-height:36px;padding:6px 10px;text-align:left;font-size:16px;font-weight:500;color:var(--ink);background:transparent;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pan-tete .pl-liste .pl-opt:hover,.pan-tete .pl-liste .pl-opt:focus-visible{background:#1D3052}
+.pan-tete .pl-liste .pl-opt[aria-selected="true"]{background:#14213A;box-shadow:inset 2px 0 0 var(--accent);color:var(--accent)}
 .pan-liste,.pan-file ol{scrollbar-width:thin;scrollbar-color:#22314F transparent}   /* même barre de défilement que la liste des titres */
 .pan-item{grid-template-columns:20px 64px minmax(0,1fr) 28px;padding:6px 8px;gap:10px;border-bottom:0}
 .pan-item:hover{background:#15223A}
@@ -517,7 +533,9 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
           <aside class="mus-panneau" id="panneau" aria-label="Playlist">
         <div class="pan-tete">
           <label class="vh" for="plVue">Playlist ouverte</label>
-          <select id="plVue"></select>
+          <select id="plVue" tabindex="-1" aria-hidden="true"></select>
+          <button id="plBtn" class="pl-btn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Playlist ouverte"></button>
+          <div id="plListe" class="pl-liste" role="listbox" aria-label="Playlists" hidden></div>
           <button id="plNouv" type="button" aria-label="Nouvelle playlist" title="Nouvelle playlist">＋</button>
           <button id="plSuppr" type="button" aria-label="Supprimer la playlist" title="Supprimer la playlist" disabled>✕</button>
           <button id="plMenu" type="button" aria-label="Autres actions" aria-haspopup="true" title="Autres actions">⋯</button>
@@ -1058,7 +1076,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 43';
+const BUILD = 'v-backend 24 oct, 44';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1270,8 +1288,18 @@ function majSelecteur() {
   groupe('Styles', offs.map(n => [n, `${n} (${M.off[n].length})`]));
   sel.value = existe(M.plActive) ? M.plActive : (noms[0] || '');
   if (!M.plActive && noms.length) { M.plActive = sel.value; }
-  majCroix();
+  majBoutonPl(); majCroix();
 }
+function majBoutonPl() { const b = $('#plBtn'), o = $('#plVue').selectedOptions[0]; b.textContent = ''; const t = document.createElement('span'); t.textContent = o ? o.textContent : 'Choisir une playlist…'; b.appendChild(t); }
+function ouvrirListePl() {
+  const L = $('#plListe'), sel = $('#plVue'); L.textContent = '';
+  const vides = [...sel.querySelectorAll('option')].filter(o => o.value).length === 0;
+  const opt = o => { if (!o.value && !vides) return; const b = document.createElement('button'); b.type = 'button'; b.className = 'pl-opt'; b.setAttribute('role', 'option'); b.textContent = o.textContent; b.setAttribute('aria-selected', String(o.value === sel.value)); b.addEventListener('click', () => { sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); fermerListePl(); $('#plBtn').focus(); }); L.appendChild(b); };
+  [...sel.children].forEach(c => { if (c.tagName === 'OPTGROUP') { const g = document.createElement('div'); g.className = 'pl-grp'; g.textContent = c.label; L.appendChild(g); [...c.children].forEach(opt); } else opt(c); });
+  L.hidden = false; $('#plBtn').setAttribute('aria-expanded', 'true');
+  (L.querySelector('[aria-selected="true"]') || L.querySelector('.pl-opt'))?.focus({ preventScroll: false });
+}
+function fermerListePl() { $('#plListe').hidden = true; $('#plBtn').setAttribute('aria-expanded', 'false'); }
 function majCroix() { const b = $('#plSuppr'); if (b) b.disabled = !(M.plActive && M.pl[M.plActive] && !estOff(M.plActive)); }
 function ajouterA(nom, tr, pos) {
   if (estOff(nom) && M.off[nom].includes(tr.youtube)) { mlg(`« ${tr.titre} » est déjà dans « ${nom} ».`); return; }
@@ -1397,6 +1425,17 @@ document.addEventListener('touchmove', e => { if (DR.on) e.preventDefault(); }, 
 function initPlaylists() {
   majSelecteur(); panneau();
   $('#plVue').addEventListener('change', e => { M.plActive = e.target.value || null; sauverPl(); majCroix(); panneau(); if (M.ctx === 'pl') reconstruire(M.cur, true); });
+  // Menu des playlists à nous (le menu natif de Chrome s'ouvre en blanc) : liste construite depuis le <select> caché
+  $('#plBtn').addEventListener('click', () => { $('#plListe').hidden ? ouvrirListePl() : fermerListePl(); });
+  $('#plBtn').addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); ouvrirListePl(); } });
+  $('#plListe').addEventListener('keydown', e => {
+    const o = [...$('#plListe').querySelectorAll('.pl-opt')], i = o.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); (o[i + 1] || o[0]).focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (o[i - 1] || o[o.length - 1]).focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); fermerListePl(); $('#plBtn').focus(); }
+  });
+  document.addEventListener('pointerdown', e => { if (!$('#plListe').hidden && !e.target.closest('#plListe, #plBtn')) fermerListePl(); });
+  $('#plVue').addEventListener('change', majBoutonPl);
   $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) { M.plActive = n; sauverPl(); majSelecteur(); panneau(); } });
   $('#plSuppr').addEventListener('click', supprimerPl);
   $('#plMenu').addEventListener('click', () => { if ($('#menuPl').hidden) ouvrirActions($('#plMenu')); else fermerMenu(); });
