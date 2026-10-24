@@ -744,12 +744,12 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "-23XCzB4CvQ",
-"titre": "Clamavi De Profundis",
-"artiste": "The Ent's Marching Song (Without Narration)",
+"titre": "The Ent's Marching Song (Without Narration)",
+"artiste": "Clamavi De Profundis",
 "genre": "epic",
 "tags": [
 "epic",
@@ -1978,8 +1978,8 @@
 },
 {
 "youtube": "5-rbSNzU_b8",
-"titre": "Cigarettes After Sex",
-"artiste": "Sunsetz",
+"titre": "Sunsetz",
+"artiste": "Cigarettes After Sex",
 "genre": "pop-indie",
 "tags": [
 "pop-indie",
@@ -5275,8 +5275,8 @@
 },
 {
 "youtube": "E2eVCqbByWY",
-"titre": "Dan Bull",
-"artiste": "LEAGUE OF LEGENDS RAP",
+"titre": "LEAGUE OF LEGENDS RAP",
+"artiste": "Dan Bull",
 "genre": "hiphop",
 "tags": [
 "hiphop"
@@ -6846,7 +6846,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": true,
-"mix": false
+"mix": true
 },
 {
 "youtube": "gQZqX04TeVs",
@@ -7881,7 +7881,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": true,
-"mix": false
+"mix": true
 },
 {
 "youtube": "ISDqBm37zos",
@@ -8486,8 +8486,8 @@
 },
 {
 "youtube": "JXEPi7cnJ08",
-"titre": "Clamavi De Profundis",
-"artiste": "The Last Goodbye",
+"titre": "The Last Goodbye",
+"artiste": "Clamavi De Profundis",
 "genre": "ost",
 "tags": [
 "ost",
@@ -8581,7 +8581,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "K0KV7F4shEk",
@@ -11825,7 +11825,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": true,
-"mix": false
+"mix": true
 },
 {
 "youtube": "qlS_q3ywnN4",
@@ -14224,8 +14224,8 @@
 },
 {
 "youtube": "uxfoa23skHg",
-"titre": "Clamavi De Profundis",
-"artiste": "Song of Durin (Complete Edition)",
+"titre": "Song of Durin (Complete Edition)",
+"artiste": "Clamavi De Profundis",
 "genre": "ost",
 "tags": [
 "ost",
@@ -14259,7 +14259,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "UxxajLWwzqY",
@@ -14759,8 +14759,8 @@
 },
 {
 "youtube": "WF9S6XpNQjo",
-"titre": "Neko Light Orchestra",
-"artiste": "Akira アキラ (cover G. Yamashirogumi)",
+"titre": "Akira アキラ (cover G. Yamashirogumi)",
+"artiste": "Neko Light Orchestra",
 "genre": "ost",
 "tags": [
 "ost"
@@ -14878,7 +14878,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": true,
-"mix": false
+"mix": true
 },
 {
 "youtube": "wOMwO5T3yT4",
@@ -16532,7 +16532,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "zzKHTCEhsp8",
