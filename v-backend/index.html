@@ -192,6 +192,8 @@ tr.cache{display:none}
 .mus-outils button{min-height:40px;padding:6px 14px;background:var(--nuit);color:var(--ink)}
 .lect-prog-boite{padding:12px 0;cursor:pointer;touch-action:none}
 .mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.aide-clavier{font-size:14px;color:var(--acier);margin-top:8px}
+@media (pointer:coarse){.aide-clavier{display:none}}
 .version{position:fixed;left:8px;bottom:2px;font-size:11px;color:#46557a;margin:0;z-index:10;pointer-events:none}
 .anneaux{display:flex;align-items:center;gap:12px;margin-top:10px;color:var(--acier);font-size:15px}
 .anneaux[hidden]{display:none}
@@ -295,6 +297,7 @@ tr.cache{display:none}
         <div class="mus-tete">
           <h2 id="mus-titre" data-entree style="--d:0">Musique</h2>
           <p id="mus-chapeau" data-entree style="--d:1">Mes favoris, rangés par genre. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.</p>
+          <p class="aide-clavier" data-entree style="--d:1">Clavier : Espace = pause · ← → = titre précédent / suivant · Maj + ← → = ±5 s</p>
         </div>
         <div class="platine" id="platineBoite" data-entree style="--d:2">
           <canvas id="platine" role="img" aria-label="Anneau de la playlist : une cellule par titre, la cellule allumée est le titre en cours"></canvas>
@@ -858,7 +861,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 6';
+const BUILD = 'v-backend 24 oct, 7';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1007,6 +1010,13 @@ function frappeLibre(e) { const t = e.target, n = t && t.tagName; return !(n ===
 addEventListener('keydown', e => {
   if ((e.code === 'Space' || e.key === ' ') && vue === 'musique' && frappeLibre(e) && !e.ctrlKey && !e.metaKey && !e.altKey) {
     e.preventDefault(); if (!e.repeat) $('#lire').click();
+  }
+  // flèches gauche / droite : titre précédent / suivant ; avec Maj : -5 s / +5 s dans le titre (sur la barre de position, les flèches seules font ±5 s)
+  if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && vue === 'musique' && frappeLibre(e) && !e.ctrlKey && !e.metaKey && !e.altKey && e.target.id !== 'lProgBoite') {
+    e.preventDefault(); if (e.repeat) return;
+    const sens = e.key === 'ArrowRight' ? 1 : -1;
+    if (e.shiftKey) { if (PY && apiPrete && M.charge) { try { PY.seekTo(Math.max(0, PY.getCurrentTime() + 5 * sens), true); } catch (x) {} } }
+    else suivant(sens);
   }
 });
 addEventListener('keyup', e => { if ((e.code === 'Space' || e.key === ' ') && vue === 'musique' && frappeLibre(e)) e.preventDefault(); });
