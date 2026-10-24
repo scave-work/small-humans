@@ -417,6 +417,8 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .mus-panneau.survol{background:rgba(24,44,84,.7);box-shadow:inset 0 0 0 1px var(--accent)}
 .pan-tete{padding:8px 10px 0;gap:2px;align-items:center;background:transparent;border-bottom:0}
 .pan-tete select{background:transparent;border:0;font-size:20px;font-weight:600;letter-spacing:.01em;padding:4px;min-height:44px;color:var(--ink)}
+.pan-tete select{color-scheme:dark}
+.pan-tete select option,.pan-tete select optgroup{background:#0E1727;color:var(--ink);font-weight:500}
 .pan-tete button{background:transparent;color:var(--acier);min-width:36px;min-height:36px}
 .pan-tete button:hover{background:#15223A;color:var(--ink)}
 .pan-compte{margin:0 14px 10px;font-size:14px;color:#8190B3}
@@ -1055,7 +1057,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 40';
+const BUILD = 'v-backend 24 oct, 41';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
