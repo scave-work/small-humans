@@ -16598,6 +16598,19 @@
 "mix": false
 },
 {
+"youtube": "_wPDg-Z0Ybo",
+"titre": "Honesty",
+"artiste": "Paper Skies, DR MAD, Zoë Starra",
+"genre": "electro-pop",
+"tags": [
+"electro-pop",
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "UIYYeitBPPQ",
 "titre": "FADE AWAY",
 "artiste": "San Holo, Tisoki",
@@ -16787,6 +16800,18 @@
 "mix": false
 },
 {
+"youtube": "asr6_eNCuoU",
+"titre": "Noosphere",
+"artiste": "Guillaume David",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "e27GIMG6LbY",
 "titre": "Panna (The Nutmeg Song)",
 "artiste": "Hulligan Jack",
@@ -16867,6 +16892,18 @@
 "genre": "electro-melodique",
 "tags": [
 "electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "F6oY-02sKSk",
+"titre": "City of Toledo",
+"artiste": "Patrik Andrén, Johan Söderqvist, Embark Studios",
+"genre": "ost",
+"tags": [
+"ost"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17326,6 +17363,31 @@
 "mix": false
 },
 {
+"youtube": "Ap04u5P2k3A",
+"titre": "Magic and Mischief",
+"artiste": "Frida Johansson, Henrik Oja",
+"genre": "folk-world",
+"tags": [
+"folk-world"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "ZNp38iDHveE",
+"titre": "Elle ne t'aime pas",
+"artiste": "La Femme, Marlon Magnée, Saxa Goth",
+"genre": "pop-indie",
+"tags": [
+"pop-indie",
+"synthwave"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "kGmJQn3MLQU",
 "titre": "Nothing Breaks Like a Heart - Spotify Singles",
 "artiste": "Damiano David",
@@ -17493,6 +17555,18 @@
 "tags": [
 "dub-reggae",
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "iFOOaT3keR0",
+"titre": "Born To Be Free",
+"artiste": "Ran-D, The Prophet, LePrince",
+"genre": "hard-edm",
+"tags": [
+"hard-edm"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -17746,6 +17820,18 @@
 "mix": false
 },
 {
+"youtube": "ahokmuD-71Q",
+"titre": "Get Down to the Beat (Future Horizons 385)",
+"artiste": "Astiko",
+"genre": "trance-psy",
+"tags": [
+"trance-psy"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "rv6Gd7SqP1M",
 "titre": "Waves",
 "artiste": "Romain Garcia",
@@ -17943,6 +18029,30 @@
 "mix": false
 },
 {
+"youtube": "1IepkNYmTEc",
+"titre": "SMSOU",
+"artiste": "Eliminate, Frost Children",
+"genre": "hard-edm",
+"tags": [
+"hard-edm"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "yGDcBmlIzww",
+"titre": "Lost Umbrella",
+"artiste": "INABAKUMORI",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "P6ws1EHRUBk",
 "titre": "Solo - Piano Version",
 "artiste": "Myles Smith",
@@ -17962,6 +18072,18 @@
 "tags": [
 "ost",
 "epic"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "T0ZtSjCfD30",
+"titre": "Mahou Hatsudou",
+"artiste": "Yasuharu Takanashi",
+"genre": "ost",
+"tags": [
+"ost"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18226,6 +18348,18 @@
 "mix": false
 },
 {
+"youtube": "lDVRqs9DQKg",
+"titre": "MONTAGEM - PR FUNK",
+"artiste": "S3BZS, Mc Gw, Mc Menor Do Alvorada",
+"genre": "hard-edm",
+"tags": [
+"hard-edm"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "OOoqThp3qUM",
 "titre": "Extinction",
 "artiste": "Thomas Barrandon",
@@ -18360,6 +18494,18 @@
 "mix": false
 },
 {
+"youtube": "ESwEkJECjWg",
+"titre": "Children of the Omnissiah",
+"artiste": "Guillaume David",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "ax-Lllo0SHQ",
 "titre": "Possible Futures",
 "artiste": "Amos Roddy",
@@ -18391,6 +18537,18 @@
 "tags": [
 "dub-reggae",
 "hiphop"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "sgxXYULOX9A",
+"titre": "Honeycomb - Edit",
+"artiste": "Lake Turner",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18439,6 +18597,18 @@
 "genre": "house-techno",
 "tags": [
 "house-techno"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "GXB3KpoBHQI",
+"titre": "Strike The Earth!",
+"artiste": "Dabu, Simon Swerwer",
+"genre": "folk-world",
+"tags": [
+"folk-world"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18514,6 +18684,18 @@
 "tags": [
 "ambient",
 "neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "_Paw8ZRSlqY",
+"titre": "Swing Lynn",
+"artiste": "remyboi",
+"genre": "chill",
+"tags": [
+"chill"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -18934,6 +19116,18 @@
 "genre": "bass",
 "tags": [
 "bass"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "p1j_AIlrHes",
+"titre": "A Door To Infinity",
+"artiste": "Alt236",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -19488,6 +19682,18 @@
 "mix": false
 },
 {
+"youtube": "-giPiokpxbw",
+"titre": "Spirits",
+"artiste": "Kabes, Linn Sandin",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "FlpYD4-Pcyk",
 "titre": "Dea Mons",
 "artiste": "Hoenix",
@@ -19813,6 +20019,18 @@
 "tags": [
 "house-techno",
 "neoclassique"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "og0RUhdL9p0",
+"titre": "Reproduction - Instrumental",
+"artiste": "Hiérophante",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -20231,6 +20449,18 @@
 "mix": false
 },
 {
+"youtube": "Bz-lQfVN0rI",
+"titre": "Transistor - Video Edit",
+"artiste": "Ben Chatwin",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "kU1KN_1aK7g",
 "titre": "Polar",
 "artiste": "Thylacine",
@@ -20416,6 +20646,18 @@
 "youtube": "w2dtaBcYEaY",
 "titre": "Snow, Lots of Snow (Short Hike)",
 "artiste": "Mark Sparling",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "jjEuIvrunnw",
+"titre": "Ezio's Family - From \"Assassin's Creed 2\"",
+"artiste": "Anthony Hames",
 "genre": "ost",
 "tags": [
 "ost"
@@ -20988,6 +21230,19 @@
 "mix": false
 },
 {
+"youtube": "RfVphD3qp5s",
+"titre": "Elden Ring Trailer Theme (from \"Elden Ring\")",
+"artiste": "UprisingGrand",
+"genre": "epic",
+"tags": [
+"epic",
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "yU0Vnmhgm2E",
 "titre": "Crew",
 "artiste": "Test Shot Starfish",
@@ -20995,6 +21250,18 @@
 "tags": [
 "bass",
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "kx8YO7CXooE",
+"titre": "When Stars Align",
+"artiste": "Christopher Haigh, Gothic Storm",
+"genre": "epic",
+"tags": [
+"epic"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21046,6 +21313,18 @@
 "tags": [
 "folk-world",
 "pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "0qmPYFl-mk4",
+"titre": "Entwined",
+"artiste": "Lustmord, Karin Park",
+"genre": "ambient",
+"tags": [
+"ambient"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21210,6 +21489,18 @@
 "mix": false
 },
 {
+"youtube": "yxN9b86OAss",
+"titre": "Just Above and Below, And Then Right Here",
+"artiste": "Steen Chorchendorff Jorgensen",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "zkb3Ppfj88Q",
 "titre": "Across the Shifting Abyss",
 "artiste": "Dahlia's Tear",
@@ -21307,6 +21598,18 @@
 "mix": false
 },
 {
+"youtube": "MTCxFpiz2b4",
+"titre": "Lettre à mon ex",
+"artiste": "KIK",
+"genre": "pop-indie",
+"tags": [
+"pop-indie"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "wYmW-WKJ1Pk",
 "titre": "The Peerless Pool",
 "artiste": "The Hardy Tree",
@@ -21349,6 +21652,18 @@
 "genre": "electronica",
 "tags": [
 "electronica"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "jqyVya1RlFQ",
+"titre": "The Walk - Piano Noir Rework",
+"artiste": "Sylvain Texier, Ô Lake, Piano Noir",
+"genre": "neoclassique",
+"tags": [
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -21691,6 +22006,18 @@
 "mix": false
 },
 {
+"youtube": "BtERwcB49Sg",
+"titre": "I Was Lost Without You",
+"artiste": "Sam Hulick",
+"genre": "ost",
+"tags": [
+"ost"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "Oz7NG7uVkHk",
 "titre": "Dwarven Stone Upon Dwarven Stone",
 "artiste": "Adam Skorupa",
@@ -21721,6 +22048,18 @@
 "genre": "ambient",
 "tags": [
 "ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "eldSs4sCgR8",
+"titre": "ODYSSEY ZERO",
+"artiste": "ALEX",
+"genre": "electronica",
+"tags": [
+"electronica"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22444,6 +22783,18 @@
 "mix": false
 },
 {
+"youtube": "xuS36LudGYw",
+"titre": "hadiknownsooner",
+"artiste": "Bonjr, Nekö, versor",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
 "youtube": "4i9hpysvjnU",
 "titre": "04:42 Still Free",
 "artiste": "Danger",
@@ -22523,6 +22874,18 @@
 "genre": "edm",
 "tags": [
 "edm"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "iS0EDWzBYv0",
+"titre": "Kings Dub",
+"artiste": "Channel One",
+"genre": "dub-reggae",
+"tags": [
+"dub-reggae"
 ],
 "source": "spotify",
 "artiste_fiable": true,
@@ -22879,6 +23242,19 @@
 "genre": "french-touch",
 "tags": [
 "french-touch"
+],
+"source": "spotify",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "rr8Sq6BaSmQ",
+"titre": "Motion",
+"artiste": "Rone, Les Siècles, François-Xavier Roth, Vanessa Wagner",
+"genre": "electronica",
+"tags": [
+"electronica",
+"neoclassique"
 ],
 "source": "spotify",
 "artiste_fiable": true,
