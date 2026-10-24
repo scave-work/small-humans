@@ -343,14 +343,15 @@ body.drag{user-select:none;cursor:grabbing}
 
 /* la vidéo (non cliquable) est au centre de l'anneau, rognée en cercle ; le titre reste dans la barre du lecteur */
 .platine .yt-boite{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:50%;max-width:none;aspect-ratio:1;margin:0;border-radius:50%;border:0;overflow:hidden;background:#02040A;order:0}
-/* zoom ×1,6 centré : la bande du titre YouTube (en haut) et le logo (en bas à droite) sortent du cercle */
-.platine .yt-boite iframe,.platine .yt-boite #ytCible{position:absolute;left:50%;top:-30%;height:160%;width:284.44%;transform:translateX(-50%);border:0}
+/* pas de zoom (décision de Simon) : la vidéo remplit le cercle en hauteur, rognée sur les côtés */
+.platine .yt-boite iframe,.platine .yt-boite #ytCible{position:absolute;left:50%;top:0;height:100%;width:177.78%;transform:translateX(-50%);border:0}
 
 .pan-file{padding:6px 12px 8px;border-bottom:1px solid #22314F;background:rgba(111,168,255,.07)}
 .pan-file-t{margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acier)}
 .pan-file ol{list-style:none;margin:0;padding:0;max-height:96px;overflow-y:auto}
 .pan-file li{display:flex;gap:8px;align-items:center;font-size:13px;line-height:1.5}
-.pan-file li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pan-file li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--acier)}
+.pan-file li:first-child span{color:var(--ink);box-shadow:inset 2px 0 0 #6FA8FF;padding-left:8px}   /* le premier = le prochain morceau */
 .pan-file li button{min-width:26px;min-height:26px;color:var(--acier)}
 .pan-file li button:hover{color:var(--ink)}
 /* entrées : seulement si le mouvement est permis ; sinon tout est déjà en place */
@@ -984,11 +985,12 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 14';
+const BUILD = 'v-backend 24 oct, 18';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-const mlg = t => { $('#lMsg').textContent = t || ''; };
+const suiteTexte = () => { const n = M.file.length; return n ? `À suivre : « ${M.file[0].titre} »${n > 1 ? ` (+${n - 1})` : ''}` : ''; };   // le prochain morceau = le premier de la file
+const mlg = t => { $('#lMsg').textContent = t || suiteTexte(); };
 function construireMusique(D) {
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
   M.parId = new Map(M.tous.map(t => [t.youtube, t]));
@@ -1103,7 +1105,7 @@ function lancer(tr, ctx) {   // titre choisi par l'utilisateur : on le met dans 
   jouerYT(tr);
 }
 function suivant(sens) {   // « À suivre » d'abord ; sinon suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif
-  if (sens > 0 && M.file.length) { const t = M.file.shift(); majFile(); lancer(t, 'bib'); return; }
+  if (sens > 0 && M.file.length) { const t = M.file.shift(); lancer(t, 'bib'); majFile(); return; }
   if (M.alea && sens > 0) { hasard(); return; }
   const n = M.liste.length; if (!n) return;
   const i = M.cur ? M.liste.indexOf(M.cur) : -1;
@@ -1341,7 +1343,8 @@ function dessinerPlatine(t) {
   g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, S, S);
   if (M.rotT0 >= 0) { const u = (t - M.rotT0) / .7; M.rot = M.rotDe + (M.rotVers - M.rotDe) * eOut(u); if (u >= 1) M.rotT0 = -1; }
   if (M.roule) { const u = cl((t - M.roule.t0) / M.roule.d); M.rot = M.roule.a0 + M.roule.total * eOut(u); if (u >= 1) finRoulette(); }
-  const rot = M.rot, nG = 6;
+  const dtL = M.lueur >= 0 && !M.roule ? t - M.lueur : -1;   // temps écoulé depuis l'arrêt de la roulette
+  const rot = M.rot + (dtL >= 0 ? .05 * Math.exp(-dtL * 5) * Math.sin(dtL * 16) : 0), nG = 6;   // léger rebond : l'anneau « tombe » sur le titre
   g.save(); g.translate(S / 2, S / 2);
   anneau(g, { r0: R * .58, r1: R * .64, n: 40, rot: rot * .6 + (M.joue && !REDUIT ? t * .2 : 0), base: .22, vari: .3 });
   g.beginPath(); g.arc(0, 0, R * .56, 0, TAU); g.fillStyle = css(mix(C.bg, C.nuit, .35)); g.fill();
@@ -1349,24 +1352,47 @@ function dessinerPlatine(t) {
   anneau(g, { r0: R * .76, r1: R * .94, n: 72, rot, base: .3, vari: .3 });
   for (let k = 0; k < nG; k++) poutre(g, -Math.PI / 2 - Math.PI / nG + k * TAU / nG + rot, R * .6, R * 1.0, R * .055, .46);
   g.restore();
-  g.save(); g.fillStyle = '#6FA8FF'; g.beginPath(); g.moveTo(S / 2, S / 2 - R * .9); g.lineTo(S / 2 - R * .04, S / 2 - R * 1.0); g.lineTo(S / 2 + R * .04, S / 2 - R * 1.0); g.closePath(); g.fill(); g.restore();   // repère fixe en haut : là où la roulette s'arrête
+  if (dtL >= 0) {   // à l'arrêt : secteur bleu qui flashe puis se calme, liseré autour de la vidéo, deux ondes qui partent du centre
+    const k = .1 + .5 * Math.exp(-dtL * 1.4), a0 = -Math.PI / 2 - .2, a1 = -Math.PI / 2 + .2;
+    g.save(); g.translate(S / 2, S / 2);
+    g.beginPath(); g.arc(0, 0, R * 1.0, a0, a1); g.arc(0, 0, R * .74, a1, a0, true); g.closePath();
+    const gr = g.createRadialGradient(0, 0, R * .74, 0, 0, R * 1.0); gr.addColorStop(0, `rgba(111,168,255,${k * .15})`); gr.addColorStop(1, `rgba(111,168,255,${k})`);   // dégradé : la lumière monte vers le bord, pas d'aplat
+    g.fillStyle = gr; g.fill();
+    g.beginPath(); g.arc(0, 0, R * .545, 0, TAU); g.strokeStyle = `rgba(111,168,255,${.25 + .6 * Math.exp(-dtL * 2)})`; g.lineWidth = R * .014; g.stroke();
+    [0, .22].forEach(dec => { const u = (dtL - dec) / 1.1; if (u > 0 && u < 1) { g.beginPath(); g.arc(0, 0, R * (.58 + .56 * eOut(u)), 0, TAU); g.strokeStyle = `rgba(111,168,255,${.55 * (1 - u) * (1 - u)})`; g.lineWidth = R * .012 * (1 - u * .6); g.stroke(); } });
+    g.restore();
+  }
+  {   // repère fixe : un cadre en traits fins (coins) autour du secteur de tirage, dans le style des poutres ; il s'allume en bleu à l'arrêt
+    const lit = dtL >= 0 ? Math.exp(-dtL * 1.4) : 0, fa0 = -Math.PI / 2 - .2, fa1 = -Math.PI / 2 + .2, rI = R * .74, rO = R * 1.0, e = R * .03, c = .06;
+    g.save(); g.translate(S / 2, S / 2); g.lineCap = 'butt'; g.lineWidth = R * (.008 + .006 * lit);
+    g.strokeStyle = lit > .02 ? `rgba(${Math.round(170 - 59 * lit)},${Math.round(195 - 27 * lit)},${Math.round(235 + 20 * lit)},${.5 + .5 * lit})` : 'rgba(170,195,235,.5)';
+    if (lit > .02) { g.shadowColor = '#6FA8FF'; g.shadowBlur = R * .05 * lit; }
+    g.beginPath();
+    [[fa0, 1], [fa1, -1]].forEach(([fa, sg]) => {
+      g.moveTo(Math.cos(fa) * (rI - e), Math.sin(fa) * (rI - e)); g.lineTo(Math.cos(fa) * (rO + e), Math.sin(fa) * (rO + e));          // trait radial
+      g.moveTo(Math.cos(fa) * (rI - e), Math.sin(fa) * (rI - e)); g.arc(0, 0, rI - e, fa, fa + sg * c, sg < 0);                          // coin intérieur
+      g.moveTo(Math.cos(fa) * (rO + e), Math.sin(fa) * (rO + e)); g.arc(0, 0, rO + e, fa, fa + sg * c, sg < 0);                          // coin extérieur
+    });
+    g.stroke(); g.restore();
+  }
   g.save(); g.beginPath(); g.arc(S / 2, S / 2, R * 1.01, 0, TAU); g.clip(); grain(g, S, S); g.restore();
 }
 /* roulette : on touche l'anneau, il tourne et tire un titre au hasard dans la liste affichée ; le titre est mis dans « À suivre » (file de lecture, non enregistrée), la musique en cours n'est jamais coupée */
-M.file = []; M.roule = null;
+M.file = []; M.roule = null; M.lueur = -1;
 function roulette() {
   if (M.roule) return;   // déjà en train de tourner
   const choix = M.biblio.filter(t => t !== M.cur && !M.file.includes(t));
   if (!choix.length) { mlg('Aucun autre titre à tirer dans cette liste.'); return; }
   const tr = choix[Math.floor(Math.random() * choix.length)];
-  if (REDUIT) { enfiler(tr); return; }
+  if (REDUIT) { M.lueur = maintenant(); enfiler(tr); return; }
+  M.lueur = -1;
   M.roule = { t0: maintenant(), d: 2.4, a0: M.rot, total: TAU * (3 + Math.random() * 2), tr };
   Son.clic();
 }
-function finRoulette() { const tr = M.roule.tr; M.roule = null; Son.clic(); enfiler(tr); }
+function finRoulette() { const tr = M.roule.tr; M.roule = null; M.lueur = maintenant(); Son.clic(); enfiler(tr); }
 function enfiler(tr) {
   if (!M.charge) { lancer(tr, 'bib'); mlg(`Lecture de « ${tr.titre} ».`); return; }   // rien ne joue encore : rien à couper
-  M.file.push(tr); majFile(); mlg(`À suivre : « ${tr.titre} ».`);
+  M.file.push(tr); majFile();
 }
 function majFile() {
   const ol = $('#panFileL'); ol.textContent = '';
@@ -1378,6 +1404,7 @@ function majFile() {
     li.append(t, x); ol.appendChild(li);
   });
   $('#panFile').hidden = !M.file.length; $('#panFileN').textContent = M.file.length ? `(${M.file.length})` : '';
+  mlg('');   // la ligne sous le lecteur montre toujours le prochain morceau
 }
 platCv.style.cursor = 'pointer'; platCv.title = 'Roulette : touche pour tirer un titre au hasard';
 platCv.addEventListener('click', roulette);
