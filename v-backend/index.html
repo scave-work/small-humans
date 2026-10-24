@@ -414,6 +414,9 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .pan-item.mx{grid-template-columns:20px 64px minmax(0,1fr) 28px 28px;cursor:pointer}
 .pan-item.mx .pan-x{opacity:0}
 .pan-item.mx:hover .pan-x,.pan-item.mx .pan-x:focus-visible{opacity:1}
+.pan-item.bloque .pan-vig,.pan-item.bloque .pan-t b{opacity:.45}
+.pan-item.bloque .pan-t i a{color:var(--accent);text-decoration:none}
+.pan-item.bloque .pan-t i a:hover{text-decoration:underline}
 .mx-c{min-width:28px;min-height:28px;padding:0;background:none;border:0;color:var(--acier);font-size:17px;cursor:pointer}
 .mx-c:hover{color:var(--accent)}
 .mx-c.fait{color:var(--accent);cursor:default}
@@ -1129,7 +1132,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 57';
+const BUILD = 'v-backend 24 oct, 59';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1347,7 +1350,7 @@ function lancer(tr, ctx) {   // titre choisi par l'utilisateur : on le met dans 
 function suivant(sens) {   // « À suivre » d'abord ; sinon suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif
   if (sens > 0 && M.file.length) { const t = M.file.shift(); lancer(t, 'bib'); majFile(); return; }
   const km = M.vueMix && M.mix && M.cur ? M.mix.items.findIndex(x => x.youtube === M.cur.youtube) : -1;   // on lit dans le Mix : suivant / précédent restent dans le Mix
-  if (km >= 0) { const L = M.mix.items; jouerMix(L[(km + sens + L.length) % L.length]); return; }
+  if (km >= 0) { const nx = mixVoisin(km, sens); if (nx) jouerMix(nx); return; }
   if (M.alea && sens > 0) { hasard(); return; }
   const n = M.liste.length; if (!n) return;
   const i = M.cur ? M.liste.indexOf(M.cur) : -1;
@@ -1380,10 +1383,9 @@ function jouerYT(tr) {
 }
 function erreurVideo(code) {   // vidéo supprimée ou non intégrable : on la masque (mémorisé) et on passe à la suivante
   const t = M.cur; if (!t) return;
-  if (t.mx && M.mix) {   // titre du Mix non lisible : retiré du Mix (temporaire), on passe au suivant du Mix
-    const k = M.mix.items.indexOf(t); if (k >= 0) M.mix.items.splice(k, 1);
-    mlg(`« ${t.titre || t.youtube} » n’est pas lisible ici (code ${code}) : retiré du Mix.`); panneau();
-    if (M.mix.items.length) jouerMix(M.mix.items[Math.min(Math.max(k, 0), M.mix.items.length - 1)]);
+  if (t.mx && M.mix) {   // titre du Mix qui ne se lit que sur YouTube : grisé (reste dans le Mix, ♥ possible), on passe au suivant lisible
+    t.bloque = true; mlg(`« ${t.titre || t.youtube} » ne se lit que sur YouTube (code ${code}) : grisé dans le Mix.`); panneau();
+    const nx = mixVoisin(M.mix.items.indexOf(t), 1); if (nx) jouerMix(nx);
     return;
   }
   const i0 = M.liste.indexOf(t);
@@ -1479,19 +1481,25 @@ function listeMix(id) {   // lit les identifiants du Mix avec un 2e lecteur cach
       div = document.createElement('div'); div.style.cssText = 'position:fixed;left:-9999px;top:0;width:200px;height:200px'; document.body.appendChild(div);
       tp = new YT.Player(div, { width: 200, height: 200, playerVars: { playsinline: 1 }, events: { onReady: () => { tp.cuePlaylist({ listType: 'playlist', list: 'RD' + id }); poll = setInterval(() => { try { const l = tp.getPlaylist(); if (l && l.length) fin(l); } catch (e) {} }, 300); } } });
     };
-    tmr = setTimeout(() => fin(null), 15000);
+    tmr = setTimeout(() => fin(null), 12000);
     if (window.YT && YT.Player) demarrer(); else { chargerApi(); const w = setInterval(() => { if (window.YT && YT.Player) { clearInterval(w); if (!fini) demarrer(); } else if (fini) clearInterval(w); }, 200); }
   });
 }
 async function ouvrirMix() {
   const src = M.cur; if (!src || M.mixEnCours) return;
   M.mixEnCours = true; mlg('Chargement du Mix…');
-  const ids = await listeMix(src.youtube); M.mixEnCours = false;
-  if (!ids) { mlg('Le Mix n’a pas pu être chargé (YouTube ne répond pas). Réessaie dans un instant.'); return; }
+  let ids = null; for (let essai = 0; essai < 2 && !ids; essai++) ids = await listeMix(src.youtube);   // YouTube répond parfois une liste vide : on réessaie avec un nouveau lecteur caché
+  M.mixEnCours = false;
+  if (!ids) { mlg('YouTube ne propose pas de Mix pour ce titre (ou ne répond pas). Essaie avec un autre titre.'); return; }
   const vus = new Set(), items = [];
   [src.youtube, ...ids].forEach(id => { if (ID_YT.test(id) && !vus.has(id)) { vus.add(id); items.push(id === src.youtube && !src.mx ? { youtube: id, titre: src.titre, artiste: src.artiste || '', mx: true } : { youtube: id, titre: '', artiste: '', mx: true }); } });
   M.mix = { de: src.titre || src.youtube, items }; M.vueMix = true; panneau(); mlg(`Mix de « ${M.mix.de} » : ${items.length} titres.`);
   remplirInfos(items);
+}
+function mixVoisin(k, sens) {   // le titre lisible suivant (ou précédent) dans le Mix, en sautant les grisés
+  const L = M.mix.items, n = L.length;
+  for (let j = 1; j <= n; j++) { const it = L[(((k + sens * j) % n) + n) % n]; if (!it.bloque && (j < n || k < 0)) return it; }
+  return null;
 }
 function jouerMix(it) {
   M.cur = it; M.courant = -1; M.prog = 0;
@@ -1531,11 +1539,16 @@ function dessinerMix() {
     li.innerHTML = '<span class="pan-n"></span><img class="pan-vig" alt="" loading="lazy" draggable="false"><span class="pan-t"><b></b><i></i></span><button type="button" class="mx-c" aria-label="Ajouter à « À ajouter »" title="Ajouter à « À ajouter »">♡</button><button type="button" class="pan-x" aria-label="Retirer du Mix" title="Retirer du Mix">✕</button>';
     li.querySelector('.pan-n').textContent = String(i + 1); li.querySelector('.pan-vig').src = 'https://i.ytimg.com/vi/' + encodeURIComponent(it.youtube) + '/mqdefault.jpg';
     li.querySelector('b').textContent = it.titre || '…'; li.querySelector('i').textContent = it.artiste || '';
+    if (it.bloque) {
+      li.classList.add('bloque');
+      const a = document.createElement('a'); a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(it.youtube); a.target = '_blank'; a.rel = 'noopener'; a.textContent = ' · Écouter sur YouTube ↗';
+      a.addEventListener('click', e => e.stopPropagation()); a.addEventListener('pointerdown', e => e.stopPropagation()); li.querySelector('i').appendChild(a);
+    }
     const c = li.querySelector('.mx-c'), deja = M.parId.has(it.youtube);
     if (deja) { c.textContent = '♥'; c.classList.add('fait'); c.title = 'Déjà dans ta bibliothèque ou dans « À ajouter »'; }
     c.addEventListener('click', e => { e.stopPropagation(); if (!deja) aimerMix(it); });
     li.querySelector('.pan-x').addEventListener('click', e => { e.stopPropagation(); const k = M.mix.items.indexOf(it); if (k >= 0) M.mix.items.splice(k, 1); panneau(); });
-    li.dataset.i = i; li.addEventListener('click', () => { if (DR.bloque) return; jouerMix(it); });
+    li.dataset.i = i; li.addEventListener('click', () => { if (DR.bloque) return; if (it.bloque) { mlg('Ce titre ne se lit que sur YouTube : utilise « Écouter sur YouTube ».'); return; } jouerMix(it); });
     li.addEventListener('pointerdown', e => armerDrag(e, it, i));
     ul.appendChild(li);
   });
