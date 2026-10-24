@@ -410,6 +410,15 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .mode-mix{box-shadow:inset 0 2px 0 var(--accent)}
 .mx-tete{list-style:none;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 8px 10px}
 .mx-tete b{flex:1 1 100%;font-weight:500;font-size:15px;color:var(--accent)}
+.mx-chips{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px}
+.mx-chip{display:inline-flex;align-items:center;gap:4px;max-width:100%;background:#1A2B4A;border-radius:999px;padding:2px 4px 2px 11px;font-size:13px;color:var(--ink)}
+.mx-chip>span{min-width:0;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mx-chip.att{opacity:.55}.mx-chip.vide{opacity:.45;text-decoration:line-through}
+.mx-tete .mx-chip button{background:none;min-height:22px;padding:0 6px;color:var(--acier);font-size:12px}
+.mx-prog{flex:1 1 100%;height:4px;border-radius:2px;background:#16223F;overflow:hidden}.mx-prog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.mx-cpt{flex:1 1 100%;margin:0;font-size:13px;color:var(--acier)}
+.mx-voir{flex:1 1 100%}
+.mx-rec{color:var(--accent)}
 .mx-tete button{font:inherit;font-size:14px;color:var(--ink);background:#1A2B4A;border:0;border-radius:999px;padding:3px 12px;min-height:30px;cursor:pointer}
 .pan-item.mx{grid-template-columns:20px 64px minmax(0,1fr) 28px 28px;cursor:pointer}
 .pan-item.mx .pan-x{opacity:0}
@@ -511,6 +520,8 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
 @media (min-width:1180px) and (min-height:560px){.mus-gauche{display:flex;flex-direction:column}.mus-gauche .platine{margin:auto}}   /* anneau centré verticalement dans sa colonne */
 /* Tags : le nombre entre parenthèses est plus discret que le nom du style (v47) */
 .filtres .nb{color:#6B7AA0}
+.filtres .filtres-saut{flex:1 1 100%;height:0}
+.mus-corps .filtres .det{background:transparent;box-shadow:inset 0 0 0 1px #22314F}
 .filtres button[aria-pressed="true"] .nb{color:inherit;opacity:.7}
 </style>
 </head>
@@ -571,7 +582,7 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
           <div class="lect-prog" id="lProg" aria-hidden="true"></div>
         </div>
         <button id="lPlein" class="lect-plein" type="button" aria-pressed="false" aria-label="Voir la vidéo en plein écran" title="Vidéo en plein écran (F)"><svg class="ico-ouvrir" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg><svg class="ico-fermer" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg></button>
-        <span class="lect-liens"><a class="lect-yt" id="lYt" href="#" target="_blank" rel="noopener">Écouter sur YouTube</a><button class="lect-yt lect-sim" id="lSim" type="button" title="Charge dans la playlist (à droite) les suggestions YouTube dans le même esprit que ce titre">Titres similaires</button></span>
+        <span class="lect-liens"><a class="lect-yt" id="lYt" href="#" target="_blank" rel="noopener">Écouter sur YouTube</a><button class="lect-yt lect-sim" id="lSim" type="button" title="Charge dans la playlist (à droite) les suggestions YouTube dans le même esprit que ce titre">Titres similaires</button><button class="lect-yt lect-sim" id="lDec" type="button" title="Mix construit à partir de plusieurs de tes titres (les plus écoutés) pour découvrir du nouveau">Découverte</button></span>
         <div class="lect-extra">
           <label class="vol" for="vol"><span>Volume</span><input id="vol" type="range" min="0" max="100" step="1" value="80" aria-label="Volume de la musique et des sons"><output id="volVal" for="vol">80</output></label>
           <p class="lect-note" id="lMsg" role="status"></p>
@@ -1148,7 +1159,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 62';
+const BUILD = 'v-backend 24 oct, 64';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1237,19 +1248,28 @@ function construireMusique(D) {
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
   M.parId = new Map(M.tous.map(t => [t.youtube, t]));
   M.pl = nettoyerPl(mem.lire('playlists', {})); M.plActive = mem.lire('vuePl', null); construireOff(); if (!existe(M.plActive)) M.plActive = null; M.ctx = 'bib';
-  M.genreFiltre = null; M.q = ''; M.mix = false; M.montre = PAGE;
+  M.genreFiltre = null; M.famille = null; M.detail = !!mem.lire('detail', false); M.q = ''; M.mix = false; M.montre = PAGE;
   const cnt = {}; M.tous.forEach(t => { cnt[t.genre] = (cnt[t.genre] || 0) + 1; });
   M.genresOrdre = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x]);
-  const f = $('#filtres'); f.textContent = '';
-  const boutons = [];
-  [null, ...M.genresOrdre].forEach(gn => {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = gn || 'Tous'; if (gn) { const nb = document.createElement('span'); nb.className = 'nb'; nb.textContent = ` (${cnt[gn]})`; b.appendChild(nb); } b.setAttribute('aria-pressed', String(gn === M.genreFiltre));
-    b.addEventListener('click', () => {
-      M.genreFiltre = (gn && gn === M.genreFiltre) ? null : gn;   // recliquer sur le genre actif = retour à « Tous »
-      M.montre = PAGE; boutons.forEach(x => x.b.setAttribute('aria-pressed', String(x.gn === M.genreFiltre))); reconstruire(M.cur, true);
-    });
-    boutons.push({ gn, b }); f.appendChild(b);
-  });
+  /* grandes familles : regroupent les tags détaillés, sans rien retagger (un titre est dans la famille de son tag) ; « Détail » déplie les tags */
+  const fam = {}; M.genresOrdre.forEach(g => { fam[familleDe(g)] = (fam[familleDe(g)] || 0) + cnt[g]; });
+  const dessinerFiltres = () => {
+    const f = $('#filtres'); f.textContent = '';
+    const bouton = (txt, nb, actif, fn, cls) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = txt; if (cls) b.className = cls;
+      if (nb != null) { const s = document.createElement('span'); s.className = 'nb'; s.textContent = ` (${nb})`; b.appendChild(s); }
+      b.setAttribute('aria-pressed', String(actif)); b.addEventListener('click', fn); f.appendChild(b); return b;
+    };
+    const maj = () => { M.montre = PAGE; dessinerFiltres(); reconstruire(M.cur, true); };
+    bouton('Tous', null, !M.famille && !M.genreFiltre, () => { M.famille = null; M.genreFiltre = null; maj(); });
+    FAMILLES.forEach(F => { if (fam[F.id]) bouton(F.id, fam[F.id], M.famille === F.id, () => { M.famille = M.famille === F.id ? null : F.id; M.genreFiltre = null; maj(); }, 'fam'); });
+    const d = bouton('Détail', null, M.detail, () => { M.detail = !M.detail; mem.ecrire('detail', M.detail); dessinerFiltres(); }, 'det'); d.textContent = M.detail ? 'Détail ▴' : 'Détail ▾';
+    if (M.detail) {
+      f.appendChild(Object.assign(document.createElement('div'), { className: 'filtres-saut' }));
+      M.genresOrdre.filter(g => !M.famille || familleDe(g) === M.famille).forEach(g => bouton(g, cnt[g], g === M.genreFiltre, () => { M.genreFiltre = M.genreFiltre === g ? null : g; if (M.genreFiltre) M.famille = familleDe(g); maj(); }));
+    }
+  };
+  dessinerFiltres();
   $('#toutAj').addEventListener('click', ajouterTous);
   $('#q').addEventListener('input', e => { M.q = e.target.value; M.montre = PAGE; reconstruire(M.cur, true); });
   $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(M.cur, true); });
@@ -1281,10 +1301,9 @@ function noterEc(id, champ) {   // champ : 'n' = écouté en entier, 's' = pass�
   if (!ID_YT.test(String(id))) return; const o = lireEc(); const e = o[id] || { n: 0, s: 0 }; e[champ] = (e[champ] || 0) + 1; o[id] = e; mem.ecrire('ecoutes', o);
 }
 function scores() {
-  const o = lireEc(), bon = new Set(M.ajouts.map(x => x.youtube)); Object.values(M.pl).forEach(l => l.forEach(i => bon.add(i)));
-  const st = new Map(), sa = new Map(), sg = new Map();
-  new Set([...Object.keys(o), ...bon]).forEach(id => {
-    const e = o[id] || { n: 0, s: 0 }, v = 2 * (e.n || 0) - 2 * (e.s || 0) + (bon.has(id) ? 3 : 0); st.set(id, v);
+  const o = lireEc(), st = new Map(), sa = new Map(), sg = new Map();   // tous les titres sont déjà des favoris : seuls les écoutes comptent
+  Object.keys(o).forEach(id => {
+    const e = o[id], v = 2 * (e.n || 0) - 2 * (e.s || 0); st.set(id, v);
     const tr = M.parId.get(id); if (tr) { if (tr.artiste) sa.set(tr.artiste, (sa.get(tr.artiste) || 0) + v); sg.set(tr.genre, (sg.get(tr.genre) || 0) + v); }
   });
   return { st, sa, sg, o };
@@ -1324,7 +1343,7 @@ function dessinerTop() {
   const rz = el('button', '', 'Remettre à zéro'); rz.type = 'button'; rz.disabled = !Object.keys(S.o).length;
   rz.addEventListener('click', () => { if (confirm('Effacer tout ton historique d’écoute (compteurs et scores) dans ce navigateur ?')) { mem.ecrire('ecoutes', {}); dessinerTop(); } });
   bas.append(ex, rz); pn.appendChild(bas);
-  pn.appendChild(el('p', 'aj-aide', 'Gardé dans ce navigateur seulement, rien n’est publié. Écoute en entier +2, passé avant 30 s −2, ♥ ou playlist +3.'));
+  pn.appendChild(el('p', 'aj-aide', 'Gardé dans ce navigateur seulement, rien n’est publié. Écoute en entier +2, passé avant 30 s −2.'));
 }
 function ouvrirTop() {
   const pn = $('#topPanneau'), b = $('#topBtn').getBoundingClientRect(); fermerAj(); dessinerTop(); pn.hidden = false; $('#topBtn').setAttribute('aria-expanded', 'true');
@@ -1347,9 +1366,16 @@ function modifiable(nom) {   // renvoie le nom d'une playlist qu'on peut modifie
   return copie;
 }
 function pistesDe(nom) { return (listeDe(nom) || []).map(id => M.parId.get(id)).filter(Boolean); }
+const FAMILLES = [
+  { id: 'Ambient', tags: ['ambient', 'neoclassique'] },
+  { id: 'Electro chill', tags: ['chill', 'electronica', 'electro-melodique', 'dub-reggae', 'synthwave'] },
+  { id: 'Electro énergique', tags: ['edm', 'bass', 'electro-pop', 'trance-psy', 'french-touch'] },
+  { id: 'Techno', tags: ['house-techno', 'hard-edm'] },
+  { id: 'Autres', tags: ['hiphop', 'pop-indie', 'rock-metal', 'folk-world', 'funk-jazz', 'ost', 'epic', 'autre'] }];
+const familleDe = g => (FAMILLES.find(F => F.tags.includes(g)) || FAMILLES[FAMILLES.length - 1]).id;   // tout tag inconnu va dans « Autres »
 function biblioAff() {   // la liste affichée : bibliothèque filtrée (genre, recherche, mix), avec les titres indisponibles (grisés, lien YouTube)
   const q = norm(M.q.trim());
-  return M.tous.filter(t => (M.mix || !t.mix) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
+  return M.tous.filter(t => (M.mix || !t.mix) && (!M.famille || familleDe(t.genre) === M.famille) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
 }
 function biblio() { return biblioAff().filter(t => !M.indispo.has(t.youtube)); }   // la liste jouable : anneau, suivant, roulette
 function contexte() {   // la liste qui sert à l'anneau et à « suivant » : la bibliothèque filtrée, ou la playlist si on lit depuis elle
@@ -1397,7 +1423,7 @@ function tableau() {
     tb.appendChild(row);
   });
   $('#plus').hidden = aff.length <= M.montre;
-  const filtre = !!(M.q.trim() || M.genreFiltre), bt = $('#toutAj');   // « tout ajouter » : seulement quand la liste est filtrée
+  const filtre = !!(M.q.trim() || M.genreFiltre || M.famille), bt = $('#toutAj');   // « tout ajouter » : seulement quand la liste est filtrée
   bt.hidden = !filtre || !M.biblio.length; bt.textContent = `Tout ajouter (${M.biblio.length})`;
 }
 function ajouterTous() {   // ajoute toute la liste filtrée (pas seulement les lignes affichées) à la playlist ouverte, sans doublon
@@ -1550,15 +1576,16 @@ function deplacerIdx(nom, de, vers) {
    Temporaire : gardé en mémoire de la page seulement, rien n'est écrit sur le disque. Seul ♥ range un titre dans « À ajouter ». */
 const nomArtiste = a => (a || '').replace(/\s*-\s*Topic$/i, '').trim();
 async function infoYT(it) {   // titre et chaîne via l'adresse oEmbed de YouTube (sans clé)
+  it.info = true;
   try { const r = await fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + it.youtube)); if (!r.ok) return; const j = await r.json(); it.titre = String(j.title || '').slice(0, 200); it.artiste = nomArtiste(j.author_name).slice(0, 100); }
   catch (e) {}
 }
 async function remplirInfos(items) {   // 100 titres, 6 requêtes à la fois ; la liste se redessine au fil de l'eau
-  const file = items.filter(x => !x.titre); let fin = 0;
-  const un = async () => { while (file.length) { const it = file.shift(); await infoYT(it); if (M.vueMix && M.mix && M.mix.items === items && ++fin % 8 === 0) panneau(); } };
-  await Promise.all([un(), un(), un(), un(), un(), un()]); if (M.vueMix && M.mix && M.mix.items === items) panneau();
+  const mix = M.mix, file = items.filter(x => !x.titre && !x.info); let fin = 0;
+  const un = async () => { while (file.length) { const it = file.shift(); await infoYT(it); if (M.vueMix && M.mix === mix && ++fin % 8 === 0) panneau(); } };
+  await Promise.all([un(), un(), un(), un(), un(), un()]); if (M.vueMix && M.mix === mix) panneau();
 }
-function listeMix(id) {   // lit les identifiants du Mix avec un 2e lecteur caché (le titre en cours continue de jouer)
+function listeMix(id, delai) {   // lit les identifiants du Mix avec un 2e lecteur caché (le titre en cours continue de jouer)
   return new Promise(res => {
     let tp = null, fini = false, tmr = null, poll = null, div = null;
     const fin = l => { if (fini) return; fini = true; clearTimeout(tmr); clearInterval(poll); try { tp && tp.destroy(); } catch (e) {} if (div) div.remove(); res(l); };
@@ -1566,7 +1593,7 @@ function listeMix(id) {   // lit les identifiants du Mix avec un 2e lecteur cach
       div = document.createElement('div'); div.style.cssText = 'position:fixed;left:-9999px;top:0;width:200px;height:200px'; document.body.appendChild(div);
       tp = new YT.Player(div, { width: 200, height: 200, playerVars: { playsinline: 1 }, events: { onReady: () => { tp.cuePlaylist({ listType: 'playlist', list: 'RD' + id }); poll = setInterval(() => { try { const l = tp.getPlaylist(); if (l && l.length) fin(l); } catch (e) {} }, 300); } } });
     };
-    tmr = setTimeout(() => fin(null), 12000);
+    tmr = setTimeout(() => fin(null), delai || 12000);
     if (window.YT && YT.Player) demarrer(); else { chargerApi(); const w = setInterval(() => { if (window.YT && YT.Player) { clearInterval(w); if (!fini) demarrer(); } else if (fini) clearInterval(w); }, 200); }
   });
 }
@@ -1583,8 +1610,17 @@ async function ouvrirMix() {
 }
 function mixVoisin(k, sens) {   // le titre lisible suivant (ou précédent) dans le Mix, en sautant les grisés
   const L = M.mix.items, n = L.length;
-  for (let j = 1; j <= n; j++) { const it = L[(((k + sens * j) % n) + n) % n]; if (!it.bloque && (j < n || k < 0)) return it; }
+  for (let j = 1; j <= n; j++) { const it = L[(((k + sens * j) % n) + n) % n]; if (!it.bloque && visibleMix(it) && (j < n || k < 0)) return it; }
   return null;
+}
+const visibleMix = it => !(M.mix && M.mix.dec && !M.mix.dec.voir && M.parId.has(it.youtube));   // Découverte : par défaut, on cache ce qui est déjà dans la bibliothèque
+function mixRetirer(k) {
+  const it = M.mix.items[k]; if (!it) return; M.mix.items.splice(k, 1);
+  if (M.mix.dec) { M.mix.dec.retires.add(it.youtube); M.mix.dec.ajouts = M.mix.dec.ajouts.filter(x => x.youtube !== it.youtube); }
+}
+function mixAjouter(it, pos) {
+  const L = M.mix.items; L.splice(pos == null ? L.length : Math.max(0, Math.min(pos, L.length)), 0, it);
+  if (M.mix.dec) { M.mix.dec.retires.delete(it.youtube); M.mix.dec.ajouts.push(it); }
 }
 function jouerMix(it) {
   M.cur = it; M.courant = -1; M.prog = 0;
@@ -1606,24 +1642,44 @@ function ajouterAuMix() {
   const s = prompt('Lien YouTube (ou identifiant à 11 caractères) du titre à ajouter au Mix ?', ''); if (!s) return;
   const m = s.match(/(?:[?&]v=|youtu\.be\/|shorts\/|^)([\w-]{11})(?![\w-])/); if (!m) { mlg('Lien non reconnu : rien ajouté.'); return; }
   if (M.mix.items.some(x => x.youtube === m[1])) { mlg('Déjà dans le Mix.'); return; }
-  const it = { youtube: m[1], titre: '', artiste: '', mx: true }; M.mix.items.push(it); panneau(); infoYT(it).then(() => { if (M.vueMix) panneau(); });
+  const it = { youtube: m[1], titre: '', artiste: '', mx: true }; mixAjouter(it); panneau(); infoYT(it).then(() => { if (M.vueMix) panneau(); });
 }
 function dessinerMix() {
   const ul = $('#panListe'); ul.textContent = ''; $('#panneau').classList.add('mode-mix'); $('#panVide').hidden = true;
-  const L = M.mix.items;
-  $('#panCompte').textContent = `${L.length} titre${L.length > 1 ? 's' : ''} · temporaire : rien n’est enregistré`;
+  const L = M.mix.items, dec = M.mix.dec, nb = L.filter(visibleMix).length;
+  $('#panCompte').textContent = `${nb} titre${nb > 1 ? 's' : ''} · temporaire : rien n’est enregistré`;
   $('#panAide').textContent = 'Clique un titre pour l’écouter. ♥ le range dans « À ajouter ». Glisse pour ranger, tire vers la droite pour retirer du Mix (pas de ta bibliothèque) ; glisse un titre de la liste ici pour l’ajouter au Mix.';
   const tete = document.createElement('li'); tete.className = 'mx-tete';
-  const b = document.createElement('b'); b.textContent = `Mix de « ${M.mix.de} »`; tete.appendChild(b);
-  const bt = (txt, f) => { const e = document.createElement('button'); e.type = 'button'; e.textContent = txt; e.addEventListener('click', f); tete.appendChild(e); };
+  const b = document.createElement('b'); b.textContent = dec ? `Découverte · départ : ${dec.lib}` : `Mix de « ${M.mix.de} »`; tete.appendChild(b);
+  const bt = (txt, f) => { const e = document.createElement('button'); e.type = 'button'; e.textContent = txt; e.addEventListener('click', f); tete.appendChild(e); return e; };
+  if (dec) {
+    const chips = document.createElement('div'); chips.className = 'mx-chips';
+    dec.seeds.forEach(s => {
+      const c = document.createElement('span'); c.className = 'mx-chip' + (dec.res.has(s.youtube) ? (dec.res.get(s.youtube) ? '' : ' vide') : ' att'); c.title = dec.res.has(s.youtube) && !dec.res.get(s.youtube) ? 'YouTube ne propose pas de Mix pour ce titre' : (s.artiste ? s.artiste + ' — ' : '') + s.titre;
+      const t = document.createElement('span'); t.textContent = s.titre; const x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', 'Retirer ce titre de départ');
+      x.addEventListener('click', () => { dec.seeds = dec.seeds.filter(y => y !== s); dec.res.delete(s.youtube); fusionDec(M.mix); panneau(); });
+      c.append(t, x); chips.appendChild(c);
+    });
+    tete.appendChild(chips);
+    if (dec.enCours) {
+      const fait = dec.seeds.filter(s => dec.res.has(s.youtube)).length, p = document.createElement('div'); p.className = 'mx-prog'; p.innerHTML = '<i></i>'; p.firstChild.style.width = Math.round(100 * fait / N_DEPARTS) + '%'; tete.appendChild(p);
+      const m = document.createElement('p'); m.className = 'mx-cpt'; m.textContent = `${fait} / ${N_DEPARTS} Mix chargés…${dec.vides ? ` (${dec.vides} titre${dec.vides > 1 ? 's' : ''} sans Mix chez YouTube, remplacé${dec.vides > 1 ? 's' : ''})` : ''}`; tete.appendChild(m);
+    }
+    bt('⟳ Autres départs', () => ouvrirDec(true));
+    bt('＋ Titre en cours comme départ', () => { const c = M.cur; if (!c || dec.seeds.some(s => s.youtube === c.youtube)) return; dec.seeds.push({ youtube: c.youtube, titre: c.titre, artiste: c.artiste || '' }); panneau(); chargerDec(M.mix); });
+    const lab = document.createElement('label'); lab.className = 'inter mx-voir'; lab.innerHTML = '<input type="checkbox" role="switch"><span class="inter-p" aria-hidden="true"></span>Cacher ce que j’ai déjà';
+    const cb = lab.querySelector('input'); cb.checked = !dec.voir; cb.addEventListener('change', () => { dec.voir = !cb.checked; fusionDec(M.mix); panneau(); remplirInfos(M.mix.items); }); tete.appendChild(lab);
+  }
   bt('← Ma playlist', () => { M.vueMix = false; panneau(); });
   bt('＋ Ajouter un titre', ajouterAuMix);
   ul.appendChild(tete);
   L.forEach((it, i) => {
+    if (!visibleMix(it)) return;
     const li = document.createElement('li'); li.className = 'pan-item mx'; if (M.cur && M.cur.youtube === it.youtube) li.classList.add('courant');
     li.innerHTML = '<span class="pan-n"></span><img class="pan-vig" alt="" loading="lazy" draggable="false"><span class="pan-t"><b></b><i></i></span><button type="button" class="mx-c" aria-label="Ajouter à « À ajouter »" title="Ajouter à « À ajouter »">♡</button><button type="button" class="pan-x" aria-label="Retirer du Mix" title="Retirer du Mix">✕</button>';
     li.querySelector('.pan-n').textContent = String(i + 1); li.querySelector('.pan-vig').src = 'https://i.ytimg.com/vi/' + encodeURIComponent(it.youtube) + '/mqdefault.jpg';
     li.querySelector('b').textContent = it.titre || '…'; li.querySelector('i').textContent = it.artiste || '';
+    if (it.rec > 1) { const r = document.createElement('span'); r.className = 'mx-rec'; r.textContent = ` · ×${it.rec}`; r.title = `Recommandé par ${it.rec} de tes titres de départ`; li.querySelector('i').appendChild(r); }
     if (it.bloque) {
       li.classList.add('bloque'); li.querySelector('.mx-c').style.visibility = 'hidden';   // inutile d'ajouter à sa bibliothèque un titre qu'on ne pourra pas lire ici
       const a = document.createElement('a'); a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(it.youtube); a.target = '_blank'; a.rel = 'noopener'; a.textContent = ' · Écouter sur YouTube ↗';
@@ -1632,12 +1688,65 @@ function dessinerMix() {
     const c = li.querySelector('.mx-c'), deja = M.parId.has(it.youtube);
     if (deja) { c.textContent = '♥'; c.classList.add('fait'); c.title = 'Déjà dans ta bibliothèque ou dans « À ajouter »'; }
     c.addEventListener('click', e => { e.stopPropagation(); if (!deja) aimerMix(it); });
-    li.querySelector('.pan-x').addEventListener('click', e => { e.stopPropagation(); const k = M.mix.items.indexOf(it); if (k >= 0) M.mix.items.splice(k, 1); panneau(); });
+    li.querySelector('.pan-x').addEventListener('click', e => { e.stopPropagation(); const k = M.mix.items.indexOf(it); if (k >= 0) mixRetirer(k); panneau(); });
     li.dataset.i = i; li.addEventListener('click', () => { if (DR.bloque) return; if (it.bloque) { mlg('Ce titre ne se lit que sur YouTube : utilise « Écouter sur YouTube ».'); return; } jouerMix(it); });
     li.addEventListener('pointerdown', e => armerDrag(e, it, i));
     ul.appendChild(li);
   });
 }
+/* ---------- Découverte : un Mix construit à partir de plusieurs de tes titres ----------
+   Départs : tes titres les plus écoutés en entier (ou au hasard dans la liste affichée). Le Mix YouTube de chacun est lu, puis tout est fusionné :
+   les titres recommandés par plusieurs départs passent en tête. Temporaire, rien n'est enregistré. */
+const N_DEPARTS = 6;
+function departs(n, exclure, hasard) {
+  const pool = M.biblio.filter(t => !exclure.has(t.youtube)), ec = lireEc();
+  const top = hasard ? [] : pool.filter(t => (ec[t.youtube] || {}).n > 0).sort((a, b) => ec[b.youtube].n - ec[a.youtube].n).slice(0, n);
+  const reste = pool.filter(t => !top.includes(t)); const nTop = top.length;
+  while (top.length < n && reste.length) top.push(reste.splice(Math.floor(Math.random() * reste.length), 1)[0]);
+  const lib = hasard || !nTop ? 'titres au hasard' : nTop < n ? `tes ${nTop} titres les plus écoutés + hasard` : 'tes titres les plus écoutés';
+  return { seeds: top.map(t => ({ youtube: t.youtube, titre: t.titre, artiste: t.artiste || '' })), lib: lib + (M.genreFiltre || M.famille ? ` · ${M.genreFiltre || M.famille}` : '') };
+}
+function fusionDec(mix) {   // recalcule la liste depuis les Mix déjà chargés : titres inconnus d'abord, triés par nombre de départs qui les recommandent
+  const d = mix.dec, ex = new Set(d.seeds.map(s => s.youtube)), cnt = new Map(), ordre = [];
+  d.seeds.forEach(s => { const l = d.res.get(s.youtube); if (!l) return; new Set(l).forEach(id => { if (ex.has(id) || !ID_YT.test(id) || d.retires.has(id)) return; if (!cnt.has(id)) { cnt.set(id, 0); ordre.push(id); } cnt.set(id, cnt.get(id) + 1); }); });
+  ordre.sort((a, b) => cnt.get(b) - cnt.get(a));
+  const vieux = new Map(mix.items.map(x => [x.youtube, x])); let nouv = 0, deja = 0; const out = [];
+  ordre.forEach(id => {
+    const dj = M.parId.has(id); if (dj ? (!d.voir || deja >= 50) : nouv >= 150) return; dj ? deja++ : nouv++;
+    const it = vieux.get(id) || { youtube: id, titre: '', artiste: '', mx: true }, tr = M.parId.get(id);
+    if (tr && !it.titre) { it.titre = tr.titre; it.artiste = tr.artiste || ''; } it.rec = cnt.get(id); out.push(it);
+  });
+  d.ajouts.forEach(it => { if (!out.some(x => x.youtube === it.youtube)) out.push(it); });
+  mix.items = out; mix.de = 'Découverte';
+}
+async function chargerDec(mix) {
+  const d = mix.dec; d.enCours = true; panneau();
+  const un = async () => {   // YouTube ne donne un Mix que pour ~1 titre sur 3 : un départ sans Mix est remplacé par un autre, jusqu'à N_DEPARTS réussis (20 essais au plus)
+    for (;;) {
+      if (M.mix !== mix) return;
+      let s = d.seeds.find(x => !d.lance.has(x.youtube));
+      if (!s) {
+        if (d.seeds.length >= N_DEPARTS || d.essais >= 20) return;
+        const r = departs(1, new Set([...d.seeds.map(x => x.youtube), ...d.tentes]), d.hasard); if (!r.seeds.length) return;
+        s = r.seeds[0]; d.seeds.push(s);
+      }
+      d.lance.add(s.youtube); d.tentes.add(s.youtube); d.essais++;
+      const l = await listeMix(s.youtube, 4500); if (M.mix !== mix) return;
+      if (l && l.length) d.res.set(s.youtube, l); else { d.seeds = d.seeds.filter(x => x !== s); d.vides++; }
+      fusionDec(mix); if (M.vueMix) panneau();
+    }
+  };
+  await Promise.all([un(), un()]); if (M.mix !== mix) return;
+  d.enCours = false; fusionDec(mix); panneau(); remplirInfos(mix.items);
+  mlg(`Découverte : ${mix.items.filter(visibleMix).length} titres, à partir de ${d.seeds.length} départs${d.vides ? ` (${d.vides} titre${d.vides > 1 ? 's' : ''} sans Mix chez YouTube, remplacé${d.vides > 1 ? 's' : ''})` : ''}.`);
+}
+function ouvrirDec(autres) {   // autres = nouveaux départs au hasard
+  if (!M.biblio.length) { mlg('Aucun titre pour partir en découverte.'); return; }
+  const d0 = autres && M.mix && M.mix.dec ? M.mix.dec : null, dep = departs(N_DEPARTS, new Set(d0 ? d0.seeds.map(s => s.youtube) : []), !!autres);
+  const mix = { de: 'Découverte', items: [], dec: { seeds: dep.seeds, lib: dep.lib, res: new Map(), lance: new Set(), tentes: new Set(), essais: 0, vides: 0, hasard: !!autres, retires: new Set(), ajouts: [], voir: false, enCours: true } };
+  M.mix = mix; M.vueMix = true; chargerDec(mix);
+}
+$('#lDec').addEventListener('click', () => ouvrirDec(false));
 $('#lSim').addEventListener('click', ouvrirMix);
 function panneau() {   // dessine la liste de la playlist ouverte
   if (M.vueMix && M.mix) { dessinerMix(); return; }
@@ -1684,7 +1793,7 @@ function supprimerPl() {
 }
 function enregistrerListe() {
   if (!M.biblio.length) { mlg('La liste affichée est vide.'); return; }
-  const n = creerPl(prompt(`Nom de la playlist (${M.biblio.length} titres de la liste affichée) ?`, M.genreFiltre || M.q || 'Ma sélection')); if (!n) return;
+  const n = creerPl(prompt(`Nom de la playlist (${M.biblio.length} titres de la liste affichée) ?`, M.genreFiltre || M.famille || M.q || 'Ma sélection')); if (!n) return;
   M.pl[n] = [...new Set(M.biblio.map(t => t.youtube))]; M.plActive = n; sauverPl(); majSelecteur(); panneau(); mlg(`Playlist « ${n} » enregistrée (${M.pl[n].length} titres).`);
 }
 function exporterPl() {
@@ -1737,11 +1846,11 @@ function finirDrag() {
     const { tr, de, cible, retirer } = DR;
     if (M.vueMix && M.mix) {   // vue Mix : mêmes gestes que la playlist, mais sur la liste temporaire
       const L = M.mix.items;
-      if (retirer && de >= 0) { L.splice(de, 1); panneau(); }
+      if (retirer && de >= 0) { mixRetirer(de); panneau(); }
       else if (cible >= 0) {
         if (de >= 0) { const [it] = L.splice(de, 1); L.splice(Math.max(0, Math.min(L.length, cible > de ? cible - 1 : cible)), 0, it); panneau(); }
         else if (L.some(x => x.youtube === tr.youtube)) mlg(`« ${tr.titre} » est déjà dans le Mix.`);
-        else { L.splice(Math.min(cible, L.length), 0, { youtube: tr.youtube, titre: tr.titre, artiste: tr.artiste || '', mx: true }); panneau(); mlg(`Ajouté au Mix : ${tr.titre}`); }
+        else { mixAjouter({ youtube: tr.youtube, titre: tr.titre, artiste: tr.artiste || '', mx: true }, cible); panneau(); mlg(`Ajouté au Mix : ${tr.titre}`); }
       }
     }
     else if (retirer && de >= 0 && M.plActive) retirerIdx(M.plActive, de);
