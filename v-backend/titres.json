@@ -28501,5 +28501,17 @@
 "source": "ajout",
 "artiste_fiable": false,
 "mix": true
+},
+{
+"youtube": "W51_VZHYYOY",
+"titre": "Il nostro amore",
+"artiste": "Schrotthagen",
+"genre": "electro-melodique",
+"tags": [
+"electro-melodique"
+],
+"source": "ajout",
+"artiste_fiable": false,
+"mix": false
 }
 ]
