@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Small Humans</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='.5' y='.5' width='31' height='31' rx='7' fill='%230B0E1A' stroke='%236FA8FF'/%3E%3Ctext x='16' y='21.5' text-anchor='middle' font-family='Raleway,Arial,sans-serif' font-weight='500' font-size='14' fill='%236FA8FF'%3ESH%3C/text%3E%3C/svg%3E">
 <meta name="description" content="Small Humans : une station vue de dessus, quatre passions (musique, cinéma, écriture, tech et IA).">
 <meta name="theme-color" content="#05080F">
 <style>
@@ -1115,7 +1116,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 49';
+const BUILD = 'v-backend 24 oct, 50';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
