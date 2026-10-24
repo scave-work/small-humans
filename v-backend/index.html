@@ -221,7 +221,6 @@ tr.cache{display:none}
 .menu-pl button{display:block;width:100%;text-align:left;min-height:42px;padding:6px 12px;background:none;color:var(--ink)}
 .menu-pl button:hover{background:#1A2B4A}
 .menu-pl .vide{padding:8px 12px;color:var(--acier)}
-.credit{position:fixed;right:8px;bottom:2px;font-size:11px;color:#46557a;margin:0;z-index:10}.credit a{color:#6FA8FF}
 .version{position:fixed;left:8px;bottom:2px;font-size:11px;color:#46557a;margin:0;z-index:10;pointer-events:none}
 .anneaux{display:flex;align-items:center;gap:12px;margin-top:10px;color:var(--acier);font-size:15px}
 .anneaux[hidden]{display:none}
@@ -381,7 +380,7 @@ body.drag{user-select:none;cursor:grabbing}
 .lect-plein[aria-pressed="true"] .ico-fermer{display:block}
 /* vidéo en plein écran : la vidéo remplit l'écran, la barre du lecteur flotte dessus ; le reste de la page est masqué */
 body.plein [data-entree]{clip-path:none !important;transform:none !important}
-body.plein .barre,body.plein .version,body.plein .credit{display:none}
+body.plein .barre,body.plein .version{display:none}
 body.plein .mus-gauche,body.plein .mus-corps,body.plein .mus-panneau{visibility:hidden}
 body.plein .platine .yt-boite{visibility:visible;position:fixed;left:0;top:0;width:100vw;height:100vh;max-width:none;transform:none;border-radius:0;aspect-ratio:auto;z-index:1;border:0;background:#000}
 body.plein .platine .yt-boite iframe,body.plein .platine .yt-boite #ytCible{left:0;top:0;width:100%;height:100%;transform:none}
@@ -588,7 +587,6 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
           <label class="vol" for="vol"><span>Volume</span><input id="vol" type="range" min="0" max="100" step="1" value="80" aria-label="Volume de la musique et des sons"><output id="volVal" for="vol">80</output></label>
           <p class="lect-note" id="lMsg" role="status"></p>
           <p class="version" id="mus-version"></p>
-          <p class="credit">BPM : <a href="https://getsongbpm.com" target="_blank" rel="noopener">GetSongBPM</a></p>
           <div class="menu-pl" id="menuPl" role="menu" hidden></div>
         </div>
       </div>
@@ -1161,7 +1159,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 65';
+const BUILD = 'v-backend 24 oct, 66';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
