@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musique — Small Humans (v-backend)</title>
+<style>
+:root{--fond:#0b1020;--carte:#121a33;--bord:#24305a;--texte:#e8ecf8;--doux:#9aa6cf;--bleu:#4c8dff;--bleu2:#79adff;--ok:#7fd1b9;--alerte:#ffb86b}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fond);color:var(--texte);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+body{padding:0 16px 120px;max-width:980px;margin:0 auto}
+h1{font-size:1.25rem;font-weight:600;margin:18px 0 4px;letter-spacing:.04em}
+.sous{color:var(--doux);margin:0 0 14px;font-size:.9rem}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--carte);border:1px solid var(--bord);border-radius:10px;padding:10px 14px;cursor:pointer;min-height:44px}
+button:hover{border-color:var(--bleu)}
+button[aria-pressed="true"]{background:var(--bleu);border-color:var(--bleu);color:#04112b}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--bleu2);outline-offset:2px}
+.lecteur{position:sticky;top:0;z-index:5;background:var(--fond);padding:8px 0 10px;border-bottom:1px solid var(--bord)}
+.video{aspect-ratio:16/9;width:100%;max-width:340px;background:#050814;border:1px solid var(--bord);border-radius:12px;overflow:hidden;display:grid;place-items:center;color:var(--doux);font-size:.9rem;text-align:center;padding:8px}
+.video iframe{width:100%;height:100%;border:0;display:block}
+.info{margin:8px 0 6px;min-height:2.6em}
+.info b{display:block;font-weight:600}
+.info span{color:var(--doux);font-size:.9rem}
+.cmd{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmd .gros{min-width:64px}
+.msg{color:var(--alerte);font-size:.85rem;margin:6px 0 0;min-height:1.2em}
+.outils{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px;align-items:center}
+.outils input[type=search]{flex:1 1 200px;background:var(--carte);border:1px solid var(--bord);border-radius:10px;padding:10px 12px;min-height:44px}
+label.case{display:flex;gap:6px;align-items:center;color:var(--doux);font-size:.9rem;min-height:44px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.chips button{padding:6px 10px;min-height:36px;font-size:.85rem;border-radius:999px}
+.compte{color:var(--doux);font-size:.85rem;margin:6px 0}
+ul.pistes{list-style:none;margin:0;padding:0}
+ul.pistes li{display:flex;gap:10px;align-items:center;border-bottom:1px solid #18214a;padding:6px 0}
+ul.pistes li.courant{background:#16224a;border-radius:8px}
+ul.pistes .t{flex:1;min-width:0;text-align:left;background:none;border:0;padding:8px 6px;min-height:44px}
+ul.pistes .t b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ul.pistes .t span{color:var(--doux);font-size:.82rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g{font-size:.72rem;color:var(--bleu2);border:1px solid var(--bord);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.mixe{font-size:.7rem;color:var(--alerte)}
+#plus{margin:12px 0}
+a{color:var(--bleu2)}
+noscript{color:var(--alerte)}
+</style>
+</head>
+<body>
+<h1>Musique</h1>
+<p class="sous" id="sous">Chargement des titres…</p>
+
+<section class="lecteur" aria-label="Lecteur">
+  <div class="video" id="video">Choisis un titre dans la liste pour lancer la lecture.</div>
+  <div class="info" aria-live="polite"><b id="iTitre">—</b><span id="iArtiste"></span></div>
+  <div class="cmd">
+    <button id="prec" type="button" aria-label="Titre précédent">◀◀</button>
+    <button id="lire" class="gros" type="button" aria-label="Lecture ou pause">▶ / ❚❚</button>
+    <button id="suiv" type="button" aria-label="Titre suivant">▶▶</button>
+    <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
+    <a id="yt" href="#" target="_blank" rel="noopener" hidden>Ouvrir sur YouTube</a>
+  </div>
+  <p class="msg" id="msg" role="status"></p>
+</section>
+
+<div class="outils">
+  <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher">
+  <label class="case"><input id="mix" type="checkbox"> afficher les mix / sets / albums complets</label>
+</div>
+<div class="chips" id="chips" role="group" aria-label="Filtrer par genre"></div>
+<p class="compte" id="compte"></p>
+<ul class="pistes" id="liste"></ul>
+<button id="plus" type="button" hidden>Afficher plus</button>
+<noscript>Cette page a besoin de JavaScript.</noscript>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const PAGE = 100;
+const S = { all: [], genre: null, q: '', mix: false, alea: false, liste: [], cur: null, vus: [], montre: PAGE, joue: false, pret: false, att: null };
+const mem = { lire(k, d) { try { const v = localStorage.getItem('sh-mus-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+              ecrire(k, v) { try { localStorage.setItem('sh-mus-' + k, JSON.stringify(v)); } catch (e) {} } };
+const msg = t => { $('#msg').textContent = t || ''; };
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+/* ---------- données ---------- */
+fetch('titres.json').then(r => { if (!r.ok) throw 0; return r.json(); }).then(D => {
+  S.all = D; S.indispo = new Set(mem.lire('indispo', []));
+  S.mix = mem.lire('mix', false); S.alea = mem.lire('alea', false);
+  $('#mix').checked = S.mix; $('#alea').setAttribute('aria-pressed', String(S.alea));
+  chips(); filtrer();
+  const dernier = mem.lire('dernier', null); if (dernier) { const t = S.all.find(x => x.youtube === dernier); if (t) majInfo(t); }
+}).catch(() => { $('#sous').textContent = 'Les titres n’ont pas pu être lus. Ouvre la page depuis GitHub Pages ou un petit serveur local, pas en double-clic.'; });
+
+function chips() {
+  const n = {}; S.all.forEach(t => { n[t.genre] = (n[t.genre] || 0) + 1; });
+  const c = $('#chips'); c.textContent = '';
+  [null, ...Object.keys(n).sort((a, b) => n[b] - n[a])].forEach(g => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = g ? `${g} (${n[g]})` : 'Tous';
+    b.setAttribute('aria-pressed', String(g === S.genre));
+    b.addEventListener('click', () => { S.genre = g; [...c.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); S.montre = PAGE; filtrer(); });
+    c.appendChild(b);
+  });
+}
+function filtrer() {
+  const q = norm(S.q.trim());
+  S.liste = S.all.filter(t => (S.mix || !t.mix) && !S.indispo.has(t.youtube) && (!S.genre || t.genre === S.genre) && (!q || norm(t.titre + ' ' + t.artiste).includes(q)));
+  $('#sous').textContent = `${S.all.length} titres de mes favoris, triés par genre.`;
+  $('#compte').textContent = `${S.liste.length} titre${S.liste.length > 1 ? 's' : ''} dans la liste`;
+  dessiner();
+}
+function dessiner() {
+  const ul = $('#liste'); ul.textContent = '';
+  S.liste.slice(0, S.montre).forEach(t => {
+    const li = document.createElement('li'); li.dataset.id = t.youtube; if (S.cur && S.cur.youtube === t.youtube) li.className = 'courant';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 't';
+    const a = document.createElement('b'); a.textContent = t.titre; const s = document.createElement('span'); s.textContent = (t.artiste || '—') + (t.mix ? ' · mix/set' : '');
+    b.append(a, s); b.addEventListener('click', () => jouer(t));
+    const g = document.createElement('span'); g.className = 'g'; g.textContent = t.genre;
+    li.append(b, g); ul.appendChild(li);
+  });
+  $('#plus').hidden = S.liste.length <= S.montre;
+}
+$('#plus').addEventListener('click', () => { S.montre += PAGE; dessiner(); });
+$('#q').addEventListener('input', e => { S.q = e.target.value; S.montre = PAGE; filtrer(); });
+$('#mix').addEventListener('change', e => { S.mix = e.target.checked; mem.ecrire('mix', S.mix); S.montre = PAGE; filtrer(); });
+$('#alea').addEventListener('click', e => { S.alea = !S.alea; e.currentTarget.setAttribute('aria-pressed', String(S.alea)); mem.ecrire('alea', S.alea); });
+
+/* ---------- lecture (API YouTube IFrame) ---------- */
+let P = null, apiDemandee = false;
+function majInfo(t) {
+  S.cur = t; $('#iTitre').textContent = t.titre; $('#iArtiste').textContent = `${t.artiste || '—'} · ${t.tags.join(', ')}`;
+  const a = $('#yt'); a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(t.youtube); a.hidden = false;
+  [...$('#liste').children].forEach(li => li.classList.toggle('courant', li.dataset.id === t.youtube));
+}
+function chargerApi() {
+  if (apiDemandee) return; apiDemandee = true;
+  window.onYouTubeIframeAPIReady = () => {
+    $('#video').textContent = '';
+    const cible = document.createElement('div'); $('#video').appendChild(cible);
+    P = new YT.Player(cible, { width: '100%', height: '100%', videoId: S.att ? S.att.youtube : undefined,
+      playerVars: { playsinline: 1, rel: 0, modestbranding: 1 },
+      events: { onReady: () => { S.pret = true; if (S.att) { P.playVideo(); S.att = null; } },
+                onStateChange: e => { S.joue = e.data === 1; if (e.data === 0) suivant(1); },
+                onError: e => erreurVideo(e.data) } });
+  };
+  const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; s.async = true;
+  s.onerror = () => { apiDemandee = false; msg('Le lecteur YouTube n’a pas pu se charger : utilise « Ouvrir sur YouTube ».'); };
+  document.head.appendChild(s);
+}
+function jouer(t) {
+  if (S.cur && S.cur.youtube !== t.youtube) S.vus.push(S.cur.youtube);
+  majInfo(t); mem.ecrire('dernier', t.youtube); msg('');
+  if (P && S.pret) { P.loadVideoById(t.youtube); } else { S.att = t; chargerApi(); }
+}
+function erreurVideo(code) {
+  const t = S.cur; if (!t) return;
+  S.indispo.add(t.youtube); mem.ecrire('indispo', [...S.indispo]);   // 100/101/150 : supprimée ou non intégrable
+  msg(`« ${t.titre} » n’est pas lisible ici (code ${code}) : masqué, on passe au suivant.`);
+  filtrer(); suivant(1);
+}
+function suivant(sens) {
+  if (!S.liste.length) return;
+  if (sens < 0 && S.vus.length) { const id = S.vus.pop(); const t = S.all.find(x => x.youtube === id); if (t) { majInfo(t); if (P && S.pret) P.loadVideoById(id); return; } }
+  let t;
+  if (S.alea) { do { t = S.liste[Math.floor(Math.random() * S.liste.length)]; } while (S.liste.length > 1 && S.cur && t.youtube === S.cur.youtube); }
+  else { const i = S.cur ? S.liste.findIndex(x => x.youtube === S.cur.youtube) : -1; t = S.liste[((i + sens) % S.liste.length + S.liste.length) % S.liste.length]; }
+  jouer(t);
+}
+$('#suiv').addEventListener('click', () => suivant(1));
+$('#prec').addEventListener('click', () => suivant(-1));
+$('#lire').addEventListener('click', () => {
+  if (!S.cur) { if (S.liste.length) jouer(S.liste[0]); return; }
+  if (!P || !S.pret) { jouer(S.cur); return; }
+  S.joue ? P.pauseVideo() : P.playVideo();
+});
+})();
+</script>
+</body>
+</html>
