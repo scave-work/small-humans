@@ -121,6 +121,12 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .tableau.ouvert{cursor:pointer}
 .tableau.ouvert:hover canvas{filter:brightness(1.18)}
 .tableau.ouvert:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
+/* onde bleue qui part de la carte, comme à la fin de la roulette : au survol, et au clic (classe .onde) */
+.tableau.ouvert::before,.tableau.ouvert::after{content:"";position:absolute;inset:0;border:1px solid var(--accent);opacity:0;pointer-events:none}
+.tableau.ouvert:hover::before,.tableau.ouvert.onde::before{animation:onde 1.1s var(--ease-out) both}
+.tableau.ouvert:hover::after,.tableau.ouvert.onde::after{animation:onde 1.1s .22s var(--ease-out) both}
+@keyframes onde{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.12)}}
+@media (prefers-reduced-motion: reduce){ .tableau.ouvert::before,.tableau.ouvert::after{animation:none!important} }
 .tableau h3{transition:color .18s ease}
 @media (max-width:600px){
   #galerie .tableaux{grid-template-columns:1fr;row-gap:28px}
@@ -986,8 +992,9 @@ function construireGalerie(D) {
     if (p.ouvert) {   // salle ouverte : toute la carte est le lien, plus de bouton « Entrer » (décision de Simon, 24 oct)
       li.classList.add('ouvert'); li.tabIndex = 0; li.setAttribute('role', 'link'); li.setAttribute('aria-label', `Entrer : ${p.nom}`);
       bt.remove();
-      li.addEventListener('click', () => { location.hash = p.id; });
-      li.addEventListener('keydown', e => { if (e.key === 'Enter') location.hash = p.id; });
+      const entrer = () => { if (REDUIT) { location.hash = p.id; return; } li.classList.add('onde'); setTimeout(() => { location.hash = p.id; }, 450); };   // le clic joue l'onde, puis on entre
+      li.addEventListener('click', entrer);
+      li.addEventListener('keydown', e => { if (e.key === 'Enter') entrer(); });
     } else {
       bt.textContent = 'En construction'; bt.setAttribute('aria-label', `${p.nom} : en construction`);
       bt.addEventListener('click', () => { etat.textContent = 'Cette salle n’est pas encore ouverte.'; });
@@ -1010,7 +1017,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 30';
+const BUILD = 'v-backend 24 oct, 32';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1421,6 +1428,18 @@ function dessinerPlatine(t) {
       g.moveTo(Math.cos(fa) * (rO + e), Math.sin(fa) * (rO + e)); g.arc(0, 0, rO + e, fa, fa + sg * c, sg < 0);                          // coin extérieur
     });
     g.stroke(); g.restore();
+    [0, .22].forEach(dec => { const u = (dtL - dec) / 1.1; if (dtL >= 0 && u > 0 && u < 1) {   // à l'arrêt : deux ondes partent du cadre et s'élargissent, comme celles de l'anneau
+      const o = R * .22 * eOut(u);   // décalage vers l'extérieur de la ligne du cadre
+      g.save(); g.translate(S / 2, S / 2); g.lineCap = 'butt'; g.lineWidth = R * .010 * (1 - u * .6); g.strokeStyle = `rgba(111,168,255,${.6 * (1 - u) * (1 - u)})`;
+      g.beginPath();
+      [[fa0, 1], [fa1, -1]].forEach(([fa, sg]) => {
+        const ri = rI - e - o, ro = rO + e + o;
+        g.moveTo(Math.cos(fa) * ri, Math.sin(fa) * ri); g.lineTo(Math.cos(fa) * ro, Math.sin(fa) * ro);
+        g.moveTo(Math.cos(fa) * ri, Math.sin(fa) * ri); g.arc(0, 0, ri, fa, fa + sg * c, sg < 0);
+        g.moveTo(Math.cos(fa) * ro, Math.sin(fa) * ro); g.arc(0, 0, ro, fa, fa + sg * c, sg < 0);
+      });
+      g.stroke(); g.restore();
+    } });
   }
   g.save(); g.beginPath(); g.arc(S / 2, S / 2, R * 1.01, 0, TAU); g.clip(); grain(g, S, S); g.restore();
 }
