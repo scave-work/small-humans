@@ -144,7 +144,8 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .ec-titre{font-size:var(--t-lead);font-weight:500;letter-spacing:.18em;text-transform:uppercase;line-height:1.25;text-wrap:balance}
 .ec-artiste{margin-top:8px;color:var(--acier)}
 .mus-corps{grid-column:2;grid-row:1;padding-top:8px}
-.filtres{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:clamp(20px,3vh,32px)}
+.filtres{display:flex;flex-wrap:nowrap;gap:8px 10px;margin-top:clamp(20px,3vh,32px);overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#22314F transparent;-webkit-overflow-scrolling:touch}
+.filtres button{flex:none}
 .filtres button{min-height:40px;padding:6px 14px;background:var(--nuit);color:var(--ink);transition:background-color .18s ease,color .18s ease}
 .filtres button:hover{background:#1A2B4A}
 .filtres button:active{transform:scale(.97)}
@@ -164,7 +165,7 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .marque{position:absolute;left:8px;top:calc(.18em + .45em);width:9px;height:13px;border-radius:2px;background:transparent}
 tr.courant .marque{background:var(--ink);box-shadow:var(--halo)} /* taste-skill-ignore : halo autorisé par Simon (titre ou cellule allumée, un seul niveau) */
 tr.cache{display:none}
-.lecteur{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--nuit);display:grid;grid-template-columns:auto minmax(0,1.2fr) minmax(0,2fr) auto;align-items:center;gap:clamp(16px,2.4vw,40px);padding:14px var(--marge)}
+.lecteur{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--nuit);display:grid;grid-template-columns:auto minmax(0,1.2fr) minmax(0,1.6fr) auto auto auto;align-items:center;gap:clamp(16px,2.4vw,40px);padding:14px var(--marge)}
 .lect-boutons{display:flex;gap:8px}
 .lect-boutons button{width:44px;height:44px;display:grid;place-items:center;color:var(--ink);transition:background-color .18s ease}
 .lect-boutons button:hover{background:#1A2B4A}
@@ -177,18 +178,21 @@ tr.cache{display:none}
 .lect-prog{display:grid;grid-template-columns:repeat(40,minmax(0,1fr));gap:3px;align-items:center}
 .lect-prog i{height:12px;border-radius:1px;background:#22314F}
 .lect-prog i.on{background:var(--ink)}
-.lect-extra{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;margin-top:6px}
-.lect-extra .vol{flex:1 1 220px}
-.lect-extra .lect-note{flex:1 1 100%;margin:0}
-.vol{display:flex;align-items:center;gap:12px;color:var(--acier)}
-.vol input{flex:1;max-width:260px;accent-color:#6FA8FF;min-height:32px}
-.vol output{min-width:2.2em;text-align:right;font-variant-numeric:tabular-nums}
-.yt-boite{width:200px;max-width:100%;aspect-ratio:16/9;background:#02040A;border:1px solid #22314F;overflow:hidden}
+.lect-extra{display:contents}
+.lect-extra .vol{width:clamp(150px,14vw,220px)}
+.lect-extra .vol span{display:none}
+.lect-extra .vol input{flex:1;min-width:0}
+.lect-extra .lect-note{grid-column:1/-1;margin:0}
+.lect-extra .lect-note:empty{display:none}
+.yt-boite{width:160px;max-width:100%;aspect-ratio:16/9;background:#02040A;border:1px solid #22314F;overflow:hidden}
 .yt-boite iframe{width:100%;height:100%;border:0;display:block}
 .mus-outils{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:12px;order:4}
 .mus-outils input[type=search]{flex:1 1 220px;min-height:40px;padding:6px 12px;background:var(--nuit);color:var(--ink);border:1px solid #22314F;font:inherit}
 .mus-outils .case{display:flex;gap:6px;align-items:center;color:var(--acier);min-height:40px}
 .mus-outils button{min-height:40px;padding:6px 14px;background:var(--nuit);color:var(--ink)}
+.mus-gauche,.filtres,.mus-outils{min-width:0;max-width:100%}
+.ec-titre{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;max-width:100%}
+@media (min-width:761px){.platine{width:min(380px,max(220px,calc(100svh - 600px)))}}
 .plus{margin:16px 0;min-height:44px;padding:8px 18px;background:var(--nuit);color:var(--ink)}
 .lect-note{grid-column:1/-1;font-size:var(--t-small);color:var(--acier);margin-top:-6px}
 .lect-yt{color:var(--acier);white-space:nowrap}
@@ -219,6 +223,10 @@ tr.cache{display:none}
   .ec-artiste{font-size:14px;margin-top:4px}
   .lecteur{position:static;margin:24px calc(-1 * var(--marge)) 0;grid-template-columns:auto minmax(0,1fr);row-gap:12px}
   .lect-prog-boite{grid-column:1/-1}
+  .lect-extra{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;grid-column:1/-1}
+  .lect-extra .vol{width:auto;flex:1 1 200px}
+  .lect-extra .vol span{display:inline}
+  .yt-boite{width:200px}
   .lect-note{grid-column:1/-1;margin-top:0}
   .lect-yt{grid-column:1/-1}
   .pistes .p-titre{font-size:19px}
