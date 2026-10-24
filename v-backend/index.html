@@ -1129,7 +1129,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 56';
+const BUILD = 'v-backend 24 oct, 57';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1519,7 +1519,7 @@ function dessinerMix() {
   const ul = $('#panListe'); ul.textContent = ''; $('#panneau').classList.add('mode-mix'); $('#panVide').hidden = true;
   const L = M.mix.items;
   $('#panCompte').textContent = `${L.length} titre${L.length > 1 ? 's' : ''} · temporaire : rien n’est enregistré`;
-  $('#panAide').textContent = 'Clique un titre pour l’écouter. ♥ le range dans « À ajouter » ; ✕ le retire du Mix (pas de ta bibliothèque).';
+  $('#panAide').textContent = 'Clique un titre pour l’écouter. ♥ le range dans « À ajouter ». Glisse pour ranger, tire vers la droite pour retirer du Mix (pas de ta bibliothèque) ; glisse un titre de la liste ici pour l’ajouter au Mix.';
   const tete = document.createElement('li'); tete.className = 'mx-tete';
   const b = document.createElement('b'); b.textContent = `Mix de « ${M.mix.de} »`; tete.appendChild(b);
   const bt = (txt, f) => { const e = document.createElement('button'); e.type = 'button'; e.textContent = txt; e.addEventListener('click', f); tete.appendChild(e); };
@@ -1535,7 +1535,8 @@ function dessinerMix() {
     if (deja) { c.textContent = '♥'; c.classList.add('fait'); c.title = 'Déjà dans ta bibliothèque ou dans « À ajouter »'; }
     c.addEventListener('click', e => { e.stopPropagation(); if (!deja) aimerMix(it); });
     li.querySelector('.pan-x').addEventListener('click', e => { e.stopPropagation(); const k = M.mix.items.indexOf(it); if (k >= 0) M.mix.items.splice(k, 1); panneau(); });
-    li.addEventListener('click', () => jouerMix(it));
+    li.dataset.i = i; li.addEventListener('click', () => { if (DR.bloque) return; jouerMix(it); });
+    li.addEventListener('pointerdown', e => armerDrag(e, it, i));
     ul.appendChild(li);
   });
 }
@@ -1595,7 +1596,7 @@ function exporterPl() {
 /* glisser-déposer (souris : tirer ; tactile : appui long puis tirer) */
 const DR = { att: null, on: false, tr: null, de: -1, ghost: null, cible: -1, retirer: false, bloque: false };
 function armerDrag(e, tr, de) {
-  if (e.button > 0 || e.target.closest('.p-plus, .pan-x, a, input, select')) return;
+  if (e.button > 0 || e.target.closest('.p-plus, .pan-x, .mx-c, a, input, select')) return;
   DR.att = { tr, de, x0: e.clientX, y0: e.clientY, tactile: e.pointerType === 'touch', t: 0 };
   if (DR.att.tactile) DR.att.t = setTimeout(() => { if (DR.att) demarrerDrag(DR.att.x0, DR.att.y0); }, 350);
   addEventListener('pointermove', bougerDrag); addEventListener('pointerup', finirDrag); addEventListener('pointercancel', finirDrag);
@@ -1607,9 +1608,9 @@ function demarrerDrag(x, y) {
 }
 function placerGhost(x, y) { if (DR.ghost) DR.ghost.style.transform = `translate(${Math.round(x + 14)}px, ${Math.round(y + 10)}px)`; }
 function indexInsertion(y) {
-  const items = [...$('#panListe').children];
+  const items = [...$('#panListe').children].filter(li => li.dataset.i !== undefined);
   for (let k = 0; k < items.length; k++) { const r = items[k].getBoundingClientRect(); if (y < r.top + r.height / 2) return +items[k].dataset.i; }
-  return (listeDe(M.plActive) || []).length;
+  return M.vueMix && M.mix ? M.mix.items.length : (listeDe(M.plActive) || []).length;
 }
 function bougerDrag(e) {
   const a = DR.att; if (!a) return;
@@ -1635,7 +1636,16 @@ function finirDrag() {
   const a = DR.att; if (a) clearTimeout(a.t); DR.att = null;
   if (DR.on) {
     const { tr, de, cible, retirer } = DR;
-    if (retirer && de >= 0 && M.plActive) retirerIdx(M.plActive, de);
+    if (M.vueMix && M.mix) {   // vue Mix : mêmes gestes que la playlist, mais sur la liste temporaire
+      const L = M.mix.items;
+      if (retirer && de >= 0) { L.splice(de, 1); panneau(); }
+      else if (cible >= 0) {
+        if (de >= 0) { const [it] = L.splice(de, 1); L.splice(Math.max(0, Math.min(L.length, cible > de ? cible - 1 : cible)), 0, it); panneau(); }
+        else if (L.some(x => x.youtube === tr.youtube)) mlg(`« ${tr.titre} » est déjà dans le Mix.`);
+        else { L.splice(Math.min(cible, L.length), 0, { youtube: tr.youtube, titre: tr.titre, artiste: tr.artiste || '', mx: true }); panneau(); mlg(`Ajouté au Mix : ${tr.titre}`); }
+      }
+    }
+    else if (retirer && de >= 0 && M.plActive) retirerIdx(M.plActive, de);
     else if (cible >= 0) {
       if (de >= 0) deplacerIdx(M.plActive, de, cible);
       else { const nom = plCourante(true); if (nom) ajouterA(nom, tr, nom === M.plActive ? cible : null); }
