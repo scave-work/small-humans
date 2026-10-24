@@ -1117,7 +1117,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 53';
+const BUILD = 'v-backend 24 oct, 54';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1170,7 +1170,7 @@ function dessinerAj() {
     const t = el('div', 'aj-t', x.titre); if (x.artiste) t.appendChild(el('small', '', '  ' + x.artiste));
     const sel = el('select'); sel.setAttribute('aria-label', 'Style');
     const o0 = el('option', '', 'style ?'); o0.value = ''; sel.appendChild(o0);
-    GENRES_AJ.forEach(g => { const o = el('option', '', g); o.value = g; if (g === x.genre) o.selected = true; sel.appendChild(o); });
+    [...GENRES_AJ].sort((u, v) => u.localeCompare(v, 'fr')).forEach(g => { const o = el('option', '', g); o.value = g; if (g === x.genre) o.selected = true; sel.appendChild(o); });
     sel.addEventListener('change', () => { x.genre = sel.value; mem.ecrire('ajouts', lireAjouts().map(y => y.youtube === x.youtube ? { ...y, genre: x.genre } : y)); if (tr) { tr.genre = GENRES_AJ.includes(x.genre) ? x.genre : 'autre'; tr.tags = [tr.genre]; reconstruire(M.cur, true); } });
     const del = el('button', 'aj-x', '✕'); del.type = 'button'; del.setAttribute('aria-label', 'Retirer');
     del.addEventListener('click', () => {
