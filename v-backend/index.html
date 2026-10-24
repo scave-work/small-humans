@@ -419,6 +419,8 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .mx-cpt{flex:1 1 100%;margin:0;font-size:13px;color:var(--acier)}
 .mx-voir{flex:1 1 100%}
 .mx-rec{color:var(--accent)}
+.mx-lf{flex:1 1 100%;font-size:13px;color:var(--acier)}
+.mx-tete button.on{outline:1px solid var(--accent)}
 .mx-tete button{font:inherit;font-size:14px;color:var(--ink);background:#1A2B4A;border:0;border-radius:999px;padding:3px 12px;min-height:30px;cursor:pointer}
 .pan-item.mx{grid-template-columns:20px 64px minmax(0,1fr) 28px 28px;cursor:pointer}
 .pan-item.mx .pan-x{opacity:0}
@@ -1159,7 +1161,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 67';
+const BUILD = 'v-backend 24 oct, 69';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1666,6 +1668,8 @@ function dessinerMix() {
       const m = document.createElement('p'); m.className = 'mx-cpt'; m.textContent = `${fait} / ${N_DEPARTS} Mix chargés…${dec.vides ? ` (${dec.vides} titre${dec.vides > 1 ? 's' : ''} sans Mix chez YouTube, remplacé${dec.vides > 1 ? 's' : ''})` : ''}`; tete.appendChild(m);
     }
     bt('⟳ Autres départs', () => ouvrirDec(true));
+    const lf = document.createElement('span'); lf.className = 'mx-lf'; lf.textContent = 'Partir de :'; tete.appendChild(lf);
+    [['Tout', null]].concat(FAMILLES.map(F => [F.id, F.id])).forEach(([n, f]) => { const e = bt(n, () => ouvrirDec(true, f)); e.className = 'mx-fam' + ((dec.fam || null) === f ? ' on' : ''); });
     bt('＋ Titre en cours comme départ', () => { const c = M.cur; if (!c || dec.seeds.some(s => s.youtube === c.youtube)) return; dec.seeds.push({ youtube: c.youtube, titre: c.titre, artiste: c.artiste || '' }); panneau(); chargerDec(M.mix); });
     const lab = document.createElement('label'); lab.className = 'inter mx-voir'; lab.innerHTML = '<input type="checkbox" role="switch"><span class="inter-p" aria-hidden="true"></span>Cacher ce que j’ai déjà';
     const cb = lab.querySelector('input'); cb.checked = !dec.voir; cb.addEventListener('change', () => { dec.voir = !cb.checked; fusionDec(M.mix); panneau(); remplirInfos(M.mix.items); }); tete.appendChild(lab);
@@ -1698,13 +1702,13 @@ function dessinerMix() {
    Départs : tes titres les plus écoutés en entier (ou au hasard dans la liste affichée). Le Mix YouTube de chacun est lu, puis tout est fusionné :
    les titres recommandés par plusieurs départs passent en tête. Temporaire, rien n'est enregistré. */
 const N_DEPARTS = 6;
-function departs(n, exclure, hasard) {
-  const pool = M.biblio.filter(t => !exclure.has(t.youtube)), ec = lireEc();
+function departs(n, exclure, hasard, fam) {   // fam : départs pris dans une grande famille de styles (toute la bibliothèque), sinon liste affichée
+  const pool = (fam ? M.tous.filter(t => !t.mix && familleDe(t.genre) === fam) : M.biblio).filter(t => !exclure.has(t.youtube)), ec = lireEc();
   const top = hasard ? [] : pool.filter(t => (ec[t.youtube] || {}).n > 0).sort((a, b) => ec[b.youtube].n - ec[a.youtube].n).slice(0, n);
   const reste = pool.filter(t => !top.includes(t)); const nTop = top.length;
   while (top.length < n && reste.length) top.push(reste.splice(Math.floor(Math.random() * reste.length), 1)[0]);
   const lib = hasard || !nTop ? 'titres au hasard' : nTop < n ? `tes ${nTop} titres les plus écoutés + hasard` : 'tes titres les plus écoutés';
-  return { seeds: top.map(t => ({ youtube: t.youtube, titre: t.titre, artiste: t.artiste || '' })), lib: lib + (M.genreFiltre || M.famille ? ` · ${M.genreFiltre || M.famille}` : '') };
+  return { seeds: top.map(t => ({ youtube: t.youtube, titre: t.titre, artiste: t.artiste || '' })), lib: lib + (fam ? ` · famille ${fam}` : M.genreFiltre || M.famille ? ` · ${M.genreFiltre || M.famille}` : '') };
 }
 function fusionDec(mix) {   // recalcule la liste depuis les Mix déjà chargés : titres inconnus d'abord, triés par nombre de départs qui les recommandent
   const d = mix.dec, ex = new Set(d.seeds.map(s => s.youtube)), cnt = new Map(), ordre = [];
@@ -1727,7 +1731,7 @@ async function chargerDec(mix) {
       let s = d.seeds.find(x => !d.lance.has(x.youtube));
       if (!s) {
         if (d.seeds.length >= N_DEPARTS || d.essais >= 20) return;
-        const r = departs(1, new Set([...d.seeds.map(x => x.youtube), ...d.tentes]), d.hasard); if (!r.seeds.length) return;
+        const r = departs(1, new Set([...d.seeds.map(x => x.youtube), ...d.tentes]), d.hasard, d.fam); if (!r.seeds.length) return;
         s = r.seeds[0]; d.seeds.push(s);
       }
       d.lance.add(s.youtube); d.tentes.add(s.youtube); d.essais++;
@@ -1740,10 +1744,10 @@ async function chargerDec(mix) {
   d.enCours = false; fusionDec(mix); panneau(); remplirInfos(mix.items);
   mlg(`Découverte : ${mix.items.filter(visibleMix).length} titres, à partir de ${d.seeds.length} départs${d.vides ? ` (${d.vides} titre${d.vides > 1 ? 's' : ''} sans Mix chez YouTube, remplacé${d.vides > 1 ? 's' : ''})` : ''}.`);
 }
-function ouvrirDec(autres) {   // autres = nouveaux départs au hasard
+function ouvrirDec(autres, fam) {   // autres = nouveaux départs au hasard ; fam = grande famille de départ (undefined : celle d'avant si « autres », sinon aucune)
   if (!M.biblio.length) { mlg('Aucun titre pour partir en découverte.'); return; }
-  const d0 = autres && M.mix && M.mix.dec ? M.mix.dec : null, dep = departs(N_DEPARTS, new Set(d0 ? d0.seeds.map(s => s.youtube) : []), !!autres);
-  const mix = { de: 'Découverte', items: [], dec: { seeds: dep.seeds, lib: dep.lib, res: new Map(), lance: new Set(), tentes: new Set(), essais: 0, vides: 0, hasard: !!autres, retires: new Set(), ajouts: [], voir: false, enCours: true } };
+  const d0 = autres && M.mix && M.mix.dec ? M.mix.dec : null, decFam = fam !== undefined ? fam : d0 ? d0.fam : null, dep = departs(N_DEPARTS, new Set(d0 ? d0.seeds.map(s => s.youtube) : []), !!autres || !!decFam, decFam);
+  const mix = { de: 'Découverte', items: [], dec: { seeds: dep.seeds, lib: dep.lib, res: new Map(), lance: new Set(), tentes: new Set(), essais: 0, vides: 0, hasard: !!autres || !!decFam, fam: decFam, retires: new Set(), ajouts: [], voir: false, enCours: true } };
   M.mix = mix; M.vueMix = true; chargerDec(mix);
 }
 $('#lDec').addEventListener('click', () => ouvrirDec(false));
