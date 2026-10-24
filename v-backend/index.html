@@ -86,6 +86,7 @@ body[data-vue="intro"] .nav{display:none}
 #scene{position:absolute;inset:0;transform-origin:var(--cx) var(--cy)}
 body[data-vue="intro"] .titre{position:fixed;left:var(--cx);top:var(--cy);transform:translate(-50%,-50%);font-size:var(--t-display);font-weight:400;padding-left:var(--suivi);text-align:center;z-index:5;pointer-events:none}
 body[data-vue="intro"] .barre{pointer-events:none}
+body:not([data-vue="intro"]) #titre{cursor:pointer}
 body[data-vue="intro"] .son{pointer-events:auto}
 body.deux-lignes[data-vue="intro"] .titre .mot{display:block}
 body.deux-lignes[data-vue="intro"] .titre .espace{display:none}
@@ -1004,7 +1005,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 27';
+const BUILD = 'v-backend 24 oct, 28';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1527,6 +1528,9 @@ function routeDepuisAdresse() {
   return null;
 }
 addEventListener('hashchange', () => { const r = routeDepuisAdresse() || 'galerie'; aller(r); });
+/* clic sur SMALL HUMANS (hors intro) : rejoue l'intro station depuis le début (demande de Simon, 24 oct) */
+function rejouerIntro() { if (vue === 'intro' || balai) return; tIntro = 0; tPrec = -1; introFinie = false; aller('intro'); }
+$('#titre').addEventListener('click', rejouerIntro);
 
 /* passer l'intro : toucher l'écran, ou Espace / Entrée / Échap */
 function passer() { if (vue === 'intro' && !balai && T_FIXE == null) { if (location.hash) aller(routeDepuisAdresse() || 'galerie'); else location.hash = 'galerie'; } }
