@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cinéma — Small Humans</title>
+<meta name="description" content="Small Humans : le journal des films, séries et anime vus, avec notes et envies.">
+<meta name="theme-color" content="#05080F">
+<style>
+/* Raleway (licence SIL OFL 1.1, voir OFL.txt), même police que l'intro */
+@font-face{font-family:"Raleway";src:url("Raleway.woff2") format("woff2");font-weight:300 600;font-style:normal;font-display:swap}
+:root{
+  --bg:#05080F; --nuit:#111F38; --nuit2:#1A2B4A; --coque:#55596C; --acier:#BABBCF; --ink:#F2F5FF; --accent:#6FA8FF; --accent-ink:#05080F;
+  --marge:clamp(16px,2.4vw,44px);
+  --t-small:14px; --t-body:clamp(16px,15px + .25vw,19px); --t-lead:clamp(18px,15px + .6vw,26px); --t-head:clamp(30px,16px + 2.6vw,64px);
+  --suivi:.25em; --ease:cubic-bezier(.22,1,.36,1);
+  --barre:60px; --actions:64px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Raleway",system-ui,sans-serif;font-size:var(--t-body);line-height:1.5;-webkit-font-smoothing:antialiased}
+body{min-height:100svh;padding:var(--barre) var(--marge) calc(var(--actions) + 56px + env(safe-area-inset-bottom));overflow-x:hidden}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+a{color:inherit}
+p,h1,h2,h3{margin:0}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cadre{max-width:1180px;margin:0 auto}
+
+/* barre du haut */
+.barre{position:fixed;top:0;left:0;right:0;z-index:10;height:var(--barre);display:flex;align-items:center;padding:0 var(--marge);background:var(--bg)}
+.barre a{text-decoration:none;text-transform:uppercase;letter-spacing:var(--suivi);font-size:16px;min-height:44px;display:inline-flex;align-items:center}
+.barre a:hover{color:var(--accent)}
+
+/* tête : titre + écran de cinéma */
+.tete{display:grid;gap:18px;padding-top:12px}
+h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-transform:uppercase;line-height:1.05}
+.resume{color:var(--acier);max-width:46ch}
+.scene{position:relative;aspect-ratio:16/10;background:#0A1020;overflow:hidden}
+.ecran{position:absolute;left:9%;top:7%;width:82%;height:62%;background:var(--nuit)}
+.diapo{position:absolute;inset:0;display:flex;align-items:center;gap:5%;padding:0 5%;opacity:0;transition:opacity .8s ease}
+.diapo.on{opacity:1}
+.diapo .aff{height:84%;aspect-ratio:2/3;flex:none}
+.diapo b{display:block;font-weight:500;font-size:clamp(14px,4.2vw,26px);line-height:1.2;letter-spacing:.08em;text-transform:uppercase}
+.diapo span{display:block;color:var(--acier);font-size:var(--t-small);margin-top:4px}
+.scene svg{position:absolute;inset:0;width:100%;height:100%}
+.faisceau{fill:#F2F5FF;opacity:.07;animation:scintille 3.2s steps(1) infinite}
+@keyframes scintille{0%{opacity:.07}18%{opacity:.045}22%{opacity:.08}60%{opacity:.06}64%{opacity:.04}68%{opacity:.07}}
+.bras{transform-origin:272px 208px;animation:salue 5s ease-in-out infinite}
+@keyframes salue{0%,55%,100%{transform:rotate(0)}65%{transform:rotate(-14deg)}75%{transform:rotate(8deg)}85%{transform:rotate(-12deg)}}
+
+/* onglets */
+.onglets{display:flex;gap:28px;margin-top:28px}
+.onglets button{min-height:48px;padding:0 2px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;font-size:15px;color:var(--acier);border-bottom:3px solid transparent;transition:color .18s ease}
+.onglets button:hover{color:var(--ink)}
+.onglets button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.onglets button:active,.btn:active,.puce:active,.tuile:active{transform:scale(.97)}
+
+/* filtres */
+.outils{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:16px}
+.outils>*{min-width:0}
+.puces{display:flex;flex-wrap:wrap;gap:8px}
+.puce{min-height:44px;background:var(--nuit);padding:0 18px;border-radius:999px;transition:background-color .18s ease;font-size:15px}
+.puce:hover{background:var(--nuit2)}
+.puce[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.menus{display:flex;gap:8px}
+.menus select{flex:1 1 0;width:0;min-width:0;min-height:44px;background:var(--nuit);border:0;border-radius:0;padding:0 28px 0 14px;border-radius:999px;appearance:none;-webkit-appearance:none;text-overflow:ellipsis;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23BABBCF' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.menus select[hidden]{display:none}
+.compte{color:var(--acier);font-size:var(--t-small);margin-top:12px;min-height:1.5em}
+
+/* grille d'affiches */
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:18px 8px;margin-top:8px}
+.mois{grid-column:1/-1;font-size:17px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-top:18px}
+.mois:first-child{margin-top:4px}
+.tuile{display:block;text-align:left;transition:transform .18s var(--ease)}
+.aff{position:relative;aspect-ratio:2/3;background:var(--nuit);overflow:hidden;display:flex;align-items:flex-end;padding:8px}
+.aff[data-t="1"]{background:#16294A}.aff[data-t="2"]{background:#0F2A3A}.aff[data-t="3"]{background:#231F3F}.aff[data-t="4"]{background:#1B3358}.aff[data-t="5"]{background:#2A2A44}
+.aff i{font-style:normal;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;line-height:1.25;color:var(--acier);overflow-wrap:anywhere}
+.aff img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.tuile .t{display:block;margin-top:8px;font-size:var(--t-small);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tuile .m{display:block;margin-top:2px;font-size:var(--t-small);color:var(--acier)}
+.tuile .m b{color:var(--accent);font-weight:500}
+.plus{display:block;margin:28px auto 0;min-height:48px;padding:0 28px;background:var(--nuit)}
+.plus:hover{background:var(--nuit2)}
+.vide{grid-column:1/-1;color:var(--acier);padding:24px 0;max-width:46ch}
+
+/* statistiques */
+.stats{display:grid;gap:36px;margin-top:28px}
+.chiffres{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 16px}
+.chiffres b{display:block;font-size:var(--t-head);font-weight:300;line-height:1;letter-spacing:.04em}
+.chiffres span{color:var(--acier);font-size:var(--t-small)}
+.stats h2{font-size:17px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+.barres{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.barres li{display:grid;grid-template-columns:5.5ch minmax(0,1fr) 4ch;align-items:center;gap:12px;min-height:28px}
+.barres.genres li{grid-template-columns:minmax(0,9ch) minmax(0,1fr) 4ch}
+.barres .n{text-align:right;font-variant-numeric:tabular-nums}
+.barres .r{height:14px;background:var(--nuit)}
+.barres .r i{display:block;height:100%;background:var(--accent)}
+
+/* barre d'actions du bas */
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:0 var(--marge) calc(12px + env(safe-area-inset-bottom));pointer-events:none}.actions .btn{pointer-events:auto}
+.actions .rangee{display:flex;justify-content:flex-end;gap:8px;max-width:1180px;margin:0 auto}
+.btn{min-height:52px;padding:0 18px;border-radius:999px;background:var(--nuit2);transition:background-color .18s ease,transform .12s ease;font-weight:500}
+.btn:hover{background:#243a60}
+.btn.fort{background:var(--accent);color:var(--accent-ink)}
+.btn.fort:hover{background:#8BB9FF}
+.btn:disabled{opacity:.45;cursor:default}
+.actions .btn{flex:none;padding:0 20px;font-size:15px;line-height:1.2;border-radius:999px;background:var(--nuit2);min-height:52px}.actions .btn.fort{background:var(--accent);color:var(--accent-ink)}
+.pied{margin-top:56px;color:var(--acier);font-size:var(--t-small)}
+.toast{position:fixed;left:var(--marge);right:var(--marge);bottom:calc(var(--actions) + 20px + env(safe-area-inset-bottom));z-index:30;background:var(--ink);color:var(--accent-ink);padding:12px 16px;max-width:520px;margin:0 auto;transform:translateY(12px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s var(--ease)}
+.toast.on{opacity:1;transform:none}
+
+/* feuille (fiche, ajout, formulaire) */
+dialog{border:0;padding:0;background:var(--bg);color:var(--ink);width:100%;max-width:none;max-height:92svh;margin:auto 0 0;overflow:auto;overscroll-behavior:contain}
+dialog::backdrop{background:rgba(5,8,15,.78)}
+dialog[open]{animation:monte .28s var(--ease)}
+@keyframes monte{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.feuille{padding:8px var(--marge) calc(28px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;display:grid;gap:18px}
+.f-tete{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:2}
+.f-tete h2{font-size:17px;font-weight:500;letter-spacing:.18em;text-transform:uppercase}
+.f-tete .btn{min-height:44px;padding:0 14px;background:var(--nuit)}
+.f-haut{display:grid;grid-template-columns:minmax(110px,38%) minmax(0,1fr);gap:16px;align-items:start}
+.f-haut h3{font-size:var(--t-lead);font-weight:500;line-height:1.2;letter-spacing:.06em;text-transform:uppercase;overflow-wrap:anywhere}
+.f-haut p{color:var(--acier);margin-top:6px}
+.f-com{background:var(--nuit);padding:14px 16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.f-actions{display:grid;gap:8px}
+.f-haut.petit{grid-template-columns:72px minmax(0,1fr);align-items:center}
+.f-haut.petit .aff{padding:4px}.f-haut.petit .aff i{font-size:9px}
+.collant{position:sticky;bottom:0;background:var(--bg);padding:12px 0 2px;display:grid;gap:8px}
+.f-actions .deux{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.champ{display:grid;gap:6px}
+.champ>label,.champ>.lib{color:var(--acier);font-size:var(--t-small)}
+.champ input,.champ textarea,.champ select{width:100%;min-height:48px;background:var(--nuit);border:0;border-radius:0;padding:10px 12px}
+.champ textarea{min-height:96px;resize:vertical}
+.choix{display:grid;grid-template-columns:repeat(var(--n,2),1fr);gap:8px}
+.choix button{min-height:48px;background:var(--nuit);padding:0 6px;transition:background-color .18s ease}
+.choix button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.resultats{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.resultats button{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;width:100%;text-align:left;align-items:center;padding:6px;background:var(--nuit);min-height:72px}
+.resultats button:hover{background:var(--nuit2)}
+.resultats .aff{width:48px;padding:4px}.resultats .aff i{font-size:9px}
+.resultats b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.resultats span{color:var(--acier);font-size:var(--t-small)}
+.note-etoiles{display:flex;align-items:center;gap:10px}
+.note-etoiles .btn{min-width:48px;padding:0;min-height:48px;font-size:22px}
+.etoiles{position:relative;width:var(--w,200px);height:calc(var(--w,200px) / 5);flex:none;touch-action:pan-y;cursor:pointer}
+.etoiles svg{position:absolute;left:0;top:0;width:var(--w,200px);height:100%;display:block}
+.etoiles .fond{fill:var(--nuit2)}
+.etoiles .clip{position:absolute;left:0;top:0;height:100%;overflow:hidden}
+.etoiles .plein{fill:var(--accent)}
+.etoiles.lect{cursor:default}
+.val{min-width:5ch;font-variant-numeric:tabular-nums}
+.alerte{color:#FFB86B;font-size:var(--t-small)}
+textarea.export{min-height:180px;font-size:13px}
+
+/* ordinateur */
+@media (min-width:760px){
+  :root{--barre:72px}
+  .tete .texte{display:grid;gap:18px;align-self:center}
+  .outils{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:center}
+  .grille{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:26px 16px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(28px,4.5vw,96px)}
+  .chiffres{grid-column:1/-1;grid-template-columns:repeat(4,1fr)}
+  dialog{width:min(620px,92vw);margin:auto;max-height:88svh}
+  .tuile:hover{transform:translateY(-3px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="barre"><a href="../index.html">Small Humans</a></header>
+
+<main class="cadre">
+  <section class="tete">
+    <div class="texte">
+      <h1>Cinéma</h1>
+      <p class="resume" id="resume">Chargement du journal…</p>
+    </div>
+  </section>
+
+  <div class="onglets" role="tablist" aria-label="Vue">
+    <button role="tab" id="o-vus" aria-selected="true" data-vue="vus">Vus</button>
+    <button role="tab" id="o-avoir" aria-selected="false" data-vue="avoir">À voir</button>
+    <button role="tab" id="o-stats" aria-selected="false" data-vue="stats">Stats</button>
+  </div>
+
+  <div class="outils" id="outils">
+    <div class="puces" role="group" aria-label="Type"></div>
+    <div class="menus">
+      <select id="f-annee" aria-label="Année de visionnage"></select>
+      <select id="f-genre" aria-label="Genre"></select>
+      <select id="f-tri" aria-label="Tri">
+        <option value="date-desc">Plus récents</option>
+        <option value="date-asc">Plus anciens</option>
+        <option value="note">Mieux notés</option>
+        <option value="titre">A → Z</option>
+      </select>
+    </div>
+  </div>
+  <p class="compte" id="compte" role="status"></p>
+
+  <section id="panneau" aria-live="polite"></section>
+  <p class="pied" id="pied"></p>
+  <noscript><p class="vide">Cette page a besoin de JavaScript.</p></noscript>
+</main>
+
+<div class="actions">
+  <div class="rangee">
+    <button class="btn fort" id="b-ajout" type="button">+ Ajouter</button>
+    <button class="btn" id="b-copie" type="button">Copier mes ajouts</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="feuille" aria-labelledby="f-titre"></dialog>
+
+<script>
+(() => {
+'use strict';
+const VERSION = '0.1';
+const IMG = 'https://image.tmdb.org/t/p/';
+const CLE = 'sh-cine-ajouts';
+const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
+const TYPES = { film: 'Films', serie: 'Séries', anime: 'Anime' };
+const ENVIES = { hate: 'Hâte', pourquoi_pas: 'Pourquoi pas', un_jour: 'Un jour' };
+const PAGE = 60;
+const $ = s => document.querySelector(s);
+const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function h(tag, a, ...fils) {
+  const e = document.createElement(tag);
+  for (const k in (a || {})) {
+    if (k === 'class') e.className = a[k]; else if (k === 'on') for (const ev in a.on) e.addEventListener(ev, a.on[ev]); else if (a[k] !== false && a[k] != null) e.setAttribute(k, a[k] === true ? '' : a[k]);
+  }
+  fils.flat().forEach(f => { if (f != null && f !== false) e.append(f.nodeType ? f : document.createTextNode(f)); });
+  return e;
+}
+const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const aujourdhui = () => new Date().toLocaleDateString('sv-SE');
+const fmtNote = n => String(n).replace('.', ',');
+const fmtDate = (d, long) => new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', long ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'short' });
+
+/* ---------- mémoire du navigateur (peut échouer) ---------- */
+let stockageOk = true, memoire = {};
+function lire() { try { const v = localStorage.getItem(CLE); memoire = v ? JSON.parse(v) : {}; } catch (e) { stockageOk = false; memoire = {}; } }
+function ecrire() { try { localStorage.setItem(CLE, JSON.stringify(memoire)); } catch (e) { stockageOk = false; } }
+
+/* ---------- données ---------- */
+const S = { journal: [], exemple: false, vue: 'vus', type: '', annee: '', genre: '', tri: 'date-desc', montre: PAGE, base: null, baseEnCours: false };
+
+async function chargerJournal() {
+  for (const url of ['data/journal.json', 'data/journal.local.json', 'data/exemple.json']) {
+    try { const r = await fetch(url); if (!r.ok) continue; const d = await r.json(); S.journal = d.titres || d; S.exemple = !!d.exemple; return; } catch (e) { /* suivant */ }
+  }
+  S.journal = [];
+}
+function fusion() {
+  const m = new Map(S.journal.map(f => [f.id, f]));
+  for (const id in memoire) m.set(id, memoire[id]);
+  return [...m.values()];
+}
+const estLocal = id => id in memoire;
+const dansJournal = id => S.journal.some(f => f.id === id);
+function propre(f) {
+  const o = {};
+  CHAMPS.forEach(k => { const v = f[k]; if (v != null && v !== '' && !(Array.isArray(v) && !v.length)) o[k] = v; });
+  if (o.statut === 'vu') delete o.envie; else { delete o.date_vu; delete o.note; }
+  return o;
+}
+function enregistrer(f) {
+  f.maj = aujourdhui(); if (!f.ajoute_le) f.ajoute_le = f.maj;
+  memoire[f.id] = propre(f); ecrire(); majBoutons(); rendre();
+}
+
+/* ---------- affiches ---------- */
+function affiche(f, taille) {
+  const t = [...f.id].reduce((a, c) => a + c.charCodeAt(0), 0) % 6;
+  const a = h('div', { class: 'aff', 'data-t': t }, h('i', null, f.titre));
+  if (f.affiche) {
+    const img = h('img', { alt: '', loading: 'lazy', decoding: 'async', width: 185, height: 278, src: IMG + 'w185' + f.affiche });
+    if (taille === 'grand') { img.src = IMG + 'w342' + f.affiche; img.removeAttribute('loading'); } else img.srcset = `${IMG}w185${f.affiche} 185w, ${IMG}w342${f.affiche} 342w`, img.sizes = '(min-width:760px) 150px, 114px';
+    img.addEventListener('error', () => img.remove());
+    a.append(img);
+  }
+  return a;
+}
+function etoiles(note, largeur) {
+  const NS = 'http://www.w3.org/2000/svg', d = 'M12 2.6l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.5l-6 3.5 1.3-6.7-5-4.7 6.8-.8z';
+  const svg = cls => { const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 120 24'); s.setAttribute('aria-hidden', 'true'); const g = document.createElementNS(NS, 'g'); g.setAttribute('class', cls);
+    for (let i = 0; i < 5; i++) { const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); p.setAttribute('transform', `translate(${i * 24})`); g.append(p); } s.append(g); return s; };
+  const clip = h('div', { class: 'clip' }, svg('plein'));
+  const e = h('div', { class: 'etoiles', style: `--w:${largeur}px` }, svg('fond'), clip);
+  e.set = n => { clip.style.width = (n || 0) / 5 * 100 + '%'; };
+  e.set(note); return e;
+}
+
+/* ---------- vue principale ---------- */
+function listeFiltree() {
+  const vu = S.vue === 'vus';
+  let l = fusion().filter(f => (vu ? f.statut === 'vu' : f.statut === 'a_voir'));
+  if (S.type) l = l.filter(f => f.type === S.type);
+  if (vu && S.annee) l = l.filter(f => (f.date_vu || '').startsWith(S.annee));
+  if (S.genre) l = l.filter(f => (f.genres || []).includes(S.genre));
+  return l;
+}
+function trier(l) {
+  const c = {
+    'date-desc': (a, b) => (b.date_vu || b.ajoute_le || '').localeCompare(a.date_vu || a.ajoute_le || '') || a.titre.localeCompare(b.titre),
+    'date-asc': (a, b) => (a.date_vu || a.ajoute_le || '').localeCompare(b.date_vu || b.ajoute_le || '') || a.titre.localeCompare(b.titre),
+    'note': (a, b) => (b.note || 0) - (a.note || 0) || a.titre.localeCompare(b.titre),
+    'titre': (a, b) => a.titre.localeCompare(b.titre, 'fr')
+  }[S.tri];
+  return l.sort(c);
+}
+function tuile(f) {
+  const vu = f.statut === 'vu';
+  const meta = vu ? (f.note ? h('span', { class: 'm' }, h('b', null, '★ ' + fmtNote(f.note)), ' · ' + fmtDate(f.date_vu)) : h('span', { class: 'm' }, fmtDate(f.date_vu)))
+                  : h('span', { class: 'm' }, f.annee || '');
+  return h('button', { class: 'tuile', type: 'button', 'aria-label': f.titre + (f.annee ? ' (' + f.annee + ')' : ''), on: { click: () => fiche(f.id) } }, affiche(f), h('span', { class: 't' }, f.titre), meta);
+}
+function rendre() {
+  const p = $('#panneau'); p.textContent = '';
+  const stats = S.vue === 'stats';
+  $('#outils').hidden = stats; $('#compte').hidden = stats;
+  ['vus', 'avoir', 'stats'].forEach(v => { const b = $('#o-' + v); b.setAttribute('aria-selected', String(v === S.vue)); });
+  const tout = fusion();
+  const vus = tout.filter(f => f.statut === 'vu');
+  const heures = Math.round(vus.filter(f => f.type === 'film').reduce((s, f) => s + (f.duree_min || 0), 0) / 60);
+  $('#resume').textContent = `${vus.length} titres vus, ${heures} h de films, et ${tout.length - vus.length} à voir.`;
+  if (stats) return rendreStats(p, vus, heures);
+  majMenus(tout);
+  let l = listeFiltree();
+  $('#compte').textContent = `${l.length} titre${l.length > 1 ? 's' : ''}`;
+  const g = h('div', { class: 'grille' });
+  if (!l.length) g.append(h('p', { class: 'vide' }, S.vue === 'vus' ? 'Rien ici avec ces filtres.' : 'Rien à voir pour l’instant : ajoute un titre avec « + Ajouter ».'));
+  if (S.vue === 'avoir') {
+    l = l.sort((a, b) => (b.ajoute_le || '').localeCompare(a.ajoute_le || ''));
+    let n = 0;
+    ['hate', 'pourquoi_pas', 'un_jour', ''].forEach(e => {
+      const gr = l.filter(f => (f.envie || '') === e); if (!gr.length) return;
+      g.append(h('h2', { class: 'mois' }, e ? ENVIES[e] : 'Sans envie précisée'));
+      gr.forEach(f => { if (n++ < S.montre) g.append(tuile(f)); });
+    });
+  } else {
+    trier(l);
+    let mois = '';
+    l.slice(0, S.montre).forEach(f => {
+      if (S.tri.startsWith('date')) { const m = f.date_vu.slice(0, 7); if (m !== mois) { mois = m; g.append(h('h2', { class: 'mois' }, new Date(m + '-15').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }))); } }
+      g.append(tuile(f));
+    });
+  }
+  p.append(g);
+  if (l.length > S.montre) p.append(h('button', { class: 'btn plus', type: 'button', on: { click: () => { S.montre += PAGE; rendre(); } } }, `Afficher plus (${l.length - S.montre})`));
+}
+function majMenus(tout) {
+  const garde = (sel, items, vide, val) => {
+    sel.textContent = ''; sel.append(h('option', { value: '' }, vide)); items.forEach(([v, t]) => sel.append(h('option', { value: v }, t))); sel.value = val;
+  };
+  const vu = S.vue === 'vus';
+  const lst = tout.filter(f => f.statut === (vu ? 'vu' : 'a_voir'));
+  const ans = [...new Set(lst.map(f => (f.date_vu || '').slice(0, 4)).filter(Boolean))].sort().reverse();
+  const gens = [...new Set(lst.flatMap(f => f.genres || []))].sort((a, b) => a.localeCompare(b, 'fr'));
+  garde($('#f-annee'), ans.map(a => [a, a]), 'Année', S.annee);
+  garde($('#f-genre'), gens.map(a => [a, a]), 'Genre', S.genre);
+  $('#f-annee').hidden = !vu; $('#f-tri').hidden = !vu; $('#f-tri').value = S.tri;
+}
+function rendreStats(p, vus, heures) {
+  const n = t => vus.filter(f => f.type === t).length;
+  const par = (cle, lim) => { const m = {}; vus.forEach(f => cle(f).forEach(k => { m[k] = (m[k] || 0) + 1; })); return Object.entries(m); };
+  const barres = (entrees, cls) => {
+    const max = Math.max(1, ...entrees.map(e => e[1]));
+    return h('ul', { class: 'barres ' + (cls || '') }, entrees.map(([k, v]) => h('li', null, h('span', null, k), h('span', { class: 'r' }, h('i', { style: `width:${v / max * 100}%` })), h('span', { class: 'n' }, v))));
+  };
+  const ans = par(f => [(f.date_vu || '').slice(0, 4)].filter(Boolean)).sort((a, b) => b[0].localeCompare(a[0]));
+  const gens = par(f => f.genres || []).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const notes = vus.filter(f => f.note);
+  const moy = notes.length ? fmtNote((notes.reduce((s, f) => s + f.note, 0) / notes.length).toFixed(1)) : '—';
+  $('#compte').textContent = '';
+  p.append(h('div', { class: 'stats' },
+    h('div', { class: 'chiffres' },
+      h('p', null, h('b', null, n('film')), h('span', null, 'films')),
+      h('p', null, h('b', null, n('serie')), h('span', null, 'séries')),
+      h('p', null, h('b', null, n('anime')), h('span', null, 'anime')),
+      h('p', null, h('b', null, heures + ' h'), h('span', null, 'de films vus'))),
+    h('div', null, h('h2', null, 'Par année'), barres(ans)),
+    h('div', null, h('h2', null, 'Genres les plus vus'), barres(gens, 'genres'), notes.length ? h('p', { class: 'compte' }, `Note moyenne : ${moy} sur 5 (${notes.length} notés)`) : h('p', { class: 'compte' }, 'Aucune note pour l’instant.'))));
+}
+
+/* ---------- feuille ---------- */
+const F = $('#feuille');
+function feuille(titre, ...contenu) {
+  F.textContent = '';
+  F.append(h('div', { class: 'feuille' }, h('div', { class: 'f-tete' }, h('h2', { id: 'f-titre' }, titre), h('button', { class: 'btn', type: 'button', on: { click: () => F.close() } }, 'Fermer')), contenu));
+  if (!F.open) F.showModal();
+  F.scrollTop = 0;
+}
+F.addEventListener('click', e => { if (e.target === F) F.close(); });
+
+function fiche(id) {
+  const f = fusion().find(x => x.id === id); if (!f) return;
+  const vu = f.statut === 'vu';
+  const infos = [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.annee, f.duree_min ? (f.duree_min >= 60 ? Math.floor(f.duree_min / 60) + ' h ' + String(f.duree_min % 60).padStart(2, '0') : f.duree_min + ' min') + (f.type === 'serie' ? ' / épisode' : '') : ''].filter(Boolean).join(' · ');
+  const act = [];
+  if (!vu) act.push(h('button', { class: 'btn fort', type: 'button', on: { click: () => formulaire(Object.assign({}, f), true) } }, 'Je l’ai vu'));
+  act.push(h('div', { class: 'deux' },
+    h('button', { class: 'btn', type: 'button', on: { click: () => formulaire(Object.assign({}, f), false) } }, vu ? 'Modifier / noter' : 'Modifier'),
+    estLocal(id) ? h('button', { class: 'btn', type: 'button', on: { click: () => { if (confirm(dansJournal(id) ? 'Annuler mes changements sur ce titre ?' : 'Retirer ce titre de mes ajouts ?')) { delete memoire[id]; ecrire(); majBoutons(); rendre(); F.close(); toast('Fait.'); } } } }, dansJournal(id) ? 'Annuler mes changements' : 'Retirer') : null));
+  feuille(vu ? 'Vu' : 'À voir',
+    h('div', { class: 'f-haut' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, infos), f.genres && f.genres.length ? h('p', null, f.genres.join(', ')) : null,
+      vu ? h('p', null, 'Vu le ' + fmtDate(f.date_vu, true)) : (f.envie ? h('p', null, ENVIES[f.envie]) : null),
+      vu ? h('div', { style: 'margin-top:12px' }, f.note ? [etoiles(f.note, 140), h('p', null, fmtNote(f.note) + ' sur 5')] : h('p', null, 'Pas encore noté')) : null)),
+    f.commentaire ? h('p', { class: 'f-com' }, f.commentaire) : null,
+    h('div', { class: 'f-actions' }, act));
+}
+
+/* note par demi-étoile : glisser, ou boutons − / + */
+function champNote(init, onChange) {
+  let n = init || 0;
+  const e = etoiles(n, 220); e.classList.add('sl');
+  e.setAttribute('role', 'slider'); e.tabIndex = 0; e.setAttribute('aria-label', 'Note sur 5'); e.setAttribute('aria-valuemin', '0'); e.setAttribute('aria-valuemax', '5');
+  const v = h('span', { class: 'val' });
+  const set = x => { n = Math.max(0, Math.min(5, x)); e.set(n); e.setAttribute('aria-valuenow', n); e.setAttribute('aria-valuetext', n ? fmtNote(n) + ' sur 5' : 'pas de note'); v.textContent = n ? fmtNote(n) + ' / 5' : 'pas noté'; onChange(n || null); };
+  const depuis = ev => { const r = e.getBoundingClientRect(); set(Math.max(0.5, Math.ceil((ev.clientX - r.left) / r.width * 10) / 2)); };
+  let actif = false;
+  e.addEventListener('pointerdown', ev => { actif = true; e.setPointerCapture(ev.pointerId); depuis(ev); });
+  e.addEventListener('pointermove', ev => { if (actif) depuis(ev); });
+  e.addEventListener('pointerup', () => { actif = false; }); e.addEventListener('pointercancel', () => { actif = false; });
+  e.addEventListener('keydown', ev => { const d = { ArrowRight: .5, ArrowUp: .5, ArrowLeft: -.5, ArrowDown: -.5 }[ev.key]; if (d) { ev.preventDefault(); set(n + d); } else if (ev.key === 'Home') { ev.preventDefault(); set(0); } else if (ev.key === 'End') { ev.preventDefault(); set(5); } });
+  set(n);
+  return h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Note, par demi-étoile'),
+    h('div', { class: 'note-etoiles' }, h('button', { class: 'btn', type: 'button', 'aria-label': 'Moins une demi-étoile', on: { click: () => set(n - .5) } }, '−'), e, h('button', { class: 'btn', type: 'button', 'aria-label': 'Plus une demi-étoile', on: { click: () => set(n < .5 ? .5 : n + .5) } }, '+')),
+    h('div', { class: 'note-etoiles' }, v, h('button', { class: 'btn', type: 'button', style: 'font-size:15px;padding:0 14px;min-height:44px', on: { click: () => set(0) } }, 'Effacer')));
+}
+
+function formulaire(f, passerVu) {
+  const neuf = !fusion().some(x => x.id === f.id);
+  if (passerVu) { f.statut = 'vu'; delete f.envie; }
+  if (f.statut === 'vu' && !f.date_vu) f.date_vu = aujourdhui();
+  const corps = h('div', { style: 'display:grid;gap:18px' });
+  const msg = h('p', { class: 'alerte', role: 'alert' });
+  const dessiner = () => {
+    corps.textContent = '';
+    corps.append(h('div', { class: 'f-haut petit' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, [f.annee, TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : ''].filter(Boolean).join(' · ')))));
+    corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Statut'),
+      h('div', { class: 'choix' }, [['vu', 'Vu'], ['a_voir', 'À voir']].map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.statut === v), on: { click: () => { f.statut = v; if (v === 'vu' && !f.date_vu) f.date_vu = aujourdhui(); dessiner(); } } }, t)))));
+    if (f.statut === 'vu') {
+      corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-date' }, 'Date de visionnage'), h('input', { id: 'ch-date', type: 'date', value: f.date_vu, max: aujourdhui(), on: { change: e => { f.date_vu = e.target.value; } } })));
+      corps.append(champNote(f.note, n => { f.note = n; }));
+      corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-com' }, 'Commentaire (facultatif)'), h('textarea', { id: 'ch-com', maxlength: 1000, on: { input: e => { f.commentaire = e.target.value; } } }, f.commentaire || '')));
+    } else {
+      corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Envie (facultatif)'),
+        h('div', { class: 'choix', style: '--n:3' }, Object.entries(ENVIES).map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.envie === v), on: { click: () => { f.envie = f.envie === v ? null : v; dessiner(); } } }, t)))));
+    }
+    corps.append(h('div', { class: 'collant' }, msg, h('button', { class: 'btn fort', type: 'button', on: { click: sauver } }, f.statut === 'vu' ? 'Enregistrer comme vu' : 'Enregistrer dans « à voir »')));
+  };
+  const sauver = () => {
+    if (f.statut === 'vu' && !/^\d{4}-\d{2}-\d{2}$/.test(f.date_vu || '')) { msg.textContent = 'Il faut une date de visionnage.'; return; }
+    enregistrer(f); F.close(); toast(f.statut === 'vu' ? 'Noté comme vu.' : 'Ajouté à « à voir ».');
+    S.vue = f.statut === 'vu' ? 'vus' : 'avoir'; rendre();
+  };
+  dessiner();
+  feuille(neuf ? 'Ajouter' : 'Modifier', corps);
+}
+
+/* ---------- ajout : recherche dans la base ---------- */
+async function chargerBase() {
+  if (S.base || S.baseEnCours) return; S.baseEnCours = true;
+  const ans = []; for (let a = 2026; a >= 2006; a--) ans.push(a);
+  const res = await Promise.allSettled(ans.map(a => fetch(`data/base/${a}.json`).then(r => r.ok ? r.json() : Promise.reject())));
+  S.base = res.flatMap(r => r.status === 'fulfilled' ? (r.value.titres || []) : []).map(f => ({ f, n: norm(f.titre) }));
+  S.baseEnCours = false;
+}
+function ajout() {
+  const liste = h('ul', { class: 'resultats' });
+  const etat = h('p', { class: 'compte', role: 'status' });
+  const q = h('input', { id: 'ch-q', type: 'search', placeholder: 'Titre du film, de la série, de l’anime', autocomplete: 'off', enterkeyhint: 'search' });
+  const chercher = async () => {
+    liste.textContent = '';
+    const mots = norm(q.value.trim()).split(/\s+/).filter(Boolean);
+    if (q.value.trim().length < 2) { etat.textContent = ''; return; }
+    if (!S.base) { etat.textContent = 'Chargement de la base…'; await chargerBase(); }
+    const deja = new Set(fusion().map(x => x.id));
+    const r = (S.base || []).filter(x => mots.every(m => x.n.includes(m))).slice(0, 40);
+    etat.textContent = r.length ? `${r.length}${r.length === 40 ? '+' : ''} résultat${r.length > 1 ? 's' : ''}` : 'Rien dans la base. Tu peux le saisir à la main ci-dessous.';
+    r.forEach(({ f }) => liste.append(h('li', null, h('button', { type: 'button', on: { click: () => formulaire(Object.assign({ statut: 'vu' }, f), false) } },
+      affiche(f), h('div', { style: 'min-width:0' }, h('b', null, f.titre), h('span', null, [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.annee, deja.has(f.id) ? 'déjà dans ta liste' : ''].filter(Boolean).join(' · ')))))));
+  };
+  let t; q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(chercher, 180); });
+  feuille('Ajouter', h('div', { class: 'champ' }, h('label', { for: 'ch-q' }, 'Chercher dans la base'), q), etat, liste,
+    h('button', { class: 'btn', type: 'button', on: { click: manuel } }, 'Saisir à la main'));
+  setTimeout(() => { chargerBase(); q.focus(); }, 60);
+}
+function manuel() {
+  const f = { type: 'film', statut: 'vu', genres: [] };
+  const titre = h('input', { id: 'm-t', type: 'text', maxlength: 120, autocomplete: 'off' });
+  const annee = h('input', { id: 'm-a', type: 'number', inputmode: 'numeric', min: 1900, max: 2100 });
+  const msg = h('p', { class: 'alerte', role: 'alert' });
+  const tp = h('div', { class: 'choix', style: '--n:3' });
+  const dess = () => { tp.textContent = ''; Object.entries(TYPES).forEach(([v, t]) => tp.append(h('button', { type: 'button', 'aria-pressed': String(f.type === v), on: { click: () => { f.type = v; dess(); } } }, t.replace(/s$/, '')))); };
+  dess();
+  feuille('Saisir à la main',
+    h('div', { class: 'champ' }, h('label', { for: 'm-t' }, 'Titre'), titre),
+    h('div', { class: 'champ' }, h('label', { for: 'm-a' }, 'Année de sortie'), annee),
+    h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Type'), tp), msg,
+    h('button', { class: 'btn fort', type: 'button', on: { click: () => {
+      const t = titre.value.trim(), a = parseInt(annee.value, 10);
+      if (!t) { msg.textContent = 'Il faut un titre.'; return; }
+      f.titre = t; if (a) f.annee = a;
+      const slug = norm(t).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'titre';
+      f.id = 'manuel-' + slug + (a ? '-' + a : '');
+      formulaire(f, false);
+    } } }, 'Continuer'));
+}
+
+/* ---------- copier mes ajouts ---------- */
+function exportJson() { return JSON.stringify({ version: 1, titres: Object.values(memoire).map(propre) }, null, 1); }
+function majBoutons() {
+  const n = Object.keys(memoire).length;
+  const b = $('#b-copie'); b.disabled = !n; b.textContent = n ? `Copier mes ajouts (${n})` : 'Copier mes ajouts';
+}
+async function copier() {
+  const txt = exportJson(), n = Object.keys(memoire).length;
+  try { await navigator.clipboard.writeText(txt); toast(`Copié : ${n} fiche${n > 1 ? 's' : ''}. Colle-les à Claude, ou dans ajouts_cinema_${aujourdhui()}.json.`); }
+  catch (e) {
+    const ta = h('textarea', { class: 'export', readonly: true }, txt);
+    feuille('Mes ajouts', h('p', null, 'Le presse-papier est bloqué : sélectionne tout le texte ci-dessous, copie-le, puis colle-le.'), ta);
+    setTimeout(() => { ta.focus(); ta.select(); }, 60);
+  }
+}
+let tToast; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tToast); tToast = setTimeout(() => t.classList.remove('on'), 4200); }
+
+/* ---------- écran de cinéma (3 derniers vus) ---------- */
+function ecran() {
+  const e = $('#ecran'); if (!e) return; e.textContent = '';
+  const r = fusion().filter(f => f.statut === 'vu').sort((a, b) => b.date_vu.localeCompare(a.date_vu)).slice(0, 3);
+  const ds = r.map((f, i) => { const d = h('div', { class: 'diapo' + (i === 0 ? ' on' : '') }, affiche(f), h('div', { style: 'min-width:0' }, h('b', null, f.titre), h('span', null, 'vu le ' + fmtDate(f.date_vu), f.note ? ' · ★ ' + fmtNote(f.note) : ''))); e.append(d); return d; });
+  if (ds.length > 1 && !reduit) { let i = 0; clearInterval(ecran.t); ecran.t = setInterval(() => { ds[i].classList.remove('on'); i = (i + 1) % ds.length; ds[i].classList.add('on'); }, 4500); }
+}
+
+/* ---------- branchements ---------- */
+document.querySelectorAll('.onglets button').forEach(b => b.addEventListener('click', () => { S.vue = b.dataset.vue; S.montre = PAGE; S.annee = ''; S.genre = ''; rendre(); }));
+const pc = $('.puces');
+[['', 'Tout'], ['film', 'Films'], ['serie', 'Séries'], ['anime', 'Anime']].forEach(([v, t]) => {
+  const b = h('button', { class: 'puce', type: 'button', 'aria-pressed': String(v === ''), on: { click: () => { S.type = v; S.montre = PAGE; pc.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); rendre(); } } }, t);
+  pc.append(b);
+});
+$('#f-annee').addEventListener('change', e => { S.annee = e.target.value; S.montre = PAGE; rendre(); });
+$('#f-genre').addEventListener('change', e => { S.genre = e.target.value; S.montre = PAGE; rendre(); });
+$('#f-tri').addEventListener('change', e => { S.tri = e.target.value; S.montre = PAGE; rendre(); });
+$('#b-ajout').addEventListener('click', ajout);
+$('#b-copie').addEventListener('click', copier);
+
+(async () => {
+  lire(); await chargerJournal(); majBoutons();
+  $('#pied').textContent = `Cinéma v${VERSION}` + (S.exemple ? ' · titres d’exemple' : '') + (stockageOk ? '' : ' · ce navigateur ne garde pas mes ajouts : pense à les copier');
+  ecran(); rendre();
+})();
+})();
+</script>
+</body>
+</html>

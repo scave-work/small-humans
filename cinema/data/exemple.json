@@ -1,0 +1,369 @@
+{
+ "version": 1,
+ "exemple": true,
+ "titres": [
+  {
+   "id": "manuel-exemple-0",
+   "type": "film",
+   "titre": "La Dernière Lanterne",
+   "annee": 2025,
+   "genres": [
+    "Drame"
+   ],
+   "duree_min": 104,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-10-22",
+   "note": 3.5,
+   "commentaire": "Exemple fictif : un commentaire court écrit à la main."
+  },
+  {
+   "id": "manuel-exemple-1",
+   "type": "film",
+   "titre": "Le Phare des Autres",
+   "annee": 2024,
+   "genres": [
+    "Thriller",
+    "Drame"
+   ],
+   "duree_min": 118,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-10-19",
+   "note": 3
+  },
+  {
+   "id": "manuel-exemple-2",
+   "type": "serie",
+   "titre": "Marée Haute",
+   "annee": 2023,
+   "genres": [
+    "Drame",
+    "Mystère"
+   ],
+   "duree_min": 52,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-10-04"
+  },
+  {
+   "id": "manuel-exemple-3",
+   "type": "anime",
+   "titre": "Quartier des Étoiles",
+   "annee": 2022,
+   "genres": [
+    "Animation",
+    "Aventure"
+   ],
+   "duree_min": 24,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-09-28",
+   "note": 4
+  },
+  {
+   "id": "manuel-exemple-4",
+   "type": "film",
+   "titre": "Un Été de Papier",
+   "annee": 2021,
+   "genres": [
+    "Comédie"
+   ],
+   "duree_min": 92,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-09-12",
+   "note": 5
+  },
+  {
+   "id": "manuel-exemple-5",
+   "type": "serie",
+   "titre": "Les Veilleurs",
+   "annee": 2025,
+   "genres": [
+    "Science-Fiction"
+   ],
+   "duree_min": 45,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-08-30"
+  },
+  {
+   "id": "manuel-exemple-6",
+   "type": "film",
+   "titre": "Cargo Silencieux",
+   "annee": 2019,
+   "genres": [
+    "Action",
+    "Thriller"
+   ],
+   "duree_min": 127,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-08-02",
+   "note": 2.5
+  },
+  {
+   "id": "manuel-exemple-7",
+   "type": "film",
+   "titre": "Petit Orage",
+   "annee": 2020,
+   "genres": [
+    "Comédie",
+    "Famille"
+   ],
+   "duree_min": 88,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-07-14",
+   "note": 2.5
+  },
+  {
+   "id": "manuel-exemple-8",
+   "type": "film",
+   "titre": "Sous la Ville",
+   "annee": 2026,
+   "genres": [
+    "Science-Fiction",
+    "Aventure"
+   ],
+   "duree_min": 109,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-06-21"
+  },
+  {
+   "id": "manuel-exemple-9",
+   "type": "serie",
+   "titre": "Les Cartographes",
+   "annee": 2024,
+   "genres": [
+    "Aventure"
+   ],
+   "duree_min": 50,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-05-27",
+   "note": 4.5
+  },
+  {
+   "id": "manuel-exemple-10",
+   "type": "film",
+   "titre": "Neige d'Octobre",
+   "annee": 2018,
+   "genres": [
+    "Drame",
+    "Romance"
+   ],
+   "duree_min": 101,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-04-11",
+   "note": 2.5
+  },
+  {
+   "id": "manuel-exemple-11",
+   "type": "anime",
+   "titre": "Kaiju Sentimental",
+   "annee": 2023,
+   "genres": [
+    "Animation",
+    "Comédie"
+   ],
+   "duree_min": 23,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-03-08"
+  },
+  {
+   "id": "manuel-exemple-12",
+   "type": "film",
+   "titre": "Le Grand Détour",
+   "annee": 2022,
+   "genres": [
+    "Comédie"
+   ],
+   "duree_min": 96,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2026-02-15",
+   "note": 3.5
+  },
+  {
+   "id": "manuel-exemple-13",
+   "type": "film",
+   "titre": "Aiguille et Fil",
+   "annee": 2017,
+   "genres": [
+    "Drame"
+   ],
+   "duree_min": 115,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2025-12-31",
+   "note": 4.5
+  },
+  {
+   "id": "manuel-exemple-14",
+   "type": "serie",
+   "titre": "Station 9",
+   "annee": 2026,
+   "genres": [
+    "Science-Fiction",
+    "Thriller"
+   ],
+   "duree_min": 48,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2025-11-09"
+  },
+  {
+   "id": "manuel-exemple-15",
+   "type": "film",
+   "titre": "L'Horloger de Minuit",
+   "annee": 2026,
+   "genres": [
+    "Mystère",
+    "Thriller"
+   ],
+   "duree_min": 121,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2025-09-20",
+   "note": 2.5
+  },
+  {
+   "id": "manuel-exemple-16",
+   "type": "film",
+   "titre": "Ciel de Plomb",
+   "annee": 2016,
+   "genres": [
+    "Guerre",
+    "Drame"
+   ],
+   "duree_min": 140,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2025-07-05",
+   "note": 4.5
+  },
+  {
+   "id": "manuel-exemple-17",
+   "type": "anime",
+   "titre": "Les Quatre Saisons du Chat",
+   "annee": 2021,
+   "genres": [
+    "Animation",
+    "Famille"
+   ],
+   "duree_min": 22,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "vu",
+   "date_vu": "2025-04-26"
+  },
+  {
+   "id": "manuel-exemple-18",
+   "type": "film",
+   "titre": "Radio Fantôme",
+   "annee": 2024,
+   "genres": [
+    "Horreur"
+   ],
+   "duree_min": 93,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "a_voir",
+   "envie": "hate"
+  },
+  {
+   "id": "manuel-exemple-19",
+   "type": "film",
+   "titre": "Dernier Métro pour Rien",
+   "annee": 2025,
+   "genres": [
+    "Comédie",
+    "Drame"
+   ],
+   "duree_min": 99,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "a_voir",
+   "envie": "pourquoi_pas"
+  },
+  {
+   "id": "manuel-exemple-20",
+   "type": "serie",
+   "titre": "Le Jardin Mécanique",
+   "annee": 2022,
+   "genres": [
+    "Fantastique"
+   ],
+   "duree_min": 40,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "a_voir",
+   "envie": "un_jour"
+  },
+  {
+   "id": "manuel-exemple-21",
+   "type": "film",
+   "titre": "Papier Froissé",
+   "annee": 2023,
+   "genres": [
+    "Drame"
+   ],
+   "duree_min": 107,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "a_voir",
+   "envie": "hate"
+  },
+  {
+   "id": "manuel-exemple-22",
+   "type": "film",
+   "titre": "Les Chemins Courts",
+   "annee": 2019,
+   "genres": [
+    "Aventure",
+    "Famille"
+   ],
+   "duree_min": 98,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "a_voir",
+   "envie": "pourquoi_pas"
+  },
+  {
+   "id": "manuel-exemple-23",
+   "type": "film",
+   "titre": "Tempête sur Mesure",
+   "annee": 2026,
+   "genres": [
+    "Action"
+   ],
+   "duree_min": 111,
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25",
+   "statut": "a_voir",
+   "envie": "un_jour"
+  }
+ ]
+}
