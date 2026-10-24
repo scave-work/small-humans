@@ -122,11 +122,11 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .tableau.ouvert:hover canvas{filter:brightness(1.18)}
 .tableau.ouvert:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
 /* onde bleue qui part de la carte, comme à la fin de la roulette : au survol, et au clic (classe .onde) */
-.tableau.ouvert::before,.tableau.ouvert::after{content:"";position:absolute;inset:0;border:1px solid var(--accent);opacity:0;pointer-events:none}
-.tableau.ouvert:hover::before,.tableau.ouvert.onde::before{animation:onde 1.1s var(--ease-out) both}
-.tableau.ouvert:hover::after,.tableau.ouvert.onde::after{animation:onde 1.1s .22s var(--ease-out) both}
+.tableau::before,.tableau::after{content:"";position:absolute;inset:0;border:1px solid var(--accent);opacity:0;pointer-events:none}
+.tableau:hover::before,.tableau.onde::before{animation:onde 1.1s var(--ease-out) both}
+.tableau:hover::after,.tableau.onde::after{animation:onde 1.1s .22s var(--ease-out) both}
 @keyframes onde{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.04)}}
-@media (prefers-reduced-motion: reduce){ .tableau.ouvert::before,.tableau.ouvert::after{animation:none!important} }
+@media (prefers-reduced-motion: reduce){ .tableau::before,.tableau::after{animation:none!important} }
 .tableau h3{transition:color .18s ease}
 @media (max-width:600px){
   #galerie .tableaux{grid-template-columns:1fr;row-gap:28px}
@@ -997,7 +997,7 @@ function construireGalerie(D) {
       li.addEventListener('keydown', e => { if (e.key === 'Enter') entrer(); });
     } else {
       bt.textContent = 'En construction'; bt.setAttribute('aria-label', `${p.nom} : en construction`);
-      bt.addEventListener('click', () => { etat.textContent = 'Cette salle n’est pas encore ouverte.'; });
+      bt.addEventListener('click', () => { li.classList.add('onde'); etat.textContent = 'Cette salle n’est pas encore ouverte.'; });
     }
     ul.appendChild(li);
     return { p, cv, g: null, w: 0, h: 0 };
@@ -1017,7 +1017,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 33';
+const BUILD = 'v-backend 24 oct, 34';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
