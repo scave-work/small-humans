@@ -192,6 +192,7 @@ tr.cache{display:none}
 .mus-outils button{min-height:40px;padding:6px 14px;background:var(--nuit);color:var(--ink)}
 .lect-prog-boite{padding:12px 0;cursor:pointer;touch-action:none}
 .mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.version{position:fixed;left:8px;bottom:2px;font-size:11px;color:#46557a;margin:0;z-index:10;pointer-events:none}
 .mus-gauche,.filtres,.mus-outils{min-width:0;max-width:100%}
 .ec-titre{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;max-width:100%;font-size:clamp(13px,1.15vw,19px);letter-spacing:.12em}
 @media (min-width:761px){.platine{width:min(100%,460px,max(240px,calc(100svh - 330px)))}}
@@ -311,6 +312,7 @@ tr.cache{display:none}
           <label class="vol" for="vol"><span>Volume</span><input id="vol" type="range" min="0" max="100" step="1" value="80" aria-label="Volume de la musique et des sons"><output id="volVal" for="vol">80</output></label>
           <div class="yt-boite" id="ytBoite"><div id="ytCible"></div></div>
           <p class="lect-note" id="lMsg" role="status"></p>
+          <p class="version" id="mus-version"></p>
         </div>
       </div>
       <div class="mus-corps">
@@ -857,6 +859,7 @@ function cellsPlatine() {   // position (angle local) de chaque titre : 6 genres
   });
 }
 let ANG = [];
+const BUILD = 'v-backend 24 oct, 4';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -879,6 +882,7 @@ function construireMusique(D) {
   $('#alea').addEventListener('click', e => { M.alea = !M.alea; e.currentTarget.setAttribute('aria-pressed', String(M.alea)); mem.ecrire('alea', M.alea); });
   $('#plus').addEventListener('click', () => { M.montre += PAGE; tableau(); });
   $('#lProg').innerHTML = '<i></i>'.repeat(40);
+  $('#mus-version').textContent = BUILD;
   reconstruire(null);
 }
 function hasard() {   // un titre au hasard dans la liste filtrée, lu tout de suite
@@ -974,9 +978,9 @@ function erreurVideo(code) {   // vidéo supprimée ou non intégrable : on la m
 /* ---------- position dans le titre : clic, glisser ou flèches ---------- */
 const boiteProg = $('#lProgBoite'); let glisse = false;
 function fraction(e) { const r = $('#lProg').getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); }
-function aller(f) { if (!PY || !apiPrete || !M.charge) return; try { const d = PY.getDuration(); if (d > 0) PY.seekTo(f * d, true); } catch (e) {} }
-boiteProg.addEventListener('pointerdown', e => { glisse = true; try { boiteProg.setPointerCapture(e.pointerId); } catch (x) {} M.seekF = fraction(e); aller(M.seekF); });
-boiteProg.addEventListener('pointermove', e => { if (glisse) { M.seekF = fraction(e); aller(M.seekF); } });
+function allerA(f) { if (!PY || !apiPrete || !M.charge) return; try { const d = PY.getDuration(); if (d > 0) PY.seekTo(f * d, true); } catch (e) {} }
+boiteProg.addEventListener('pointerdown', e => { glisse = true; try { boiteProg.setPointerCapture(e.pointerId); } catch (x) {} M.seekF = fraction(e); allerA(M.seekF); });
+boiteProg.addEventListener('pointermove', e => { if (glisse) { M.seekF = fraction(e); allerA(M.seekF); } });
 ['pointerup', 'pointercancel'].forEach(n => boiteProg.addEventListener(n, () => { glisse = false; M.seekF = null; }));
 boiteProg.addEventListener('keydown', e => {
   if (!PY || !apiPrete || !M.charge) return;
@@ -1131,7 +1135,7 @@ async function demarrer() {
   let D = null;
   try {
     D = {"titre":"SMALL HUMANS","passions":[{"id":"musique","court":"MUSIQUE","nom":"Musique","phrase":"Mes favoris rangés par genre, à écouter d’un clic.","ouvert":true},{"id":"cinema","court":"CINÉMA","nom":"Cinéma, séries, anime","phrase":"Tout ce que je regarde, noté ou non, et la liste à voir.","ouvert":false},{"id":"ecriture","court":"ÉCRITURE","nom":"Écriture","phrase":"Mes textes, protégés par un mot de passe.","ouvert":false},{"id":"tech","court":"TECH & IA","nom":"Tech & IA","phrase":"Mes projets perso et ce que j’apprends avec l’IA.","ouvert":false}],"genres":["synthwave","electronica","electro-melodique","house-techno","french-touch","neoclassique"],"titres":[{"titre":"Un nouveau soleil","artiste":"M83","genre":"synthwave","youtube":"36mlX318Q3w"},{"titre":"Strands Unravel","artiste":"DEADLIFE","genre":"synthwave","youtube":"cGYtl4L6ajY"},{"titre":"The Way Home","artiste":"Magic Sword","genre":"synthwave","youtube":"mCikIkXslP0"},{"titre":"Roller Mobster","artiste":"Carpenter Brut","genre":"synthwave","youtube":"qFfybn_W8Ak"},{"titre":"Rhubarb","artiste":"Aphex Twin","genre":"electronica","youtube":"_AWIqXzvX-U"},{"titre":"Resonance","artiste":"HOME","genre":"electronica","youtube":"8GW6sLrK40k"},{"titre":"Vanished","artiste":"Crystal Castles","genre":"electronica","youtube":"9XViPhRnOiQ"},{"titre":"Two Thousand and Seventeen","artiste":"Four Tet","genre":"electronica","youtube":"CUYboWbVe0A"},{"titre":"Inner Peace","artiste":"CloZee","genre":"electro-melodique","youtube":"1IQiwy_m8_U"},{"titre":"Beyond","artiste":"OVERWERK","genre":"electro-melodique","youtube":"9Vjt_K7rsnw"},{"titre":"Snowflakes","artiste":"Rawtekk","genre":"electro-melodique","youtube":"a-GHEHTtNrE"},{"titre":"Push Through","artiste":"DROELOE","genre":"electro-melodique","youtube":"aZrkZGApUcw"},{"titre":"La Parisienne","artiste":"Worakls","genre":"house-techno","youtube":"5zwjkfmMwb4"},{"titre":"Little Voices","artiste":"Lane 8","genre":"house-techno","youtube":"8jXUSxq30hA"},{"titre":"Burnt","artiste":"Kiasmos","genre":"house-techno","youtube":"c4f7GtBR3RM"},{"titre":"Arquipelago","artiste":"Gui Boratto","genre":"house-techno","youtube":"7Y2W2-oSqOU"},{"titre":"Vertigo Valley","artiste":"French 79","genre":"french-touch","youtube":"hD9rzo6g5JU"},{"titre":"Haine-moi","artiste":"Møme","genre":"french-touch","youtube":"Gq_0sz0_Wkg"},{"titre":"Monaco","artiste":"Bon Entendeur","genre":"french-touch","youtube":"bKUMaibnQKU"},{"titre":"Prelude","artiste":"The Blaze","genre":"french-touch","youtube":"76r4l-BV9U4"},{"titre":"Infra 5","artiste":"Max Richter","genre":"neoclassique","youtube":"B4Kybxu7fiQ"},{"titre":"Non-eternal","artiste":"Max Richter","genre":"neoclassique","youtube":"bMzEClKWUxc"},{"titre":"Love","artiste":"Ben Lukas Boysen","genre":"neoclassique","youtube":"j7usC68u6kk"},{"titre":"Cantorum","artiste":"Penguin Cafe","genre":"neoclassique","youtube":"mRcceK-0G7w"}]};
-    try { const r = await fetch('titres.json'); if (!r.ok) throw 0; D.titres = await r.json(); }
+    try { const r = await fetch('titres.json?b=' + encodeURIComponent(BUILD)); if (!r.ok) throw 0; D.titres = await r.json(); }
     catch (e) { erreur('Les titres (titres.json) n’ont pas pu être lus : on garde les titres d’exemple. Ouvre la page depuis GitHub Pages ou un petit serveur local, pas en double-clic.'); }
   } catch (e) {
     erreur('Les données n’ont pas pu être lues.');
