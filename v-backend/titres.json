@@ -28441,5 +28441,41 @@
 "source": "spotify",
 "artiste_fiable": true,
 "mix": false
+},
+{
+"youtube": "fSOSsR3dJHw",
+"titre": "everything is live music",
+"artiste": "Jersey",
+"genre": "electro-pop",
+"tags": [
+"electro-pop"
+],
+"source": "ajout",
+"artiste_fiable": false,
+"mix": false
+},
+{
+"youtube": "iDc948L8CF8",
+"titre": "Monday (Visualizer)",
+"artiste": "NTO",
+"genre": "french-touch",
+"tags": [
+"french-touch"
+],
+"source": "ajout",
+"artiste_fiable": true,
+"mix": false
+},
+{
+"youtube": "K8xR8PrjtZ0",
+"titre": "Colors Collide feat. New Constellations [Visualizer]",
+"artiste": "French 79",
+"genre": "french-touch",
+"tags": [
+"french-touch"
+],
+"source": "ajout",
+"artiste_fiable": true,
+"mix": false
 }
 ]
