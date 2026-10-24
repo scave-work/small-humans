@@ -403,6 +403,23 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .lect-boutons button:hover{background:#15223A}
 .lect-yt{font-size:14px;text-decoration:none}
 .lect-yt:hover{text-decoration:underline}
+.lect-liens{display:flex;gap:16px;align-items:center;white-space:nowrap}
+@media (max-width:1100px){.lect-liens{grid-column:1/-1}}
+.aj-panneau{position:fixed;z-index:41;width:min(560px,calc(100vw - 16px));max-height:min(70vh,560px);overflow:auto;background:rgba(12,23,48,.97);border-radius:12px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.aj-panneau[hidden]{display:none}
+.aj-tete{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}
+.aj-tete h3{margin:0;font-size:16px;font-weight:500}
+.aj-ligne{display:flex;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:#0E1727;margin-bottom:6px}
+.aj-ligne .aj-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aj-ligne .aj-t small{color:var(--acier)}
+.aj-panneau button,.aj-panneau select{font:inherit;font-size:14px;color:var(--ink);background:#1A2B4A;border:0;border-radius:999px;padding:3px 12px;min-height:30px;cursor:pointer}
+.aj-panneau select{max-width:150px}
+.aj-panneau .aj-prim{background:var(--accent);color:var(--accent-ink)}
+.aj-panneau .aj-prim:disabled{opacity:.4;cursor:default}
+.aj-panneau .aj-x{background:none;color:var(--acier);padding:3px 8px}
+.aj-bas{display:flex;gap:12px;align-items:center;margin-top:10px}
+a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;border-radius:999px;background:#0E1727;color:var(--accent);text-decoration:none;font-size:14px;cursor:grab}
+.aj-aide{color:var(--acier);font-size:13px;margin:10px 0 0}
 .mus-outils .case input{accent-color:var(--accent)}
 .mus-corps .mus-outils{gap:6px 8px}   /* la ligne de recherche à l'échelle des tags (15 px, 32 px de haut) */
 .mus-corps .mus-outils input[type=search],.mus-corps .mus-outils .case,.mus-corps .mus-outils button{min-height:32px;font-size:15px}
@@ -524,7 +541,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
           <div class="lect-prog" id="lProg" aria-hidden="true"></div>
         </div>
         <button id="lPlein" class="lect-plein" type="button" aria-pressed="false" aria-label="Voir la vidéo en plein écran" title="Vidéo en plein écran (F)"><svg class="ico-ouvrir" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg><svg class="ico-fermer" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg></button>
-        <a class="lect-yt" id="lYt" href="#" target="_blank" rel="noopener">Écouter sur YouTube</a>
+        <span class="lect-liens"><a class="lect-yt" id="lYt" href="#" target="_blank" rel="noopener">Écouter sur YouTube</a><a class="lect-yt" id="lSim" href="#" target="_blank" rel="noopener" title="Ouvre le Mix YouTube de ce titre : suggestions dans le même esprit">Titres similaires</a></span>
         <div class="lect-extra">
           <label class="vol" for="vol"><span>Volume</span><input id="vol" type="range" min="0" max="100" step="1" value="80" aria-label="Volume de la musique et des sons"><output id="volVal" for="vol">80</output></label>
           <p class="lect-note" id="lMsg" role="status"></p>
@@ -539,6 +556,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
           <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
           <button id="toutAj" type="button" hidden>Tout ajouter</button>
+          <button id="ajBtn" type="button" aria-haspopup="dialog" aria-expanded="false">À ajouter</button>
         </div>
         <div class="pistes-zone">
         <table class="pistes">
@@ -567,6 +585,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
         <p class="pan-vide" id="panVide"></p>
         <p class="pan-aide">Glisse des titres de la liste ici. Dans la playlist : glisse pour ranger, tire vers la droite pour retirer.</p>
       </aside>
+      <div class="aj-panneau" id="ajPanneau" role="dialog" aria-label="Titres à ajouter" hidden></div>
     </div>
   </section>
 </main>
@@ -1096,13 +1115,90 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 48';
+const BUILD = 'v-backend 24 oct, 49';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const suiteTexte = () => { const n = M.file.length; return n ? `À suivre : « ${M.file[0].titre} »${n > 1 ? ` (+${n - 1})` : ''}` : ''; };   // le prochain morceau = le premier de la file
 const mlg = t => { $('#lMsg').textContent = t || suiteTexte(); };
+/* ---------- « À ajouter » : titres trouvés sur YouTube/Spotify avec le favori « + Site » ----------
+   Gardés dans CE navigateur seulement (jamais écrits dans les données publiques), puis exportés en fichier et intégrés par backend/scripts/13_integrer_ajouts.py. */
+const GENRES_AJ = ['house-techno', 'electro-melodique', 'electro-pop', 'electronica', 'french-touch', 'synthwave', 'trance-psy', 'hard-edm', 'edm', 'bass', 'dub-reggae', 'chill', 'ambient', 'neoclassique', 'ost', 'folk-world', 'hiphop', 'rock-metal', 'pop-indie', 'epic', 'funk-jazz', 'autre'];
+const ID_YT = /^[\w-]{11}$/;
+const lireAjouts = () => { const a = mem.lire('ajouts', []); return Array.isArray(a) ? a.filter(x => x && ID_YT.test(String(x.youtube)) && typeof x.titre === 'string') : []; };
+function recevoirAjout() {   // le favori ouvre le site avec ?ajout=ID&t=titre&c=chaîne : on range le titre puis on nettoie l'adresse
+  const p = new URLSearchParams(location.search), id = p.get('ajout'); if (id === null) return '';
+  const titre = (p.get('t') || 'Sans titre').slice(0, 200), chaine = (p.get('c') || '').slice(0, 100);
+  ['ajout', 't', 'c'].forEach(k => p.delete(k)); history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
+  if (!ID_YT.test(id)) return 'Adresse de vidéo invalide : rien ajouté.';
+  const l = lireAjouts(); if (l.some(x => x.youtube === id)) return `Déjà dans « À ajouter » : ${titre}`;
+  l.push({ youtube: id, titre, artiste: chaine, genre: '', ajoute_le: new Date().toISOString().slice(0, 10) }); mem.ecrire('ajouts', l);
+  return `Ajouté à « À ajouter » : ${titre}`;
+}
+const pseudoTitre = x => { const g = GENRES_AJ.includes(x.genre) ? x.genre : 'autre'; return { youtube: x.youtube, titre: x.titre, artiste: x.artiste || '', genre: g, tags: [g], source: 'ajout', artiste_fiable: false, mix: false, local: true }; };
+function fusionnerAjouts(D) {   // les ajouts apparaissent dans la liste comme les autres titres, tant qu'ils ne sont pas dans titres.json
+  const connus = new Set(D.titres.map(t => t.youtube));
+  M.ajouts = lireAjouts().filter(x => !connus.has(x.youtube));
+  D.titres = D.titres.concat(M.ajouts.map(pseudoTitre));
+}
+function codeFavori() {   // le favori : lit l'adresse et le titre de la page YouTube ouverte (ou la page Spotify) et ouvre ce site
+  const b = location.origin + location.pathname;
+  return "(function(){var u=location.href,h=location.hostname,t=document.title,b=" + JSON.stringify(b) + ";" +
+    "if(/youtube\\.com|youtu\\.be/.test(h)){var m=u.match(/[?&]v=([\\w-]{11})/)||u.match(/youtu\\.be\\/([\\w-]{11})/);" +
+    "if(!m){alert('Pas de vidéo sur cette page.');return}" +
+    "var c='';try{c=(document.querySelector('ytd-video-owner-renderer #channel-name a')||{}).textContent||''}catch(e){}" +
+    "t=t.replace(/^\\(\\d+\\)\\s*/,'').replace(/\\s*-\\s*YouTube$/,'');" +
+    "window.open(b+'?vue=musique&ajout='+m[1]+'&t='+encodeURIComponent(t)+'&c='+encodeURIComponent(c.trim()))}" +
+    "else if(/spotify\\.com/.test(h)){t=t.replace(/\\s*\\|\\s*Spotify$/,'').replace(/\\s*[-–]\\s*(Titre, paroles et vidéo de|song and lyrics by|Song, Lyrics, and Music Video by)\\s*/i,' ');" +
+    "window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(t))}" +
+    "else{alert('Ouvre une vidéo YouTube ou un titre Spotify.')}})()";
+}
+function majAjBtn() { const n = M.ajouts.length; $('#ajBtn').textContent = n ? `À ajouter (${n})` : 'À ajouter'; }
+function dessinerAj() {
+  const pn = $('#ajPanneau'); pn.textContent = '';
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
+  const tete = el('div', 'aj-tete'); tete.appendChild(el('h3', '', `À ajouter${M.ajouts.length ? ` (${M.ajouts.length})` : ''}`));
+  const fer = el('button', 'aj-x', '✕'); fer.type = 'button'; fer.setAttribute('aria-label', 'Fermer'); fer.addEventListener('click', fermerAj); tete.appendChild(fer); pn.appendChild(tete);
+  if (!M.ajouts.length) pn.appendChild(el('p', 'aj-aide', 'Rien pour l’instant. Sur une vidéo YouTube, clique sur le favori « + Site » : le titre arrive ici.'));
+  M.ajouts.forEach(x => {
+    const tr = M.parId.get(x.youtube); const l = el('div', 'aj-ligne');
+    const pl = el('button', '', '▶'); pl.type = 'button'; pl.setAttribute('aria-label', 'Écouter'); pl.addEventListener('click', () => { if (tr) lancer(tr); });
+    const t = el('div', 'aj-t', x.titre); if (x.artiste) t.appendChild(el('small', '', '  ' + x.artiste));
+    const sel = el('select'); sel.setAttribute('aria-label', 'Style');
+    const o0 = el('option', '', 'style ?'); o0.value = ''; sel.appendChild(o0);
+    GENRES_AJ.forEach(g => { const o = el('option', '', g); o.value = g; if (g === x.genre) o.selected = true; sel.appendChild(o); });
+    sel.addEventListener('change', () => { x.genre = sel.value; mem.ecrire('ajouts', lireAjouts().map(y => y.youtube === x.youtube ? { ...y, genre: x.genre } : y)); if (tr) { tr.genre = GENRES_AJ.includes(x.genre) ? x.genre : 'autre'; tr.tags = [tr.genre]; reconstruire(M.cur, true); } });
+    const del = el('button', 'aj-x', '✕'); del.type = 'button'; del.setAttribute('aria-label', 'Retirer');
+    del.addEventListener('click', () => {
+      mem.ecrire('ajouts', lireAjouts().filter(y => y.youtube !== x.youtube)); M.ajouts = M.ajouts.filter(y => y !== x);
+      if (tr) { const i = M.tous.indexOf(tr); if (i >= 0) M.tous.splice(i, 1); M.parId.delete(x.youtube); reconstruire(M.cur, true); }
+      majAjBtn(); dessinerAj();
+    });
+    l.append(pl, t, sel, del); pn.appendChild(l);
+  });
+  const bas = el('div', 'aj-bas');
+  const ex = el('button', 'aj-prim', 'Exporter le fichier'); ex.type = 'button'; ex.disabled = !M.ajouts.length;
+  ex.addEventListener('click', () => {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(M.ajouts, null, 2)], { type: 'application/json' }));
+    a.download = 'ajouts_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
+  });
+  const fav = el('a', 'aj-fav', '+ Site'); fav.href = 'javascript:' + codeFavori(); fav.title = 'Glisse ce bouton dans ta barre de favoris'; fav.addEventListener('click', e => e.preventDefault());
+  bas.append(ex, fav); pn.appendChild(bas);
+  pn.appendChild(el('p', 'aj-aide', 'Ces titres restent dans ce navigateur. Pour les rendre permanents : « Exporter le fichier », puis lancer Integrer_mes_ajouts.bat. Favori : glisse « + Site » dans ta barre de favoris (Ctrl+Maj+B pour l’afficher).'));
+}
+function fermerAj() { $('#ajPanneau').hidden = true; $('#ajBtn').setAttribute('aria-expanded', 'false'); }
+function ouvrirAj() {
+  const pn = $('#ajPanneau'), b = $('#ajBtn').getBoundingClientRect(); dessinerAj(); pn.hidden = false; $('#ajBtn').setAttribute('aria-expanded', 'true');
+  const w = pn.offsetWidth; pn.style.top = Math.round(b.bottom + 8) + 'px'; pn.style.left = Math.max(8, Math.min(Math.round(b.left), innerWidth - w - 8)) + 'px';
+}
+function initAjouts(msg) {
+  majAjBtn(); if (msg) mlg(msg);
+  $('#ajBtn').addEventListener('click', () => { $('#ajPanneau').hidden ? ouvrirAj() : fermerAj(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#ajPanneau').hidden) fermerAj(); });
+  document.addEventListener('pointerdown', e => { const pn = $('#ajPanneau'); if (!pn.hidden && !pn.contains(e.target) && e.target !== $('#ajBtn')) fermerAj(); });
+}
 function construireMusique(D) {
+  const msgAj = recevoirAjout(); fusionnerAjouts(D);
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
   M.parId = new Map(M.tous.map(t => [t.youtube, t]));
   M.pl = nettoyerPl(mem.lire('playlists', {})); M.plActive = mem.lire('vuePl', null); construireOff(); if (!existe(M.plActive)) M.plActive = null; M.ctx = 'bib';
@@ -1131,6 +1227,7 @@ function construireMusique(D) {
   $('#lProg').innerHTML = '<i></i>'.repeat(40);
   $('#mus-version').textContent = BUILD;
   reconstruire(null);
+  initAjouts(msgAj);
 }
 function hasard() {   // un titre au hasard dans la liste filtrée, lu tout de suite
   if (!M.liste.length) return;
@@ -1219,6 +1316,7 @@ function choisir(i, premier) {
   $('#ecTitre').textContent = tr.titre; $('#ecArtiste').textContent = tr.artiste || '';
   $('#lTitre').textContent = tr.titre; $('#lArtiste').textContent = `${tr.artiste || '—'} · ${tr.genre}`;
   $('#lYt').href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(tr.youtube);
+  $('#lSim').href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(tr.youtube) + '&list=RD' + encodeURIComponent(tr.youtube);   // Mix YouTube du titre
   // l'anneau tourne pour amener la cellule du titre en haut
   let cible = -Math.PI / 2 - ANG[i], d = ((cible - M.rot) % TAU + TAU + Math.PI) % TAU - Math.PI;
   M.rotDe = M.rot; M.rotVers = M.rot + d; M.rotT0 = maintenant();
