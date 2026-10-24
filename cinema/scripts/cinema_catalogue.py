@@ -1,5 +1,6 @@
 """Catalogue des sorties films/séries/anime depuis TMDB -> data/catalogue.json.
 Usage : python -I backend/v-cinema/scripts/cinema_catalogue.py [--sortie FICHIER] [--fixture DOSSIER] [--pages N]
+  [--films-avant 90] [--films-apres 180] [--series-jours 365]   (fenêtre de dates, en jours)
 Clé : variable d'environnement TMDB_API_KEY (clé « API Key » v3 gratuite). Jamais dans un fichier ni un commit.
   --fixture DOSSIER : lit des réponses TMDB enregistrées au lieu d'appeler le réseau (tests, sans clé).
 Ce que ça fait : films à l'affiche et à venir en France, séries en cours de diffusion ; détaille chacun (durée, genres) ;
@@ -7,6 +8,7 @@ Ce que ça fait : films à l'affiche et à venir en France, séries en cours de 
 Le catalogue est REMPLACÉ à chaque exécution ; le journal de Simon (journal.json) n'est jamais touché.
 """
 import json, os, sys, time, urllib.parse, urllib.request
+from datetime import date, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cinema_lib as lib
 
@@ -42,8 +44,13 @@ def genres_par_id(src):
     return g
 
 
-def construire(src, pages):
+def construire(src, pages, films_avant=90, films_apres=180, series_jours=365):
+    """Garde les films sortis depuis films_avant jours ou prévus dans films_apres jours, et les séries commencées depuis series_jours jours.
+    (TMDB renvoie aussi des ressorties et des séries de plusieurs décennies : ce ne sont pas des sorties.)"""
     noms = genres_par_id(src)
+    auj = date.today()
+    films_min, films_max = (auj - timedelta(films_avant)).isoformat(), (auj + timedelta(films_apres)).isoformat()
+    series_min = (auj - timedelta(series_jours)).isoformat()
     vus, sortie = set(), []
     for type_tmdb, liste in LISTES:
         for page in range(1, pages + 1):
@@ -62,7 +69,9 @@ def construire(src, pages):
                     ep = det.get('episode_run_time') or []
                     duree, date_s = (ep[0] if ep else None), det.get('first_air_date') or None
                     titre = det.get('name')
-                if not titre: continue
+                if not titre or not date_s: continue
+                if type_tmdb == 'movie' and not (films_min <= date_s <= films_max): continue
+                if type_tmdb == 'tv' and date_s < series_min: continue
                 sortie.append({
                     'id': f'tmdb-{type_tmdb}-{r["id"]}',
                     'type': 'anime' if anime else ('film' if type_tmdb == 'movie' else 'serie'),
@@ -75,7 +84,7 @@ def construire(src, pages):
                     'affiche': det.get('poster_path') or None,
                     'tmdb': {'type': type_tmdb, 'id': r['id']},
                 })
-    sortie.sort(key=lambda t: (t['sortie'] or '9999', t['titre']))
+    sortie.sort(key=lambda t: (t['sortie'], t['titre']), reverse=True)
     return sortie
 
 
@@ -87,7 +96,7 @@ def main():
     chemin = opt('--sortie', os.path.join(RACINE, 'data', 'catalogue.json'))
     cle = os.environ.get('TMDB_API_KEY', '').strip()
     if not fixture and not cle: raise SystemExit("TMDB_API_KEY absente : définis la variable d'environnement (voir PROCEDURE_CINEMA.md).")
-    titres = construire(Source(fixture, cle), pages)
+    titres = construire(Source(fixture, cle), pages, int(opt('--films-avant', 90)), int(opt('--films-apres', 180)), int(opt('--series-jours', 365)))
     if not titres: raise SystemExit('Aucun titre reçu : le catalogue existant est conservé.')
     lib.ecrire_json(chemin, {'genere_le': lib.aujourdhui(), 'mention': 'This product uses the TMDB API but is not endorsed or certified by TMDB.', 'titres': titres})
     print(f'{len(titres)} titres écrits dans {chemin}')
