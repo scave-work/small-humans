@@ -421,6 +421,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .aj-bas{display:flex;gap:12px;align-items:center;margin-top:10px}
 a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;border-radius:999px;background:#0E1727;color:var(--accent);text-decoration:none;font-size:14px;cursor:grab}
 .aj-aide{color:var(--acier);font-size:13px;margin:10px 0 0}
+.aj-info{color:var(--accent);margin:0 0 10px}
 .mus-outils .case input{accent-color:var(--accent)}
 .mus-corps .mus-outils{gap:6px 8px}   /* la ligne de recherche à l'échelle des tags (15 px, 32 px de haut) */
 .mus-corps .mus-outils input[type=search],.mus-corps .mus-outils .case,.mus-corps .mus-outils button{min-height:32px;font-size:15px}
@@ -1116,7 +1117,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 50';
+const BUILD = 'v-backend 24 oct, 51';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1127,11 +1128,12 @@ const mlg = t => { $('#lMsg').textContent = t || suiteTexte(); };
 const GENRES_AJ = ['house-techno', 'electro-melodique', 'electro-pop', 'electronica', 'french-touch', 'synthwave', 'trance-psy', 'hard-edm', 'edm', 'bass', 'dub-reggae', 'chill', 'ambient', 'neoclassique', 'ost', 'folk-world', 'hiphop', 'rock-metal', 'pop-indie', 'epic', 'funk-jazz', 'autre'];
 const ID_YT = /^[\w-]{11}$/;
 const lireAjouts = () => { const a = mem.lire('ajouts', []); return Array.isArray(a) ? a.filter(x => x && ID_YT.test(String(x.youtube)) && typeof x.titre === 'string') : []; };
-function recevoirAjout() {   // le favori ouvre le site avec ?ajout=ID&t=titre&c=chaîne : on range le titre puis on nettoie l'adresse
+function recevoirAjout(D) {   // le favori ouvre le site avec ?ajout=ID&t=titre&c=chaîne : on range le titre puis on nettoie l'adresse
   const p = new URLSearchParams(location.search), id = p.get('ajout'); if (id === null) return '';
   const titre = (p.get('t') || 'Sans titre').slice(0, 200), chaine = (p.get('c') || '').slice(0, 100);
   ['ajout', 't', 'c'].forEach(k => p.delete(k)); history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
   if (!ID_YT.test(id)) return 'Adresse de vidéo invalide : rien ajouté.';
+  if (D.titres.some(t => t.youtube === id)) return `Déjà dans ta bibliothèque : ${titre}`;
   const l = lireAjouts(); if (l.some(x => x.youtube === id)) return `Déjà dans « À ajouter » : ${titre}`;
   l.push({ youtube: id, titre, artiste: chaine, genre: '', ajoute_le: new Date().toISOString().slice(0, 10) }); mem.ecrire('ajouts', l);
   return `Ajouté à « À ajouter » : ${titre}`;
@@ -1160,6 +1162,7 @@ function dessinerAj() {
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
   const tete = el('div', 'aj-tete'); tete.appendChild(el('h3', '', `À ajouter${M.ajouts.length ? ` (${M.ajouts.length})` : ''}`));
   const fer = el('button', 'aj-x', '✕'); fer.type = 'button'; fer.setAttribute('aria-label', 'Fermer'); fer.addEventListener('click', fermerAj); tete.appendChild(fer); pn.appendChild(tete);
+  if (M.infoAj) pn.appendChild(el('p', 'aj-info', M.infoAj));
   if (!M.ajouts.length) pn.appendChild(el('p', 'aj-aide', 'Rien pour l’instant. Sur une vidéo YouTube, clique sur le favori « + Site » : le titre arrive ici.'));
   M.ajouts.forEach(x => {
     const tr = M.parId.get(x.youtube); const l = el('div', 'aj-ligne');
@@ -1187,19 +1190,19 @@ function dessinerAj() {
   bas.append(ex, fav); pn.appendChild(bas);
   pn.appendChild(el('p', 'aj-aide', 'Ces titres restent dans ce navigateur. Pour les rendre permanents : « Exporter le fichier », puis lancer Integrer_mes_ajouts.bat. Favori : glisse « + Site » dans ta barre de favoris (Ctrl+Maj+B pour l’afficher).'));
 }
-function fermerAj() { $('#ajPanneau').hidden = true; $('#ajBtn').setAttribute('aria-expanded', 'false'); }
+function fermerAj() { M.infoAj = ''; $('#ajPanneau').hidden = true; $('#ajBtn').setAttribute('aria-expanded', 'false'); }
 function ouvrirAj() {
   const pn = $('#ajPanneau'), b = $('#ajBtn').getBoundingClientRect(); dessinerAj(); pn.hidden = false; $('#ajBtn').setAttribute('aria-expanded', 'true');
   const w = pn.offsetWidth; pn.style.top = Math.round(b.bottom + 8) + 'px'; pn.style.left = Math.max(8, Math.min(Math.round(b.left), innerWidth - w - 8)) + 'px';
 }
 function initAjouts(msg) {
-  majAjBtn(); if (msg) mlg(msg);
+  majAjBtn(); if (msg) { mlg(msg); M.infoAj = msg; ouvrirAj(); }   // le message s'affiche aussi en haut du panneau, ouvert tout de suite
   $('#ajBtn').addEventListener('click', () => { $('#ajPanneau').hidden ? ouvrirAj() : fermerAj(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#ajPanneau').hidden) fermerAj(); });
   document.addEventListener('pointerdown', e => { const pn = $('#ajPanneau'); if (!pn.hidden && !pn.contains(e.target) && e.target !== $('#ajBtn')) fermerAj(); });
 }
 function construireMusique(D) {
-  const msgAj = recevoirAjout(); fusionnerAjouts(D);
+  const msgAj = recevoirAjout(D); fusionnerAjouts(D);
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
   M.parId = new Map(M.tous.map(t => [t.youtube, t]));
   M.pl = nettoyerPl(mem.lire('playlists', {})); M.plActive = mem.lire('vuePl', null); construireOff(); if (!existe(M.plActive)) M.plActive = null; M.ctx = 'bib';
