@@ -194,7 +194,7 @@ tr.cache{display:none}
 .mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .aide-clavier{font-size:14px;color:var(--acier);margin-top:8px}
 @media (pointer:coarse){.aide-clavier{display:none}}
-.mus-pl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 14px}
+.mus-pl-obsolete{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 14px}
 .mus-pl select{min-height:40px;max-width:100%;padding:6px 10px;background:var(--nuit);color:var(--ink);border:1px solid #22314F;font:inherit}
 .mus-pl button{min-height:40px;padding:6px 12px;background:var(--nuit);color:var(--ink)}
 .mus-pl [hidden]{display:none}
@@ -211,15 +211,61 @@ tr.cache{display:none}
 .anneaux button{min-width:40px;min-height:40px;background:var(--nuit);color:var(--ink);font-size:22px;line-height:1}
 .anneaux button:disabled{opacity:.35;cursor:default}
 .mus-gauche,.filtres,.mus-outils{min-width:0;max-width:100%}
+.mus{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.mus-panneau{display:flex;flex-direction:column;background:rgba(14,26,51,.55);border:1px solid #22314F;min-height:260px;min-width:0;transition:border-color .15s,background-color .15s}
+.mus-panneau.survol{border-color:#6FA8FF;background:rgba(24,44,84,.7)}
+.pan-tete{display:flex;gap:6px;padding:10px;border-bottom:1px solid #22314F}
+.pan-tete select{flex:1;min-width:0;min-height:40px;padding:6px 8px;background:var(--nuit);color:var(--ink);border:1px solid #22314F;font:inherit}
+.pan-tete button{min-width:40px;min-height:40px;background:var(--nuit);color:var(--ink);font-size:20px;line-height:1}
+.pan-compte{margin:8px 12px 2px;font-size:13px;color:var(--acier);min-height:1.2em}
+.pan-liste{list-style:none;margin:0;padding:0 6px;flex:1;overflow-y:auto;min-height:60px}
+.pan-item{display:grid;grid-template-columns:22px 64px minmax(0,1fr) 28px;gap:8px;align-items:center;padding:5px 4px;border-bottom:1px solid #16223F;cursor:grab;user-select:none;touch-action:pan-y;transition:opacity .12s,transform .12s}
+.pan-item:hover{background:#12203D}
+.pan-item.courant{background:#16264A}
+.pan-item.ins{box-shadow:inset 0 3px 0 #6FA8FF}
+.pan-item.va-partir{opacity:.35;transform:translateX(18px)}
+.pan-liste.ins-fin{box-shadow:inset 0 -3px 0 #6FA8FF}
+.pan-n{font-size:12px;color:var(--acier);text-align:right}
+.pan-vig{width:64px;height:36px;object-fit:cover;background:#050814;display:block;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.pan-t{min-width:0}
+.pan-t b{display:block;font-weight:500;font-size:14px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pan-t i{display:block;font-style:normal;font-size:12px;color:var(--acier);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pan-x{min-width:28px;min-height:28px;padding:0;background:none;color:var(--acier);opacity:0;font-size:14px}
+.pan-item:hover .pan-x,.pan-x:focus-visible{opacity:1}
+.pan-vide{margin:10px 14px;color:var(--acier);font-size:14px}
+.pan-vide[hidden]{display:none}
+.pan-aide{margin:0;padding:8px 12px;font-size:12px;color:#6b7aa0;border-top:1px solid #16223F}
+.drag-ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;max-width:320px;padding:8px 12px;background:#0C1730;border:1px solid #6FA8FF;color:var(--ink);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.95}
+.drag-ghost.rouge{border-color:#E86A6A;color:#ffb3b3}
+body.drag{user-select:none;cursor:grabbing}
+.pistes tbody tr{cursor:grab;user-select:none}
+.p-plus{display:none;margin-left:8px;min-width:30px;min-height:30px;padding:0;background:var(--nuit);color:var(--ink)}
+@media (pointer:coarse){.p-plus{display:inline-block}.pistes tbody tr{cursor:pointer}}
+.yt-boite{pointer-events:none;user-select:none;margin-top:10px;width:100%;max-width:230px}
+.yt-boite iframe{pointer-events:none}
+@media (min-width:1180px){
+  .mus{grid-template-columns:minmax(0,4.1fr) minmax(0,6fr) minmax(0,3.4fr)}
+  .mus-panneau{grid-column:3;grid-row:1;position:sticky;top:calc(var(--barre) + clamp(12px,2vh,28px));height:calc(100svh - var(--barre) - 150px)}
+  .platine{width:min(100%,420px,max(220px,calc(100svh - 560px)))}
+}
+@media (min-width:761px) and (max-width:1179px){
+  .mus-panneau{grid-column:2;grid-row:1;height:300px;margin-bottom:18px}
+  .mus-corps{grid-row:2}.mus-gauche{grid-row:1 / span 2}
+}
+@media (max-width:760px){
+  .mus-panneau{order:4;height:340px;margin-top:20px}
+  .yt-boite{order:4;margin:16px auto 0}
+}
+
 .ec-titre{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;max-width:100%;font-size:clamp(13px,1.15vw,19px);letter-spacing:.12em}
-@media (min-width:761px){.platine{width:min(100%,460px,max(240px,calc(100svh - 330px)))}}
+@media (min-width:761px) and (max-width:1179px){.platine{width:min(100%,380px,max(220px,calc(100svh - 360px)))}}
 .mus-corps{padding-top:0}
 .mus-corps .filtres{flex-wrap:wrap;overflow:visible;gap:6px 8px;margin:0 0 10px;padding:0}
 .mus-corps .filtres button{min-height:32px;padding:3px 11px;font-size:15px}
 .mus-corps .mus-outils{margin:0 0 14px}
 .pistes{font-size:clamp(16px,14px + .45vw,21px)}
 .pistes td{padding-top:.08em;padding-bottom:.08em}
-.pistes .p-titre{width:46%}.pistes .p-artiste{width:30%}.pistes .p-genre{width:16%}
+.pistes .p-titre{width:44%}.pistes .p-artiste{width:28%}.pistes .p-genre{width:22%;overflow-wrap:normal}
 .plus{margin:16px 0;min-height:44px;padding:8px 18px;background:var(--nuit);color:var(--ink)}
 .lect-note{grid-column:1/-1;font-size:var(--t-small);color:var(--acier);margin-top:-6px}
 .lect-yt{color:var(--acier);white-space:nowrap}
@@ -308,13 +354,14 @@ tr.cache{display:none}
         <div class="mus-tete">
           <h2 id="mus-titre" data-entree style="--d:0">Musique</h2>
           <p id="mus-chapeau" data-entree style="--d:1">Mes favoris, rangés par genre. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.</p>
-          <p class="aide-clavier" data-entree style="--d:1">Clavier : Espace = pause · ← → = titre précédent / suivant · Maj + ← → = ±5 s</p>
+          <p class="aide-clavier" data-entree style="--d:1">Espace pause · ← → titre · Maj + ← → ±5 s</p>
         </div>
         <div class="platine" id="platineBoite" data-entree style="--d:2">
           <canvas id="platine" role="img" aria-label="Anneau de la playlist : une cellule par titre, la cellule allumée est le titre en cours"></canvas>
           <div class="moyeu" aria-live="polite"><p class="ec-titre" id="ecTitre"></p><p class="ec-artiste" id="ecArtiste"></p></div>
         </div>
         <div class="anneaux" id="anneaux" hidden><button id="aPrec" type="button" aria-label="Anneau précédent">‹</button><span id="aInfo" aria-live="polite"></span><button id="aSuiv" type="button" aria-label="Anneau suivant">›</button></div>
+        <div class="yt-boite" id="ytBoite" aria-hidden="true"><div id="ytCible"></div></div>
       </div>
       <div class="lecteur" id="lecteur" role="region" aria-label="Lecteur">
         <div class="lect-boutons">
@@ -330,7 +377,6 @@ tr.cache{display:none}
         <a class="lect-yt" id="lYt" href="#" target="_blank" rel="noopener">Écouter sur YouTube</a>
         <div class="lect-extra">
           <label class="vol" for="vol"><span>Volume</span><input id="vol" type="range" min="0" max="100" step="1" value="80" aria-label="Volume de la musique et des sons"><output id="volVal" for="vol">80</output></label>
-          <div class="yt-boite" id="ytBoite"><div id="ytCible"></div></div>
           <p class="lect-note" id="lMsg" role="status"></p>
           <p class="version" id="mus-version"></p>
           <div class="menu-pl" id="menuPl" role="menu" hidden></div>
@@ -343,24 +389,26 @@ tr.cache{display:none}
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
           <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
         </div>
-        <div class="mus-pl" id="musPl" data-entree style="--d:2">
-          <label class="vh" for="plVue">Vue : bibliothèque ou playlist</label>
-          <select id="plVue"></select>
-          <button id="plNouv" type="button">Nouvelle playlist</button>
-          <button id="plRen" type="button" hidden>Renommer</button>
-          <button id="plSup" type="button" hidden>Supprimer la playlist</button>
-          <button id="plSauve" type="button" title="Enregistre la liste affichée (genre, recherche…) comme playlist">Enregistrer la liste</button>
-          <button id="plExp" type="button">Exporter</button>
-          <button id="plImp" type="button">Importer</button>
-          <input id="plFic" type="file" accept="application/json,.json" hidden>
-        </div>
         <table class="pistes">
           <caption class="vh">Les titres</caption>
-          <thead class="vh"><tr><th scope="col">Titre</th><th scope="col">Artiste</th><th scope="col">Genre</th><th scope="col">Lien</th></tr></thead>
+          <thead class="vh"><tr><th scope="col">Titre</th><th scope="col">Artiste</th><th scope="col">Genre</th></tr></thead>
           <tbody id="pistes"></tbody>
         </table>
         <button id="plus" class="plus" type="button" hidden>Afficher plus</button>
       </div>
+          <aside class="mus-panneau" id="panneau" aria-label="Playlist">
+        <div class="pan-tete">
+          <label class="vh" for="plVue">Playlist ouverte</label>
+          <select id="plVue"></select>
+          <button id="plNouv" type="button" aria-label="Nouvelle playlist" title="Nouvelle playlist">＋</button>
+          <button id="plMenu" type="button" aria-label="Autres actions" aria-haspopup="true" title="Autres actions">⋯</button>
+          <input id="plFic" type="file" accept="application/json,.json" hidden>
+        </div>
+        <p class="pan-compte" id="panCompte"></p>
+        <ol class="pan-liste" id="panListe" aria-label="Titres de la playlist"></ol>
+        <p class="pan-vide" id="panVide"></p>
+        <p class="pan-aide">Glisse des titres de la liste ici. Dans la playlist : glisse pour ranger, tire vers la droite pour retirer.</p>
+      </aside>
     </div>
   </section>
 </main>
@@ -885,7 +933,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 9';
+const BUILD = 'v-backend 24 oct, 10';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -893,7 +941,7 @@ const mlg = t => { $('#lMsg').textContent = t || ''; };
 function construireMusique(D) {
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
   M.parId = new Map(M.tous.map(t => [t.youtube, t]));
-  M.pl = nettoyerPl(mem.lire('playlists', {})); M.vue = mem.lire('vuePl', null); if (!M.vue || !M.pl[M.vue]) M.vue = null;
+  M.pl = nettoyerPl(mem.lire('playlists', {})); M.plActive = mem.lire('vuePl', null); if (!M.plActive || !M.pl[M.plActive]) M.plActive = null; M.ctx = 'bib';
   M.genreFiltre = null; M.q = ''; M.mix = false; M.montre = PAGE;
   const cnt = {}; M.tous.forEach(t => { cnt[t.genre] = (cnt[t.genre] || 0) + 1; });
   M.genresOrdre = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x]);
@@ -921,10 +969,12 @@ function hasard() {   // un titre au hasard dans la liste filtrée, lu tout de s
   lancer(t);
 }
 function pistesDe(nom) { return (M.pl[nom] || []).map(id => M.parId.get(id)).filter(Boolean); }
-function liste() {
-  const q = norm(M.q.trim()), enPl = M.vue && M.pl[M.vue];
-  const base = enPl ? pistesDe(M.vue) : M.tous;
-  return base.filter(t => (enPl || M.mix || !t.mix) && !M.indispo.has(t.youtube) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
+function biblio() {   // la bibliothèque filtrée (genre, recherche, mix)
+  const q = norm(M.q.trim());
+  return M.tous.filter(t => (M.mix || !t.mix) && !M.indispo.has(t.youtube) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
+}
+function contexte() {   // la liste qui sert à l'anneau et à « suivant » : la bibliothèque filtrée, ou la playlist si on lit depuis elle
+  return M.ctx === 'pl' && M.plActive && M.pl[M.plActive] ? pistesDe(M.plActive).filter(t => !M.indispo.has(t.youtube)) : M.biblio;
 }
 function afficherPage(page) {   // un anneau = une « page » de N_ANNEAU titres de la liste ; plusieurs anneaux si la liste est longue
   const pages = Math.max(1, Math.ceil(M.liste.length / N_ANNEAU)); M.page = Math.max(0, Math.min(pages - 1, page));
@@ -937,42 +987,40 @@ function afficherPage(page) {   // un anneau = une « page » de N_ANNEAU titres
   $('#aInfo').textContent = `Anneau ${M.page + 1} / ${pages} · titres ${M.page * N_ANNEAU + 1}–${Math.min(n, (M.page + 1) * N_ANNEAU)} sur ${n}`;
   $('#aPrec').disabled = M.page <= 0; $('#aSuiv').disabled = M.page >= pages - 1;
 }
-function reconstruire(courant, garder) {   // liste filtrée recalculée ; « garder » = ne pas toucher au titre en cours de lecture (changement de filtre ou de vue)
-  M.liste = liste();
+function reconstruire(courant, garder) {   // « garder » = ne pas toucher au titre en cours de lecture (changement de filtre ou de vue)
+  M.biblio = biblio(); if (M.ctx === 'pl' && !(M.plActive && M.pl[M.plActive])) M.ctx = 'bib'; M.liste = contexte();
   const i = courant ? M.liste.indexOf(courant) : -1;
   if (!garder) M.cur = i >= 0 ? courant : null;
   afficherPage(i >= 0 ? Math.floor(i / N_ANNEAU) : 0);
-  tableau();
+  tableau(); panneau();
   if (garder) { if (!M.cur && M.D.titres.length) choisir(0, true); return; }
   if (M.D.titres.length) choisir(i >= 0 ? M.D.titres.indexOf(courant) : 0, true);
   else { M.cur = null; $('#ecTitre').textContent = 'Aucun titre'; $('#ecArtiste').textContent = ''; $('#lTitre').textContent = 'Aucun titre'; $('#lArtiste').textContent = ''; }
 }
 function tableau() {
   const tb = $('#pistes'); tb.textContent = '';
-  M.liste.slice(0, M.montre).forEach(tr => {
+  M.biblio.slice(0, M.montre).forEach(tr => {
     const row = document.createElement('tr'); row.dataset.id = tr.youtube;
-    row.innerHTML = `<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button></td><td class="p-artiste"></td><td class="p-genre"></td><td class="p-lien"><button type="button" class="act ajout" aria-label="Ajouter à une playlist" title="Ajouter à une playlist">＋</button><a target="_blank" rel="noopener">YouTube</a></td>`;
+    row.innerHTML = '<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button><button type="button" class="p-plus" aria-label="Ajouter à la playlist ouverte" title="Ajouter à la playlist ouverte">＋</button></td><td class="p-artiste"></td><td class="p-genre"></td>';
     row.querySelector('.p-jouer').textContent = tr.titre + (tr.mix ? ' (mix/set)' : '');
     row.querySelector('.p-artiste').textContent = tr.artiste || '—'; row.querySelector('.p-artiste').dataset.genre = tr.genre;
     row.querySelector('.p-genre').textContent = tr.genre;
-    const a = row.querySelector('a'); a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(tr.youtube); a.setAttribute('aria-label', `Écouter ${tr.titre} sur YouTube`);
-    a.addEventListener('click', e => e.stopPropagation());
-    const ba = row.querySelector('.ajout'); ba.addEventListener('click', e => { e.stopPropagation(); ouvrirMenu(ba, tr); });
-    if (M.vue) { const bs = document.createElement('button'); bs.type = 'button'; bs.className = 'act'; bs.textContent = '✕'; bs.title = 'Retirer de la playlist'; bs.setAttribute('aria-label', `Retirer ${tr.titre} de la playlist`);
-      bs.addEventListener('click', e => { e.stopPropagation(); retirerDe(M.vue, tr); }); ba.after(bs); }
+    row.querySelector('.p-plus').addEventListener('click', e => { e.stopPropagation(); const nom = plCourante(true); if (nom) ajouterA(nom, tr); });
     if (M.cur && M.cur.youtube === tr.youtube) row.classList.add('courant');
-    row.addEventListener('click', () => lancer(tr));
+    row.addEventListener('click', () => { if (DR.bloque) return; lancer(tr, 'bib'); });
+    row.addEventListener('pointerdown', e => armerDrag(e, tr, -1));
     tb.appendChild(row);
   });
-  $('#plus').hidden = M.liste.length <= M.montre;
-  const nt = M.liste.length, pl = nt > 1 ? 's' : '';
-  $('#mus-chapeau').textContent = M.vue ? `Playlist « ${M.vue} » : ${nt} titre${pl}. ＋ ajoute un titre à une playlist, ✕ le retire de celle-ci.` : `${nt} titre${pl} sur ${M.tous.length}. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.`;
+  $('#plus').hidden = M.biblio.length <= M.montre;
+  const nt = M.biblio.length, pl = nt > 1 ? 's' : '';
+  $('#mus-chapeau').textContent = `${nt} titre${pl} sur ${M.tous.length}. Touche un titre, ou sa cellule sur l’anneau, pour le lancer. Glisse un titre vers la playlist pour l’y ajouter.`;
 }
 function visible(i) { return true; }   // l'anneau est déjà filtré
 function choisir(i, premier) {
   const tr = M.D.titres[i]; if (!tr) return;
   M.courant = i; M.prog = 0; M.allume[i] = maintenant(); M.cur = tr;
   [...$('#pistes').children].forEach(r => r.classList.toggle('courant', r.dataset.id === tr.youtube));
+  [...$('#panListe').children].forEach(li => li.classList.toggle('courant', (M.pl[M.plActive] || [])[+li.dataset.i] === tr.youtube));
   $('#ecTitre').textContent = tr.titre; $('#ecArtiste').textContent = tr.artiste || '';
   $('#lTitre').textContent = tr.titre; $('#lArtiste').textContent = `${tr.artiste || '—'} · ${tr.genre}`;
   $('#lYt').href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(tr.youtube);
@@ -982,9 +1030,10 @@ function choisir(i, premier) {
   if (premier || REDUIT) { M.rot = M.rotVers; M.rotT0 = -1; }
   if (!premier) Son.clic();
 }
-function lancer(tr) {   // titre choisi par l'utilisateur : on le met dans l'anneau si besoin, puis on le joue
+function lancer(tr, ctx) {   // titre choisi par l'utilisateur : on le met dans l'anneau si besoin, puis on le joue ; ctx = d'où il vient (bibliothèque ou playlist)
+  const change = ctx && ctx !== M.ctx; if (ctx) M.ctx = ctx;
   const i = M.D.titres.indexOf(tr);
-  if (i < 0) reconstruire(tr); else choisir(i);
+  if (change || i < 0) reconstruire(tr); else choisir(i);
   jouerYT(tr);
 }
 function suivant(sens) {   // suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif
@@ -1005,7 +1054,7 @@ $('#lire').addEventListener('click', () => {
 function chargerApi() {
   if (apiDemandee) return; apiDemandee = true;
   window.onYouTubeIframeAPIReady = () => {
-    PY = new YT.Player('ytCible', { width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, modestbranding: 1 },
+    PY = new YT.Player('ytCible', { width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, modestbranding: 1, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3 },
       events: { onReady: () => { apiPrete = true; PY.setVolume(VOLP); if (attente) { PY.loadVideoById(attente.youtube); attente = null; } },
                 onStateChange: e => { if (e.data === 1 || e.data === 2) { M.joue = e.data === 1; majBoutonLire(); } if (e.data === 0) { M.joue = false; majBoutonLire(); suivant(1); } },
                 onError: e => erreurVideo(e.data) } });
@@ -1023,7 +1072,7 @@ function erreurVideo(code) {   // vidéo supprimée ou non intégrable : on la m
   const i0 = M.liste.indexOf(t);
   M.indispo.add(t.youtube); mem.ecrire('indispo', [...M.indispo]);
   mlg(`« ${t.titre} » n’est pas lisible ici (code ${code}) : masqué, on passe au suivant.`);
-  M.liste = liste(); const nxt = M.liste[Math.min(Math.max(i0, 0), M.liste.length - 1)];
+  M.biblio = biblio(); M.liste = contexte(); const nxt = M.liste[Math.min(Math.max(i0, 0), M.liste.length - 1)];
   if (nxt) { reconstruire(nxt); jouerYT(nxt); } else reconstruire(null);
 }
 /* ---------- position dans le titre : clic, glisser ou flèches ---------- */
@@ -1039,82 +1088,165 @@ boiteProg.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { PY.seekTo(Math.min(d, t + 5), true); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') { PY.seekTo(Math.max(0, t - 5), true); e.preventDefault(); }
 });
-/* ---------- playlists (mémoire du navigateur + export / import JSON) ---------- */
+/* ---------- playlists : panneau à droite, glisser-déposer, mémoire du navigateur + export / import JSON ---------- */
 function nettoyerPl(o) {
   const r = {}; if (!o || typeof o !== 'object' || Array.isArray(o)) return r;
   Object.keys(o).forEach(nom => { if (Array.isArray(o[nom])) r[String(nom).slice(0, 80)] = [...new Set(o[nom].filter(i => typeof i === 'string' && /^[\w-]{11}$/.test(i)))]; });
   return r;
 }
-function sauverPl() { mem.ecrire('playlists', M.pl); mem.ecrire('vuePl', M.vue); }
-function majSelecteur() {
-  const sel = $('#plVue'); sel.textContent = '';
-  const o0 = document.createElement('option'); o0.value = ''; o0.textContent = `Toute la bibliothèque (${M.tous.length})`; sel.appendChild(o0);
-  Object.keys(M.pl).forEach(nom => { const o = document.createElement('option'); o.value = nom; o.textContent = `♪ ${nom} (${pistesDe(nom).length})`; sel.appendChild(o); });
-  sel.value = M.vue || '';
-  $('#plRen').hidden = $('#plSup').hidden = !M.vue;
-}
-function changerVue(nom) { M.vue = nom && M.pl[nom] ? nom : null; M.montre = PAGE; sauverPl(); majSelecteur(); reconstruire(M.cur, true); }
+function sauverPl() { mem.ecrire('playlists', M.pl); mem.ecrire('vuePl', M.plActive); }
 function nomLibre(base) { let n = base, k = 2; while (M.pl[n]) n = `${base} (${k++})`; return n; }
 function creerPl(nom) { nom = (nom || '').trim().slice(0, 80); if (!nom) return null; nom = nomLibre(nom); M.pl[nom] = []; sauverPl(); return nom; }
-function ajouterA(nom, tr) {
+function plCourante(creer) {   // la playlist ouverte ; on en crée une (nom demandé) si besoin
+  if (M.plActive && M.pl[M.plActive]) return M.plActive;
+  if (!creer) return null;
+  const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (!n) return null;
+  M.plActive = n; sauverPl(); return n;
+}
+function majSelecteur() {
+  const sel = $('#plVue'); sel.textContent = '';
+  const noms = Object.keys(M.pl);
+  if (!noms.length) { const o = document.createElement('option'); o.value = ''; o.textContent = 'Aucune playlist'; sel.appendChild(o); }
+  noms.forEach(nom => { const o = document.createElement('option'); o.value = nom; o.textContent = `♪ ${nom} (${M.pl[nom].length})`; sel.appendChild(o); });
+  sel.value = M.plActive && M.pl[M.plActive] ? M.plActive : (noms[0] || '');
+  if (!M.plActive && noms.length) { M.plActive = sel.value; }
+}
+function ajouterA(nom, tr, pos) {
   const l = M.pl[nom]; if (!l) return;
   if (l.includes(tr.youtube)) { mlg(`« ${tr.titre} » est déjà dans « ${nom} ».`); return; }
-  l.push(tr.youtube); sauverPl(); majSelecteur(); mlg(`Ajouté à « ${nom} ».`);
-  if (M.vue === nom) reconstruire(M.cur, true);
+  l.splice(pos == null ? l.length : Math.max(0, Math.min(l.length, pos)), 0, tr.youtube); sauverPl(); majSelecteur(); panneau(); mlg(`Ajouté à « ${nom} ».`);
+  if (M.ctx === 'pl' && M.plActive === nom) reconstruire(M.cur, true);
 }
-function retirerDe(nom, tr) {
-  M.pl[nom] = (M.pl[nom] || []).filter(i => i !== tr.youtube); sauverPl(); majSelecteur(); mlg(`Retiré de « ${nom} ».`);
-  if (M.vue === nom) reconstruire(M.cur, true);
+function retirerIdx(nom, i) {
+  const l = M.pl[nom]; if (!l || i < 0 || i >= l.length) return; const id = l[i]; l.splice(i, 1); sauverPl(); majSelecteur(); panneau();
+  const tr = M.parId.get(id); mlg(`${tr ? '« ' + tr.titre + ' »' : 'Titre'} retiré de « ${nom} ».`);
+  if (M.ctx === 'pl' && M.plActive === nom) reconstruire(M.cur, true);
 }
+function deplacerIdx(nom, de, vers) {
+  const l = M.pl[nom]; if (!l || de < 0 || de >= l.length) return; const [id] = l.splice(de, 1);
+  l.splice(Math.max(0, Math.min(l.length, vers > de ? vers - 1 : vers)), 0, id); sauverPl(); panneau();
+  if (M.ctx === 'pl' && M.plActive === nom) reconstruire(M.cur, true);
+}
+function panneau() {   // dessine la liste de la playlist ouverte
+  const ul = $('#panListe'); ul.textContent = ''; const nom = M.plActive && M.pl[M.plActive] ? M.plActive : null, ids = nom ? M.pl[nom] : [];
+  let n = 0;
+  ids.forEach((id, i) => {
+    const tr = M.parId.get(id); if (!tr) return; n++;
+    const li = document.createElement('li'); li.className = 'pan-item'; li.dataset.i = i;
+    if (M.cur && M.cur.youtube === id) li.classList.add('courant');
+    li.innerHTML = '<span class="pan-n"></span><img class="pan-vig" alt="" loading="lazy" draggable="false"><span class="pan-t"><b></b><i></i></span><button type="button" class="pan-x" aria-label="Retirer de la playlist" title="Retirer">✕</button>';
+    li.querySelector('.pan-n').textContent = String(n); li.querySelector('.pan-vig').src = 'https://i.ytimg.com/vi/' + encodeURIComponent(id) + '/mqdefault.jpg'; li.querySelector('b').textContent = tr.titre; li.querySelector('i').textContent = tr.artiste || '';
+    li.querySelector('.pan-x').addEventListener('click', e => { e.stopPropagation(); retirerIdx(nom, i); });
+    li.addEventListener('click', () => { if (DR.bloque) return; lancer(tr, 'pl'); });
+    li.addEventListener('pointerdown', e => armerDrag(e, tr, i));
+    ul.appendChild(li);
+  });
+  const v = $('#panVide');
+  v.hidden = n > 0; v.textContent = !nom ? 'Aucune playlist. Crée-en une avec ＋, ou glisse un titre ici.' : 'Playlist vide : glisse des titres ici depuis la liste.';
+  $('#panCompte').textContent = nom ? `${n} titre${n > 1 ? 's' : ''}` : '';
+}
+/* menu d'actions (⋯) */
 function fermerMenu() { $('#menuPl').hidden = true; }
-function ouvrirMenu(ancre, tr) {
-  const m = $('#menuPl'); m.textContent = '';
-  const noms = Object.keys(M.pl);
-  if (!noms.length) { const p = document.createElement('p'); p.className = 'vide'; p.textContent = 'Aucune playlist pour l’instant.'; m.appendChild(p); }
-  noms.forEach(nom => { const b = document.createElement('button'); b.type = 'button'; b.textContent = `${M.pl[nom].includes(tr.youtube) ? '✓ ' : ''}${nom}`; b.addEventListener('click', () => { fermerMenu(); ajouterA(nom, tr); }); m.appendChild(b); });
-  const nb = document.createElement('button'); nb.type = 'button'; nb.textContent = '＋ Nouvelle playlist…';
-  nb.addEventListener('click', () => { fermerMenu(); const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) { majSelecteur(); ajouterA(n, tr); } });
-  m.appendChild(nb); m.hidden = false;
+function ouvrirActions(ancre) {
+  const m = $('#menuPl'); m.textContent = ''; const nom = M.plActive && M.pl[M.plActive] ? M.plActive : null;
+  const act = (txt, f, off) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt; if (off) b.disabled = true; b.addEventListener('click', () => { fermerMenu(); f(); }); m.appendChild(b); };
+  act('Renommer la playlist', renommerPl, !nom); act('Supprimer la playlist', supprimerPl, !nom);
+  act('Enregistrer la liste affichée comme playlist', enregistrerListe); act('Exporter mes playlists', exporterPl); act('Importer des playlists…', () => $('#plFic').click());
+  m.hidden = false;
   const r = ancre.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
-  m.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px';
+  m.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.right - w)) + 'px';
   m.style.top = (r.bottom + h + 8 < innerHeight ? r.bottom + 4 : Math.max(8, r.top - h - 4)) + 'px';
 }
-addEventListener('pointerdown', e => { if (!$('#menuPl').hidden && !e.target.closest('#menuPl') && !e.target.closest('.ajout') && !e.target.closest('#lPl')) fermerMenu(); });
+addEventListener('pointerdown', e => { if (!$('#menuPl').hidden && !e.target.closest('#menuPl') && !e.target.closest('#plMenu')) fermerMenu(); });
 addEventListener('keydown', e => { if (e.key === 'Escape') fermerMenu(); });
+function renommerPl() {
+  const ancien = M.plActive; if (!ancien || !M.pl[ancien]) return; const n = (prompt('Nouveau nom ?', ancien) || '').trim().slice(0, 80); if (!n || n === ancien) return;
+  const nom = M.pl[n] ? nomLibre(n) : n, nouv = {}; Object.keys(M.pl).forEach(k => { nouv[k === ancien ? nom : k] = M.pl[k]; }); M.pl = nouv; M.plActive = nom; sauverPl(); majSelecteur(); panneau();
+}
+function supprimerPl() {
+  const nom = M.plActive; if (!nom || !M.pl[nom] || !confirm(`Supprimer la playlist « ${nom} » ? (les morceaux restent dans la bibliothèque)`)) return;
+  delete M.pl[nom]; M.plActive = null; sauverPl(); majSelecteur(); panneau(); if (M.ctx === 'pl') M.ctx = 'bib'; reconstruire(M.cur, true);
+}
+function enregistrerListe() {
+  if (!M.biblio.length) { mlg('La liste affichée est vide.'); return; }
+  const n = creerPl(prompt(`Nom de la playlist (${M.biblio.length} titres de la liste affichée) ?`, M.genreFiltre || M.q || 'Ma sélection')); if (!n) return;
+  M.pl[n] = [...new Set(M.biblio.map(t => t.youtube))]; M.plActive = n; sauverPl(); majSelecteur(); panneau(); mlg(`Playlist « ${n} » enregistrée (${M.pl[n].length} titres).`);
+}
+function exporterPl() {
+  const blob = new Blob([JSON.stringify({ version: 1, playlists: M.pl }, null, 1)], { type: 'application/json' }), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'small-humans-playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  mlg(`${Object.keys(M.pl).length} playlist(s) exportée(s).`);
+}
+/* glisser-déposer (souris : tirer ; tactile : appui long puis tirer) */
+const DR = { att: null, on: false, tr: null, de: -1, ghost: null, cible: -1, retirer: false, bloque: false };
+function armerDrag(e, tr, de) {
+  if (e.button > 0 || e.target.closest('.p-plus, .pan-x, a, input, select')) return;
+  DR.att = { tr, de, x0: e.clientX, y0: e.clientY, tactile: e.pointerType === 'touch', t: 0 };
+  if (DR.att.tactile) DR.att.t = setTimeout(() => { if (DR.att) demarrerDrag(DR.att.x0, DR.att.y0); }, 350);
+  addEventListener('pointermove', bougerDrag); addEventListener('pointerup', finirDrag); addEventListener('pointercancel', finirDrag);
+}
+function demarrerDrag(x, y) {
+  const a = DR.att; if (!a) return; DR.on = true; DR.tr = a.tr; DR.de = a.de; DR.retirer = false; DR.cible = -1;
+  const g = document.createElement('div'); g.className = 'drag-ghost'; g.textContent = `${a.tr.titre}${a.tr.artiste ? ' — ' + a.tr.artiste : ''}`; document.body.appendChild(g); DR.ghost = g;
+  document.body.classList.add('drag'); placerGhost(x, y);
+}
+function placerGhost(x, y) { if (DR.ghost) DR.ghost.style.transform = `translate(${Math.round(x + 14)}px, ${Math.round(y + 10)}px)`; }
+function indexInsertion(y) {
+  const items = [...$('#panListe').children];
+  for (let k = 0; k < items.length; k++) { const r = items[k].getBoundingClientRect(); if (y < r.top + r.height / 2) return +items[k].dataset.i; }
+  return (M.pl[M.plActive] || []).length;
+}
+function bougerDrag(e) {
+  const a = DR.att; if (!a) return;
+  if (!DR.on) {
+    const d = Math.hypot(e.clientX - a.x0, e.clientY - a.y0);
+    if (a.tactile) { if (d > 10) { clearTimeout(a.t); finirDrag(); } return; }   // le doigt bouge avant l'appui long : c'est un défilement
+    if (d < 6) return; demarrerDrag(e.clientX, e.clientY);
+  }
+  placerGhost(e.clientX, e.clientY);
+  const pan = $('#panneau'), r = pan.getBoundingClientRect(), dessus = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+  pan.classList.toggle('survol', dessus);
+  DR.retirer = DR.de >= 0 && e.clientX - DR.att.x0 > 70;   // un titre de la playlist tiré vers la droite = retiré
+  DR.ghost.classList.toggle('rouge', DR.retirer);
+  [...$('#panListe').children].forEach(li => { li.classList.remove('ins'); li.classList.toggle('va-partir', DR.retirer && +li.dataset.i === DR.de); });
+  $('#panListe').classList.remove('ins-fin'); DR.cible = -1;
+  if (dessus && !DR.retirer) {
+    DR.cible = indexInsertion(e.clientY); const li = $('#panListe').querySelector(`[data-i="${DR.cible}"]`);
+    if (li) li.classList.add('ins'); else $('#panListe').classList.add('ins-fin');
+  }
+}
+function finirDrag() {
+  removeEventListener('pointermove', bougerDrag); removeEventListener('pointerup', finirDrag); removeEventListener('pointercancel', finirDrag);
+  const a = DR.att; if (a) clearTimeout(a.t); DR.att = null;
+  if (DR.on) {
+    const { tr, de, cible, retirer } = DR;
+    if (retirer && de >= 0 && M.plActive) retirerIdx(M.plActive, de);
+    else if (cible >= 0) {
+      if (de >= 0) deplacerIdx(M.plActive, de, cible);
+      else { const nom = plCourante(true); if (nom) ajouterA(nom, tr, nom === M.plActive ? cible : null); }
+    }
+    DR.bloque = true; setTimeout(() => { DR.bloque = false; }, 250);
+  }
+  DR.on = false; if (DR.ghost) DR.ghost.remove(); DR.ghost = null; document.body.classList.remove('drag');
+  $('#panneau').classList.remove('survol'); $('#panListe').classList.remove('ins-fin'); [...$('#panListe').children].forEach(li => li.classList.remove('ins', 'va-partir'));
+}
+document.addEventListener('touchmove', e => { if (DR.on) e.preventDefault(); }, { passive: false });
 function initPlaylists() {
-  majSelecteur();
-  $('#plVue').addEventListener('change', e => changerVue(e.target.value));
-  $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) changerVue(n); });
-  $('#plRen').addEventListener('click', () => {
-    const ancien = M.vue; if (!ancien) return; const n = (prompt('Nouveau nom ?', ancien) || '').trim().slice(0, 80); if (!n || n === ancien) return;
-    const nom = M.pl[n] ? nomLibre(n) : n; const nouv = {}; Object.keys(M.pl).forEach(k => { nouv[k === ancien ? nom : k] = M.pl[k]; }); M.pl = nouv; M.vue = nom; sauverPl(); majSelecteur(); reconstruire(M.cur, true);
-  });
-  $('#plSup').addEventListener('click', () => {
-    const nom = M.vue; if (!nom || !confirm(`Supprimer la playlist « ${nom} » ? (les morceaux restent dans la bibliothèque)`)) return;
-    delete M.pl[nom]; M.vue = null; sauverPl(); majSelecteur(); M.montre = PAGE; reconstruire(M.cur, true);
-  });
-  $('#plSauve').addEventListener('click', () => {
-    if (!M.liste.length) { mlg('La liste affichée est vide.'); return; }
-    const n = creerPl(prompt(`Nom de la playlist (${M.liste.length} titres de la liste affichée) ?`, M.genreFiltre || M.q || 'Ma sélection')); if (!n) return;
-    M.pl[n] = [...new Set(M.liste.map(t => t.youtube))]; sauverPl(); changerVue(n); mlg(`Playlist « ${n} » enregistrée (${M.pl[n].length} titres).`);
-  });
-  $('#plExp').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify({ version: 1, playlists: M.pl }, null, 1)], { type: 'application/json' }), a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'small-humans-playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    mlg(`${Object.keys(M.pl).length} playlist(s) exportée(s).`);
-  });
-  $('#plImp').addEventListener('click', () => $('#plFic').click());
+  majSelecteur(); panneau();
+  $('#plVue').addEventListener('change', e => { M.plActive = e.target.value || null; sauverPl(); panneau(); if (M.ctx === 'pl') reconstruire(M.cur, true); });
+  $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) { M.plActive = n; sauverPl(); majSelecteur(); panneau(); } });
+  $('#plMenu').addEventListener('click', () => { if ($('#menuPl').hidden) ouvrirActions($('#plMenu')); else fermerMenu(); });
   $('#plFic').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return; const rd = new FileReader();
     rd.onload = () => {
       try { const o = JSON.parse(rd.result), src = nettoyerPl(o && o.playlists ? o.playlists : o); let n = 0;
-        Object.keys(src).forEach(nom => { M.pl[nomLibre(nom)] = src[nom]; n++; }); if (!n) throw 0; sauverPl(); majSelecteur(); mlg(`${n} playlist(s) importée(s).`); }
+        Object.keys(src).forEach(nom => { M.pl[nomLibre(nom)] = src[nom]; n++; }); if (!n) throw 0; sauverPl(); majSelecteur(); panneau(); mlg(`${n} playlist(s) importée(s).`); }
       catch (x) { mlg('Fichier illisible : ce n’est pas un export de playlists.'); }
       e.target.value = '';
     };
     rd.readAsText(f);
   });
-  $('#lPl').addEventListener('click', () => { if (M.cur) ouvrirMenu($('#lPl'), M.cur); });
+  $('#lPl').addEventListener('click', () => { if (!M.cur) return; const nom = plCourante(true); if (nom) ajouterA(nom, M.cur); });
 }
 /* ---------- barre d'espace : pause / lecture ---------- */
 function frappeLibre(e) { const t = e.target, n = t && t.tagName; return !(n === 'INPUT' || n === 'TEXTAREA' || n === 'SELECT' || (t && t.isContentEditable)); }
