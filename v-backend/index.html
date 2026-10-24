@@ -398,7 +398,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .lecteur{background:#080D18}
 .lect-titre{text-transform:none;letter-spacing:.01em;font-weight:600;font-size:19px}
 .lect-prog{gap:0;border-radius:2px;overflow:hidden}
-.lect-prog i{height:4px;background:#1B2740;border-radius:0}
+.lect-prog i{height:6px;background:#2B3B60;border-radius:0}
 .lect-prog i.on{background:var(--accent)}
 .lect-extra .vol input{accent-color:var(--accent)}
 .lect-boutons button:hover{background:#15223A}
@@ -422,6 +422,8 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 .pan-tete button{background:transparent;color:var(--acier);min-width:36px;min-height:36px}
 .pan-tete button:hover{background:#15223A;color:var(--ink)}
 .pan-compte{margin:0 14px 10px;font-size:14px;color:#8190B3}
+#plSuppr:disabled{display:none}   /* playlists de style : on ne les supprime pas, donc pas de ✕ */
+.pan-liste,.pan-file ol{scrollbar-width:thin;scrollbar-color:#22314F transparent}   /* même barre de défilement que la liste des titres */
 .pan-item{grid-template-columns:20px 64px minmax(0,1fr) 28px;padding:6px 8px;gap:10px;border-bottom:0}
 .pan-item:hover{background:#15223A}
 .pan-item.courant{background:#14213A;box-shadow:inset 2px 0 0 var(--accent)}
@@ -1057,7 +1059,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 41';
+const BUILD = 'v-backend 24 oct, 42';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
