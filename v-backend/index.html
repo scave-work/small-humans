@@ -397,8 +397,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 /* Page Musique : composition colorimétrique v40 (un seul bleu allumé : le bleu #6FA8FF marque seulement l'actif ; surfaces sobres sans bordure ; panneau de playlist translucide) */
 .lecteur{background:#080D18}
 .lect-titre{text-transform:none;letter-spacing:.01em;font-weight:600;font-size:19px}
-.lect-prog{gap:0;border-radius:2px;overflow:hidden}
-.lect-prog i{height:6px;background:#2B3B60;border-radius:0}
+.lect-prog i{background:#22314F}   /* petits rectangles d'origine, remplis en bleu */
 .lect-prog i.on{background:var(--accent)}
 .lect-extra .vol input{accent-color:var(--accent)}
 .lect-boutons button:hover{background:#15223A}
@@ -1059,7 +1058,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 42';
+const BUILD = 'v-backend 24 oct, 43';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
