@@ -394,6 +394,39 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 #balai{position:fixed;left:0;right:0;top:0;height:3px;background:var(--accent);z-index:25;display:none;pointer-events:none}
 
 .erreur{position:fixed;left:var(--marge);right:var(--marge);bottom:calc(var(--zone-basse) + 16px);z-index:26;background:var(--nuit);padding:14px 18px;max-width:60ch}
+/* Page Musique : composition colorimétrique v40 (un seul bleu allumé : le bleu #6FA8FF marque seulement l'actif ; surfaces sobres sans bordure ; panneau de playlist translucide) */
+.lecteur{background:#080D18}
+.lect-titre{text-transform:none;letter-spacing:.01em;font-weight:600;font-size:19px}
+.lect-prog{gap:0;border-radius:2px;overflow:hidden}
+.lect-prog i{height:4px;background:#1B2740;border-radius:0}
+.lect-prog i.on{background:var(--accent)}
+.lect-extra .vol input{accent-color:var(--accent)}
+.lect-boutons button:hover{background:#15223A}
+.lect-yt{font-size:14px;text-decoration:none}
+.lect-yt:hover{text-decoration:underline}
+.mus-outils .case input{accent-color:var(--accent)}
+.filtres button{background:#0E1727;color:var(--acier)}
+.filtres button:hover{background:#15223A;color:var(--ink)}
+.filtres button[aria-pressed="true"]{background:rgba(111,168,255,.18);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.mus-outils input[type=search]{background:#0E1727;border:0}
+.mus-outils button{background:#0E1727}
+.mus-outils button[aria-pressed="true"]{background:rgba(111,168,255,.18);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.pistes tbody tr:hover{background:#0E1727}
+.pistes tr.courant,.pistes tr.courant td{background:#14213A}
+.mus-panneau{background:rgba(14,23,39,.45);border:0;padding-top:6px}
+.mus-panneau.survol{background:rgba(24,44,84,.7);box-shadow:inset 0 0 0 1px var(--accent)}
+.pan-tete{padding:8px 10px 0;gap:2px;align-items:center;background:transparent;border-bottom:0}
+.pan-tete select{background:transparent;border:0;font-size:20px;font-weight:600;letter-spacing:.01em;padding:4px;min-height:44px;color:var(--ink)}
+.pan-tete button{background:transparent;color:var(--acier);min-width:36px;min-height:36px}
+.pan-tete button:hover{background:#15223A;color:var(--ink)}
+.pan-compte{margin:0 14px 10px;font-size:14px;color:#8190B3}
+.pan-item{grid-template-columns:20px 64px minmax(0,1fr) 28px;padding:6px 8px;gap:10px;border-bottom:0}
+.pan-item:hover{background:#15223A}
+.pan-item.courant{background:#14213A;box-shadow:inset 2px 0 0 var(--accent)}
+.pan-t b{font-size:15px;color:var(--ink)}
+.pan-t i{font-size:13px;color:var(--acier)}
+.pan-n{color:#6B7AA0}
+.pan-aide{padding:10px 14px;color:#6B7AA0;border-top:0}
 </style>
 </head>
 <body data-vue="intro">
@@ -1022,7 +1055,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 39';
+const BUILD = 'v-backend 24 oct, 40';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
