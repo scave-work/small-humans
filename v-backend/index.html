@@ -193,6 +193,10 @@ tr.cache{display:none}
 .lect-prog-boite{padding:12px 0;cursor:pointer;touch-action:none}
 .mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .version{position:fixed;left:8px;bottom:2px;font-size:11px;color:#46557a;margin:0;z-index:10;pointer-events:none}
+.anneaux{display:flex;align-items:center;gap:12px;margin-top:10px;color:var(--acier);font-size:15px}
+.anneaux[hidden]{display:none}
+.anneaux button{min-width:40px;min-height:40px;background:var(--nuit);color:var(--ink);font-size:22px;line-height:1}
+.anneaux button:disabled{opacity:.35;cursor:default}
 .mus-gauche,.filtres,.mus-outils{min-width:0;max-width:100%}
 .ec-titre{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;max-width:100%;font-size:clamp(13px,1.15vw,19px);letter-spacing:.12em}
 @media (min-width:761px){.platine{width:min(100%,460px,max(240px,calc(100svh - 330px)))}}
@@ -224,7 +228,7 @@ tr.cache{display:none}
   .mus{display:block}
   .mus{display:flex;flex-direction:column}
   .mus-gauche{display:contents}
-  .mus-tete{order:1} .platine{order:2} .lecteur{order:3} .filtres{order:4} .mus-corps{order:5}
+  .mus-tete{order:1} .platine{order:2} .anneaux{order:2} .lecteur{order:3} .filtres{order:4} .mus-corps{order:5}
   .platine{width:min(72vw,340px,calc(100svh - 400px));min-width:220px;margin:20px auto 0}
   .filtres{margin-top:24px}
   .mus-corps{padding-top:0;margin-top:28px}
@@ -296,6 +300,7 @@ tr.cache{display:none}
           <canvas id="platine" role="img" aria-label="Anneau de la playlist : une cellule par titre, la cellule allumée est le titre en cours"></canvas>
           <div class="moyeu" aria-live="polite"><p class="ec-titre" id="ecTitre"></p><p class="ec-artiste" id="ecArtiste"></p></div>
         </div>
+        <div class="anneaux" id="anneaux" hidden><button id="aPrec" type="button" aria-label="Anneau précédent">‹</button><span id="aInfo" aria-live="polite"></span><button id="aSuiv" type="button" aria-label="Anneau suivant">›</button></div>
       </div>
       <div class="lecteur" id="lecteur" role="region" aria-label="Lecteur">
         <div class="lect-boutons">
@@ -321,7 +326,6 @@ tr.cache{display:none}
           <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
           <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
-          <button id="melange" type="button">Mélanger l’anneau</button>
         </div>
         <table class="pistes">
           <caption class="vh">Les titres</caption>
@@ -849,17 +853,12 @@ function dessinerTableaux(t) { tabs.forEach(o => { if (o.g && TABLEAUX[o.p.id]) 
 const M = { D: null, genre: null, courant: 0, joue: false, charge: false, prog: 0, rot: 0, rotDe: 0, rotVers: 0, rotT0: -1, allume: [], survol: -1 };
 const DUREE = 40;   // lecture simulée : 40 s par titre
 const platCv = $('#platine'); let gP = null, PS = 0;
-function cellsPlatine() {   // position (angle local) de chaque titre : 6 genres = 6 arcs de 4 cellules
-  const D = M.D, nG = Math.max(1, D.genres.length), arc = TAU / nG, pyl = 9 * Math.PI / 180;
-  const parG = D.genres.map(() => 0);
-  return D.titres.map(tr => {
-    const gI = Math.max(0, D.genres.indexOf(tr.genre)), j = parG[gI]++;
-    const nDans = D.titres.filter(x => x.genre === tr.genre).length, pas = (arc - pyl) / Math.max(4, nDans);
-    return -Math.PI / 2 - arc / 2 + gI * arc + pyl / 2 + (j + .5) * pas + (Math.max(4, nDans) - nDans) * pas / 2;
-  });
+function cellsPlatine() {   // les titres de la page courante, répartis régulièrement sur l'anneau, dans l'ordre de la liste
+  const n = Math.max(1, M.D.titres.length);
+  return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 4';
+const BUILD = 'v-backend 24 oct, 6';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -877,9 +876,10 @@ function construireMusique(D) {
   });
   $('#q').addEventListener('input', e => { M.q = e.target.value; M.montre = PAGE; reconstruire(null); });
   $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(null); });
-  $('#melange').addEventListener('click', () => reconstruire(null));
   M.alea = !!mem.lire('alea', false); $('#alea').setAttribute('aria-pressed', String(M.alea));
   $('#alea').addEventListener('click', e => { M.alea = !M.alea; e.currentTarget.setAttribute('aria-pressed', String(M.alea)); mem.ecrire('alea', M.alea); });
+  $('#aPrec').addEventListener('click', () => afficherPage(M.page - 1));
+  $('#aSuiv').addEventListener('click', () => afficherPage(M.page + 1));
   $('#plus').addEventListener('click', () => { M.montre += PAGE; tableau(); });
   $('#lProg').innerHTML = '<i></i>'.repeat(40);
   $('#mus-version').textContent = BUILD;
@@ -894,16 +894,24 @@ function liste() {
   const q = norm(M.q.trim());
   return M.tous.filter(t => (M.mix || !t.mix) && !M.indispo.has(t.youtube) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
 }
-function reconstruire(courant) {   // l'anneau montre une sélection de N_ANNEAU titres de la liste filtrée
-  M.liste = liste();
-  const pool = M.liste.filter(t => t !== courant);
-  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  const file = (courant ? [courant, ...pool] : pool).slice(0, N_ANNEAU);
-  file.sort((x, y) => M.genresOrdre.indexOf(x.genre) - M.genresOrdre.indexOf(y.genre));
-  M.D.titres = file; M.D.genres = M.genresOrdre.filter(g => file.some(t => t.genre === g));
+function afficherPage(page) {   // un anneau = une « page » de N_ANNEAU titres de la liste ; plusieurs anneaux si la liste est longue
+  const pages = Math.max(1, Math.ceil(M.liste.length / N_ANNEAU)); M.page = Math.max(0, Math.min(pages - 1, page));
+  const file = M.liste.slice(M.page * N_ANNEAU, (M.page + 1) * N_ANNEAU);
+  M.D.titres = file; M.D.genres = [];
   ANG = cellsPlatine(); M.allume = file.map(() => -10);
+  M.courant = M.cur ? file.indexOf(M.cur) : -1;
+  const n = M.liste.length;
+  $('#anneaux').hidden = pages <= 1;
+  $('#aInfo').textContent = `Anneau ${M.page + 1} / ${pages} · titres ${M.page * N_ANNEAU + 1}–${Math.min(n, (M.page + 1) * N_ANNEAU)} sur ${n}`;
+  $('#aPrec').disabled = M.page <= 0; $('#aSuiv').disabled = M.page >= pages - 1;
+}
+function reconstruire(courant) {   // liste filtrée recalculée ; l'anneau affiche la page qui contient le titre courant
+  M.liste = liste();
+  const i = courant ? M.liste.indexOf(courant) : -1;
+  M.cur = i >= 0 ? courant : null;
+  afficherPage(i >= 0 ? Math.floor(i / N_ANNEAU) : 0);
   tableau();
-  if (file.length) choisir(courant ? file.indexOf(courant) : 0, true);
+  if (M.D.titres.length) choisir(i >= 0 ? M.D.titres.indexOf(courant) : 0, true);
   else { M.cur = null; $('#ecTitre').textContent = 'Aucun titre'; $('#ecArtiste').textContent = ''; $('#lTitre').textContent = 'Aucun titre'; $('#lArtiste').textContent = ''; }
 }
 function tableau() {
@@ -942,7 +950,12 @@ function lancer(tr) {   // titre choisi par l'utilisateur : on le met dans l'ann
   if (i < 0) reconstruire(tr); else choisir(i);
   jouerYT(tr);
 }
-function suivant(sens) { if (M.alea && sens > 0) { hasard(); return; } const n = M.D.titres.length; if (!n) return; const i = (M.courant + sens + n) % n; choisir(i); jouerYT(M.D.titres[i]); }
+function suivant(sens) {   // suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif
+  if (M.alea && sens > 0) { hasard(); return; }
+  const n = M.liste.length; if (!n) return;
+  const i = M.cur ? M.liste.indexOf(M.cur) : -1;
+  lancer(M.liste[i < 0 ? 0 : (i + sens + n) % n]);
+}
 $('#suiv').addEventListener('click', () => suivant(1));
 $('#prec').addEventListener('click', () => suivant(-1));
 function majBoutonLire() { $('#lire').setAttribute('aria-label', M.joue ? 'Pause' : 'Lecture'); $('#lireIcone').setAttribute('d', M.joue ? 'M4 3h4v14H4zM12 3h4v14h-4z' : 'M5 3l12 7-12 7z'); }
@@ -970,10 +983,11 @@ function jouerYT(tr) {
 }
 function erreurVideo(code) {   // vidéo supprimée ou non intégrable : on la masque (mémorisé) et on passe à la suivante
   const t = M.cur; if (!t) return;
+  const i0 = M.liste.indexOf(t);
   M.indispo.add(t.youtube); mem.ecrire('indispo', [...M.indispo]);
   mlg(`« ${t.titre} » n’est pas lisible ici (code ${code}) : masqué, on passe au suivant.`);
-  const n = M.D.titres.length, nxt = n > 1 ? M.D.titres[(M.courant + 1) % n] : null;
-  reconstruire(nxt); if (M.cur) jouerYT(M.cur);
+  M.liste = liste(); const nxt = M.liste[Math.min(Math.max(i0, 0), M.liste.length - 1)];
+  if (nxt) { reconstruire(nxt); jouerYT(nxt); } else reconstruire(null);
 }
 /* ---------- position dans le titre : clic, glisser ou flèches ---------- */
 const boiteProg = $('#lProgBoite'); let glisse = false;
@@ -988,6 +1002,14 @@ boiteProg.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { PY.seekTo(Math.min(d, t + 5), true); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') { PY.seekTo(Math.max(0, t - 5), true); e.preventDefault(); }
 });
+/* ---------- barre d'espace : pause / lecture ---------- */
+function frappeLibre(e) { const t = e.target, n = t && t.tagName; return !(n === 'INPUT' || n === 'TEXTAREA' || n === 'SELECT' || (t && t.isContentEditable)); }
+addEventListener('keydown', e => {
+  if ((e.code === 'Space' || e.key === ' ') && vue === 'musique' && frappeLibre(e) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault(); if (!e.repeat) $('#lire').click();
+  }
+});
+addEventListener('keyup', e => { if ((e.code === 'Space' || e.key === ' ') && vue === 'musique' && frappeLibre(e)) e.preventDefault(); });
 /* ---------- volume (musique + sons d'interface) ---------- */
 function reglerVolume(v) { VOLP = Math.max(0, Math.min(100, v)); VOLN = VOLP / 100; $('#volVal').textContent = String(VOLP); mem.ecrire('vol', VOLP); if (PY && apiPrete) { try { PY.setVolume(VOLP); } catch (e) {} } }
 $('#vol').value = String(VOLP); $('#volVal').textContent = String(VOLP);
@@ -998,7 +1020,7 @@ function dessinerPlatine(t) {
   const g = gP, S = PS, R = S * .47;
   g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, S, S);
   if (M.rotT0 >= 0) { const u = (t - M.rotT0) / .7; M.rot = M.rotDe + (M.rotVers - M.rotDe) * eOut(u); if (u >= 1) M.rotT0 = -1; }
-  const rot = M.rot, nG = Math.max(1, M.D.genres.length);
+  const rot = M.rot, nG = 6;
   g.save(); g.translate(S / 2, S / 2);
   anneau(g, { r0: R * .58, r1: R * .64, n: 40, rot: rot * .6 + (M.joue && !REDUIT ? t * .2 : 0), base: .22, vari: .3 });
   g.beginPath(); g.arc(0, 0, R * .56, 0, TAU); g.fillStyle = css(mix(C.bg, C.nuit, .35)); g.fill();
