@@ -194,6 +194,17 @@ tr.cache{display:none}
 .mus-outils button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .aide-clavier{font-size:14px;color:var(--acier);margin-top:8px}
 @media (pointer:coarse){.aide-clavier{display:none}}
+.mus-pl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 14px}
+.mus-pl select{min-height:40px;max-width:100%;padding:6px 10px;background:var(--nuit);color:var(--ink);border:1px solid #22314F;font:inherit}
+.mus-pl button{min-height:40px;padding:6px 12px;background:var(--nuit);color:var(--ink)}
+.mus-pl [hidden]{display:none}
+.act{min-width:34px;min-height:32px;margin-right:6px;padding:0 8px;background:var(--nuit);color:var(--ink);font-size:17px;line-height:1}
+.act:hover{background:#1A2B4A}
+.menu-pl{position:fixed;z-index:40;background:#0C1730;border:1px solid #2B3C66;padding:6px;min-width:220px;max-width:min(340px,92vw);max-height:60vh;overflow:auto}
+.menu-pl[hidden]{display:none}
+.menu-pl button{display:block;width:100%;text-align:left;min-height:42px;padding:6px 12px;background:none;color:var(--ink)}
+.menu-pl button:hover{background:#1A2B4A}
+.menu-pl .vide{padding:8px 12px;color:var(--acier)}
 .version{position:fixed;left:8px;bottom:2px;font-size:11px;color:#46557a;margin:0;z-index:10;pointer-events:none}
 .anneaux{display:flex;align-items:center;gap:12px;margin-top:10px;color:var(--acier);font-size:15px}
 .anneaux[hidden]{display:none}
@@ -310,6 +321,7 @@ tr.cache{display:none}
           <button id="prec" type="button" aria-label="Titre précédent"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 3h2.4v14H4zM17 3v14L7.6 10z"/></svg></button>
           <button id="lire" class="lire" type="button" aria-label="Lecture"><svg viewBox="0 0 20 20" aria-hidden="true"><path id="lireIcone" d="M5 3l12 7-12 7z"/></svg></button>
           <button id="suiv" type="button" aria-label="Titre suivant"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13.6 3H16v14h-2.4zM3 3v14l9.4-7z"/></svg></button>
+          <button id="lPl" type="button" aria-label="Ajouter ce titre à une playlist" title="Ajouter à une playlist"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9 3h2v6h6v2h-6v6H9v-6H3V9h6z"/></svg></button>
         </div>
         <div class="lect-info"><p class="lect-titre" id="lTitre"></p><p class="lect-artiste" id="lArtiste"></p></div>
         <div class="lect-prog-boite" id="lProgBoite" role="slider" tabindex="0" aria-label="Position dans le titre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -321,6 +333,7 @@ tr.cache{display:none}
           <div class="yt-boite" id="ytBoite"><div id="ytCible"></div></div>
           <p class="lect-note" id="lMsg" role="status"></p>
           <p class="version" id="mus-version"></p>
+          <div class="menu-pl" id="menuPl" role="menu" hidden></div>
         </div>
       </div>
       <div class="mus-corps">
@@ -329,6 +342,17 @@ tr.cache{display:none}
           <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
           <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
+        </div>
+        <div class="mus-pl" id="musPl" data-entree style="--d:2">
+          <label class="vh" for="plVue">Vue : bibliothèque ou playlist</label>
+          <select id="plVue"></select>
+          <button id="plNouv" type="button">Nouvelle playlist</button>
+          <button id="plRen" type="button" hidden>Renommer</button>
+          <button id="plSup" type="button" hidden>Supprimer la playlist</button>
+          <button id="plSauve" type="button" title="Enregistre la liste affichée (genre, recherche…) comme playlist">Enregistrer la liste</button>
+          <button id="plExp" type="button">Exporter</button>
+          <button id="plImp" type="button">Importer</button>
+          <input id="plFic" type="file" accept="application/json,.json" hidden>
         </div>
         <table class="pistes">
           <caption class="vh">Les titres</caption>
@@ -861,13 +885,15 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 7';
+const BUILD = 'v-backend 24 oct, 8';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const mlg = t => { $('#lMsg').textContent = t || ''; };
 function construireMusique(D) {
   M.D = D; M.tous = D.titres; M.indispo = new Set(mem.lire('indispo', []));
+  M.parId = new Map(M.tous.map(t => [t.youtube, t]));
+  M.pl = nettoyerPl(mem.lire('playlists', {})); M.vue = mem.lire('vuePl', null); if (!M.vue || !M.pl[M.vue]) M.vue = null;
   M.genreFiltre = null; M.q = ''; M.mix = false; M.montre = PAGE;
   const cnt = {}; M.tous.forEach(t => { cnt[t.genre] = (cnt[t.genre] || 0) + 1; });
   M.genresOrdre = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x]);
@@ -884,6 +910,7 @@ function construireMusique(D) {
   $('#aPrec').addEventListener('click', () => afficherPage(M.page - 1));
   $('#aSuiv').addEventListener('click', () => afficherPage(M.page + 1));
   $('#plus').addEventListener('click', () => { M.montre += PAGE; tableau(); });
+  initPlaylists();
   $('#lProg').innerHTML = '<i></i>'.repeat(40);
   $('#mus-version').textContent = BUILD;
   reconstruire(null);
@@ -893,9 +920,11 @@ function hasard() {   // un titre au hasard dans la liste filtrée, lu tout de s
   let t; do { t = M.liste[Math.floor(Math.random() * M.liste.length)]; } while (M.liste.length > 1 && M.cur && t === M.cur);
   lancer(t);
 }
+function pistesDe(nom) { return (M.pl[nom] || []).map(id => M.parId.get(id)).filter(Boolean); }
 function liste() {
-  const q = norm(M.q.trim());
-  return M.tous.filter(t => (M.mix || !t.mix) && !M.indispo.has(t.youtube) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
+  const q = norm(M.q.trim()), enPl = M.vue && M.pl[M.vue];
+  const base = enPl ? pistesDe(M.vue) : M.tous;
+  return base.filter(t => (enPl || M.mix || !t.mix) && !M.indispo.has(t.youtube) && (!M.genreFiltre || t.genre === M.genreFiltre) && (!q || norm(t.titre + ' ' + (t.artiste || '')).includes(q)));
 }
 function afficherPage(page) {   // un anneau = une « page » de N_ANNEAU titres de la liste ; plusieurs anneaux si la liste est longue
   const pages = Math.max(1, Math.ceil(M.liste.length / N_ANNEAU)); M.page = Math.max(0, Math.min(pages - 1, page));
@@ -921,18 +950,22 @@ function tableau() {
   const tb = $('#pistes'); tb.textContent = '';
   M.liste.slice(0, M.montre).forEach(tr => {
     const row = document.createElement('tr'); row.dataset.id = tr.youtube;
-    row.innerHTML = `<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button></td><td class="p-artiste"></td><td class="p-genre"></td><td class="p-lien"><a target="_blank" rel="noopener">YouTube</a></td>`;
+    row.innerHTML = `<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button></td><td class="p-artiste"></td><td class="p-genre"></td><td class="p-lien"><button type="button" class="act ajout" aria-label="Ajouter à une playlist" title="Ajouter à une playlist">＋</button><a target="_blank" rel="noopener">YouTube</a></td>`;
     row.querySelector('.p-jouer').textContent = tr.titre + (tr.mix ? ' (mix/set)' : '');
     row.querySelector('.p-artiste').textContent = tr.artiste || '—'; row.querySelector('.p-artiste').dataset.genre = tr.genre;
     row.querySelector('.p-genre').textContent = tr.genre;
     const a = row.querySelector('a'); a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(tr.youtube); a.setAttribute('aria-label', `Écouter ${tr.titre} sur YouTube`);
     a.addEventListener('click', e => e.stopPropagation());
+    const ba = row.querySelector('.ajout'); ba.addEventListener('click', e => { e.stopPropagation(); ouvrirMenu(ba, tr); });
+    if (M.vue) { const bs = document.createElement('button'); bs.type = 'button'; bs.className = 'act'; bs.textContent = '✕'; bs.title = 'Retirer de la playlist'; bs.setAttribute('aria-label', `Retirer ${tr.titre} de la playlist`);
+      bs.addEventListener('click', e => { e.stopPropagation(); retirerDe(M.vue, tr); }); ba.after(bs); }
     if (M.cur && M.cur.youtube === tr.youtube) row.classList.add('courant');
     row.addEventListener('click', () => lancer(tr));
     tb.appendChild(row);
   });
   $('#plus').hidden = M.liste.length <= M.montre;
-  $('#mus-chapeau').textContent = `${M.liste.length} titre${M.liste.length > 1 ? 's' : ''} sur ${M.tous.length}. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.`;
+  const nt = M.liste.length, pl = nt > 1 ? 's' : '';
+  $('#mus-chapeau').textContent = M.vue ? `Playlist « ${M.vue} » : ${nt} titre${pl}. ＋ ajoute un titre à une playlist, ✕ le retire de celle-ci.` : `${nt} titre${pl} sur ${M.tous.length}. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.`;
 }
 function visible(i) { return true; }   // l'anneau est déjà filtré
 function choisir(i, premier) {
@@ -1005,6 +1038,83 @@ boiteProg.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { PY.seekTo(Math.min(d, t + 5), true); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') { PY.seekTo(Math.max(0, t - 5), true); e.preventDefault(); }
 });
+/* ---------- playlists (mémoire du navigateur + export / import JSON) ---------- */
+function nettoyerPl(o) {
+  const r = {}; if (!o || typeof o !== 'object' || Array.isArray(o)) return r;
+  Object.keys(o).forEach(nom => { if (Array.isArray(o[nom])) r[String(nom).slice(0, 80)] = [...new Set(o[nom].filter(i => typeof i === 'string' && /^[\w-]{11}$/.test(i)))]; });
+  return r;
+}
+function sauverPl() { mem.ecrire('playlists', M.pl); mem.ecrire('vuePl', M.vue); }
+function majSelecteur() {
+  const sel = $('#plVue'); sel.textContent = '';
+  const o0 = document.createElement('option'); o0.value = ''; o0.textContent = `Toute la bibliothèque (${M.tous.length})`; sel.appendChild(o0);
+  Object.keys(M.pl).forEach(nom => { const o = document.createElement('option'); o.value = nom; o.textContent = `♪ ${nom} (${pistesDe(nom).length})`; sel.appendChild(o); });
+  sel.value = M.vue || '';
+  $('#plRen').hidden = $('#plSup').hidden = !M.vue;
+}
+function changerVue(nom) { M.vue = nom && M.pl[nom] ? nom : null; M.montre = PAGE; sauverPl(); majSelecteur(); reconstruire(M.cur); }
+function nomLibre(base) { let n = base, k = 2; while (M.pl[n]) n = `${base} (${k++})`; return n; }
+function creerPl(nom) { nom = (nom || '').trim().slice(0, 80); if (!nom) return null; nom = nomLibre(nom); M.pl[nom] = []; sauverPl(); return nom; }
+function ajouterA(nom, tr) {
+  const l = M.pl[nom]; if (!l) return;
+  if (l.includes(tr.youtube)) { mlg(`« ${tr.titre} » est déjà dans « ${nom} ».`); return; }
+  l.push(tr.youtube); sauverPl(); majSelecteur(); mlg(`Ajouté à « ${nom} ».`);
+  if (M.vue === nom) reconstruire(M.cur);
+}
+function retirerDe(nom, tr) {
+  M.pl[nom] = (M.pl[nom] || []).filter(i => i !== tr.youtube); sauverPl(); majSelecteur(); mlg(`Retiré de « ${nom} ».`);
+  if (M.vue === nom) reconstruire(M.cur === tr ? null : M.cur);
+}
+function fermerMenu() { $('#menuPl').hidden = true; }
+function ouvrirMenu(ancre, tr) {
+  const m = $('#menuPl'); m.textContent = '';
+  const noms = Object.keys(M.pl);
+  if (!noms.length) { const p = document.createElement('p'); p.className = 'vide'; p.textContent = 'Aucune playlist pour l’instant.'; m.appendChild(p); }
+  noms.forEach(nom => { const b = document.createElement('button'); b.type = 'button'; b.textContent = `${M.pl[nom].includes(tr.youtube) ? '✓ ' : ''}${nom}`; b.addEventListener('click', () => { fermerMenu(); ajouterA(nom, tr); }); m.appendChild(b); });
+  const nb = document.createElement('button'); nb.type = 'button'; nb.textContent = '＋ Nouvelle playlist…';
+  nb.addEventListener('click', () => { fermerMenu(); const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) { majSelecteur(); ajouterA(n, tr); } });
+  m.appendChild(nb); m.hidden = false;
+  const r = ancre.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px';
+  m.style.top = (r.bottom + h + 8 < innerHeight ? r.bottom + 4 : Math.max(8, r.top - h - 4)) + 'px';
+}
+addEventListener('pointerdown', e => { if (!$('#menuPl').hidden && !e.target.closest('#menuPl') && !e.target.closest('.ajout') && !e.target.closest('#lPl')) fermerMenu(); });
+addEventListener('keydown', e => { if (e.key === 'Escape') fermerMenu(); });
+function initPlaylists() {
+  majSelecteur();
+  $('#plVue').addEventListener('change', e => changerVue(e.target.value));
+  $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) changerVue(n); });
+  $('#plRen').addEventListener('click', () => {
+    const ancien = M.vue; if (!ancien) return; const n = (prompt('Nouveau nom ?', ancien) || '').trim().slice(0, 80); if (!n || n === ancien) return;
+    const nom = M.pl[n] ? nomLibre(n) : n; const nouv = {}; Object.keys(M.pl).forEach(k => { nouv[k === ancien ? nom : k] = M.pl[k]; }); M.pl = nouv; M.vue = nom; sauverPl(); majSelecteur(); reconstruire(M.cur);
+  });
+  $('#plSup').addEventListener('click', () => {
+    const nom = M.vue; if (!nom || !confirm(`Supprimer la playlist « ${nom} » ? (les morceaux restent dans la bibliothèque)`)) return;
+    delete M.pl[nom]; M.vue = null; sauverPl(); majSelecteur(); M.montre = PAGE; reconstruire(M.cur);
+  });
+  $('#plSauve').addEventListener('click', () => {
+    if (!M.liste.length) { mlg('La liste affichée est vide.'); return; }
+    const n = creerPl(prompt(`Nom de la playlist (${M.liste.length} titres de la liste affichée) ?`, M.genreFiltre || M.q || 'Ma sélection')); if (!n) return;
+    M.pl[n] = [...new Set(M.liste.map(t => t.youtube))]; sauverPl(); changerVue(n); mlg(`Playlist « ${n} » enregistrée (${M.pl[n].length} titres).`);
+  });
+  $('#plExp').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ version: 1, playlists: M.pl }, null, 1)], { type: 'application/json' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'small-humans-playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    mlg(`${Object.keys(M.pl).length} playlist(s) exportée(s).`);
+  });
+  $('#plImp').addEventListener('click', () => $('#plFic').click());
+  $('#plFic').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return; const rd = new FileReader();
+    rd.onload = () => {
+      try { const o = JSON.parse(rd.result), src = nettoyerPl(o && o.playlists ? o.playlists : o); let n = 0;
+        Object.keys(src).forEach(nom => { M.pl[nomLibre(nom)] = src[nom]; n++; }); if (!n) throw 0; sauverPl(); majSelecteur(); mlg(`${n} playlist(s) importée(s).`); }
+      catch (x) { mlg('Fichier illisible : ce n’est pas un export de playlists.'); }
+      e.target.value = '';
+    };
+    rd.readAsText(f);
+  });
+  $('#lPl').addEventListener('click', () => { if (M.cur) ouvrirMenu($('#lPl'), M.cur); });
+}
 /* ---------- barre d'espace : pause / lecture ---------- */
 function frappeLibre(e) { const t = e.target, n = t && t.tagName; return !(n === 'INPUT' || n === 'TEXTAREA' || n === 'SELECT' || (t && t.isContentEditable)); }
 addEventListener('keydown', e => {
