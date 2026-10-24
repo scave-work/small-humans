@@ -671,7 +671,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "1pcxrdP3ums",
@@ -2980,7 +2980,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "9fygHXi85T4",
@@ -3321,7 +3321,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "AdCU75EMqh4",
@@ -12565,7 +12565,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "RQcLIm-s75U",
@@ -14779,7 +14779,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": true,
-"mix": false
+"mix": true
 },
 {
 "youtube": "-WfsLHPHCkc",
@@ -15307,7 +15307,7 @@
 ],
 "source": "youtube",
 "artiste_fiable": false,
-"mix": false
+"mix": true
 },
 {
 "youtube": "xkGes2Ueawk",
