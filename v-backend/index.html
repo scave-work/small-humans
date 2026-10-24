@@ -1161,7 +1161,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 71';
+const BUILD = 'v-backend 25 oct, 72';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1460,7 +1460,6 @@ function lancer(tr, ctx) {   // titre choisi par l'utilisateur : on le met dans 
   jouerYT(tr);
 }
 function suivant(sens, auto) {   // « À suivre » d'abord ; sinon suivant / précédent dans la liste affichée ; au hasard si « Aléatoire » est actif ; auto = fin naturelle du titre
-  if (!auto && M.cur && M.charge && M.joue) { try { if (PY.getCurrentTime() < 30) noterEc(M.cur.youtube, 's'); } catch (e) {} }   // passé avant 30 s : score en baisse
   if (sens > 0 && M.file.length) { const t = M.file.shift(); lancer(t, 'bib'); majFile(); return; }
   const km = M.vueMix && M.mix && M.cur ? M.mix.items.findIndex(x => x.youtube === M.cur.youtube) : -1;   // on lit dans le Mix : suivant / précédent restent dans le Mix
   if (km >= 0) { const nx = mixVoisin(km, sens); if (nx) jouerMix(nx); return; }
@@ -1491,6 +1490,7 @@ function chargerApi() {
   document.head.appendChild(sc);
 }
 function jouerYT(tr) {
+  if (PY && apiPrete && M.charge && M.joue) { try { const av = PY.getVideoData().video_id; if (av && av !== tr.youtube && PY.getCurrentTime() < 30) noterEc(av, 's'); } catch (e) {} }   // quel que soit le chemin (suivant, clic dans la liste, anneau, Mix) : titre quitté avant 30 s = score en baisse
   M.charge = true; mem.ecrire('dernier', tr.youtube); mlg('');
   if (PY && apiPrete) { PY.loadVideoById(tr.youtube); PY.setVolume(VOLP); } else { attente = tr; chargerApi(); }
 }
