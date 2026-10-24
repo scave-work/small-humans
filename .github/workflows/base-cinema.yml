@@ -1,0 +1,48 @@
+name: Base cinema 20 ans
+on:
+  workflow_dispatch:
+    inputs:
+      debut:
+        description: Première année
+        default: '2006'
+      fin:
+        description: Dernière année
+        default: '2026'
+      films:
+        description: Films par année (les plus votés)
+        default: '300'
+      series:
+        description: Séries et anime par année (les plus votés)
+        default: '100'
+      refaire:
+        description: Refaire les années déjà écrites (true ou false)
+        default: 'false'
+permissions:
+  contents: write
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Construire la base
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          DEBUT: ${{ inputs.debut }}
+          FIN: ${{ inputs.fin }}
+          FILMS: ${{ inputs.films }}
+          SERIES: ${{ inputs.series }}
+          REFAIRE: ${{ inputs.refaire }}
+        run: |
+          OPT=""
+          if [ "$REFAIRE" = "true" ]; then OPT="--refaire"; fi
+          python -I cinema/scripts/cinema_base.py --debut "$DEBUT" --fin "$FIN" --films "$FILMS" --series "$SERIES" --dossier cinema/data/base $OPT
+      - name: Enregistrer
+        run: |
+          git config user.name "catalogue-cinema"
+          git config user.email "actions@users.noreply.github.com"
+          git add cinema/data/base
+          git diff --cached --quiet || (git commit -m "Base cinema : mise a jour automatique" && git pull --rebase && git push)

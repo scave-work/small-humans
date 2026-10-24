@@ -26,15 +26,18 @@ class Source:
         if self.fixture:
             nom = chemin.replace('/', '_') + (f"_p{params['page']}" if 'page' in params else '') + '.json'
             return lib.lire_json(os.path.join(self.fixture, nom), {})
-        params.update(api_key=self.cle, language='fr-FR', region='FR')
+        params.setdefault('region', 'FR')
+        params = {k: v for k, v in params.items() if v is not None}   # region=None : pas de filtre de pays
+        params.update(api_key=self.cle, language='fr-FR')
         url = f"{API}/{chemin}?" + urllib.parse.urlencode(params)
         for essai in range(3):
+            time.sleep(0.03)
             try:
                 with urllib.request.urlopen(url, timeout=20) as r: return json.load(r)
             except urllib.error.HTTPError as e:
+                if e.code == 404: return {}
                 if e.code == 429 and essai < 2: time.sleep(2 + 3 * essai); continue
                 raise SystemExit(f"TMDB a répondu {e.code} pour {chemin} (clé invalide ou quota). Arrêt sans rien écrire.")
-        time.sleep(0.05)
 
 
 def genres_par_id(src):
@@ -42,6 +45,29 @@ def genres_par_id(src):
     for t in ('movie', 'tv'):
         for x in src.get(f'genre/{t}/list').get('genres', []): g[x['id']] = x['name']
     return g
+
+
+def fiche_depuis_details(type_tmdb, tid, det, genre_ids, noms):
+    """Fiche du catalogue à partir de la réponse détaillée de TMDB (None si le titre n'a pas de nom ou de date)."""
+    anime = 16 in genre_ids and det.get('original_language') == 'ja'
+    if type_tmdb == 'movie':
+        duree, date_s, titre = det.get('runtime') or None, det.get('release_date') or None, det.get('title')
+    else:
+        ep = det.get('episode_run_time') or []
+        duree, date_s, titre = (ep[0] if ep else None), det.get('first_air_date') or None, det.get('name')
+    if not titre or not date_s: return None
+    return {
+        'id': f'tmdb-{type_tmdb}-{tid}',
+        'type': 'anime' if anime else ('film' if type_tmdb == 'movie' else 'serie'),
+        'titre': titre,
+        'annee': int(date_s[:4]),
+        'sortie': date_s,
+        'duree_min': duree,
+        'saisons': det.get('number_of_seasons') if type_tmdb == 'tv' else None,
+        'genres': [noms.get(i, str(i)) for i in genre_ids],
+        'affiche': det.get('poster_path') or None,
+        'tmdb': {'type': type_tmdb, 'id': tid},
+    }
 
 
 def construire(src, pages, films_avant=90, films_apres=180, series_jours=365):
@@ -61,29 +87,12 @@ def construire(src, pages, films_avant=90, films_apres=180, series_jours=365):
                 det = src.get(f'{type_tmdb}/{r["id"]}')
                 if not det: continue
                 genre_ids = [x['id'] for x in det.get('genres', [])] or r.get('genre_ids', [])
-                anime = 16 in genre_ids and det.get('original_language') == 'ja'
-                if type_tmdb == 'movie':
-                    duree, date_s = det.get('runtime') or None, det.get('release_date') or None
-                    titre = det.get('title')
-                else:
-                    ep = det.get('episode_run_time') or []
-                    duree, date_s = (ep[0] if ep else None), det.get('first_air_date') or None
-                    titre = det.get('name')
-                if not titre or not date_s: continue
+                fiche = fiche_depuis_details(type_tmdb, r['id'], det, genre_ids, noms)
+                if not fiche: continue
+                date_s = fiche['sortie']
                 if type_tmdb == 'movie' and not (films_min <= date_s <= films_max): continue
                 if type_tmdb == 'tv' and date_s < series_min: continue
-                sortie.append({
-                    'id': f'tmdb-{type_tmdb}-{r["id"]}',
-                    'type': 'anime' if anime else ('film' if type_tmdb == 'movie' else 'serie'),
-                    'titre': titre,
-                    'annee': int(date_s[:4]) if date_s else None,
-                    'sortie': date_s,
-                    'duree_min': duree,
-                    'saisons': det.get('number_of_seasons') if type_tmdb == 'tv' else None,
-                    'genres': [noms.get(i, str(i)) for i in genre_ids],
-                    'affiche': det.get('poster_path') or None,
-                    'tmdb': {'type': type_tmdb, 'id': r['id']},
-                })
+                sortie.append(fiche)
     sortie.sort(key=lambda t: (t['sortie'], t['titre']), reverse=True)
     return sortie
 
