@@ -111,13 +111,13 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .tableau h3{margin:clamp(14px,2vh,22px) 0 8px;font-size:var(--t-lead);font-weight:500;letter-spacing:var(--suivi);text-transform:uppercase;line-height:1.2}
 .tableau .action::after{content:"";position:absolute;inset:0}
 .tableau p{max-width:34ch}
-.tableau h3,.tableau p,.tableau .etat{padding-inline:clamp(6px,.8vw,12px)}   /* marge du texte : plus collé au bord gauche de la carte (demande de Simon) */
+.tableau h3,.tableau p,.tableau .etat{padding-inline:clamp(3px,.4vw,6px)}   /* marge du texte : plus collé au bord gauche de la carte (demande de Simon) */
 .tableau .etat{margin-top:6px;font-size:var(--t-small);color:var(--acier);min-height:1.55em}
 .tableau .action{display:inline-block;margin-top:10px;min-height:44px;padding:10px 18px;font-weight:500;color:var(--acier);text-align:left}
 .tableau .action.entrer{background:var(--accent);color:var(--accent-ink);transition:background-color .18s ease}
 .tableau .action.entrer:hover{background:#8BB9FF}
 .tableau .action:active{transform:scale(.97)}
-.tableau .action:not(.entrer){padding-left:clamp(6px,.8vw,12px);text-decoration:underline;text-underline-offset:.2em}
+.tableau .action:not(.entrer){padding-left:clamp(3px,.4vw,6px);text-decoration:underline;text-underline-offset:.2em}
 .tableau:hover canvas{transform:scale(1.015)}
 .tableau:hover h3{color:var(--accent)}
 .tableau.ouvert{cursor:pointer}
@@ -1022,7 +1022,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 38';
+const BUILD = 'v-backend 24 oct, 39';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
