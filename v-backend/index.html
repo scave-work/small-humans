@@ -16,6 +16,7 @@
   --marge:clamp(16px,2.4vw,44px);
   --zone-basse:0px;              /* sur mobile : les 250 px du bas (référence 1080×1920) restent libres */
   --barre:72px;
+  --lect-h:84px;                 /* hauteur de la barre du lecteur (grand écran) */
   /* cinq tailles de texte, pas une de plus */
   --t-small:14px;
   --t-body:clamp(16px,15px + .25vw,19px);
@@ -306,6 +307,44 @@ body.drag{user-select:none;cursor:grabbing}
   .pistes .p-artiste,.pistes .p-lien{font-size:15px}
 }
 
+.aide-mus{font-size:14px;line-height:1.45;color:var(--acier);max-width:52ch}
+.aide-mus+.aide-clavier{margin-top:6px}
+.mus-outils #toutAj{background:var(--accent);color:var(--accent-ink)}
+.mus-outils #toutAj[hidden]{display:none}
+/* le message du lecteur flotte au-dessus de la barre : il ne l'agrandit plus et ne masque plus la page */
+@media (min-width:761px){.lect-note,.lect-extra .lect-note{position:absolute;left:var(--marge);bottom:calc(100% + 4px);margin:0;grid-column:auto}}
+/* liste compacte : une ligne par titre, texte coupé par « … » (le titre complet s'affiche au survol) */
+.pistes{table-layout:fixed;font-size:clamp(14px,13px + .3vw,17px);line-height:1.4}
+@media (min-width:1101px){.pistes .p-titre{width:48%}.pistes .p-artiste{width:30%}.pistes .p-genre{width:22%}}
+.pistes td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-top:.22em;padding-bottom:.22em}
+.pistes .p-genre{font-size:.88em}
+.p-jouer{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.marque{top:calc(.22em + .35em)}
+@media (pointer:coarse){.p-plus{position:absolute;right:4px;top:50%;transform:translateY(-50%);margin:0}.pistes .p-titre{padding-right:40px}}
+/* grand écran : la page tient dans l'écran (barre en haut, lecteur en bas), chaque colonne défile à l'intérieur */
+@media (min-width:1180px) and (min-height:560px){
+  body[data-vue="musique"]{overflow:hidden}
+  #musique{height:100svh;min-height:0;padding-bottom:calc(var(--lect-h) + 16px);padding-top:calc(var(--barre) + 16px)}
+  .mus{height:100%;grid-template-rows:minmax(0,1fr);align-items:stretch}
+  .mus-gauche{position:static;grid-row:1;min-height:0;overflow-y:auto;scrollbar-width:none}
+  .mus-corps{display:flex;flex-direction:column;min-height:0;padding-top:0}
+  .mus-outils{order:0}
+  .pistes-zone{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#22314F transparent}
+  .mus-panneau{position:static;grid-row:1;height:auto;min-height:0}
+  .platine{margin-top:14px;width:min(100%,420px,max(200px,calc(100svh - var(--barre) - var(--lect-h) - 330px)))}
+
+}
+@media (min-width:1180px) and (min-height:560px) and (max-height:820px){
+  .mus-corps .filtres{gap:4px 6px;margin-bottom:6px}
+  .mus-corps .filtres button{min-height:28px;padding:1px 9px;font-size:14px}
+  .mus-corps .mus-outils{margin-bottom:8px}
+  .mus-outils input[type=search],.mus-outils .case,.mus-outils button{min-height:34px}
+}
+
+/* la vidéo (non cliquable) est au centre de l'anneau, rognée en cercle ; le titre reste dans la barre du lecteur */
+.platine .yt-boite{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:50%;max-width:none;aspect-ratio:1;margin:0;border-radius:50%;border:0;overflow:hidden;background:#02040A;order:0}
+.platine .yt-boite iframe,.platine .yt-boite #ytCible{position:absolute;left:50%;top:0;height:100%;width:177.78%;transform:translateX(-50%);border:0}
+
 /* entrées : seulement si le mouvement est permis ; sinon tout est déjà en place */
 @media (prefers-reduced-motion:no-preference){
   .vue.pret [data-entree]{transform:translateY(24px);clip-path:inset(0 0 100% 0)}
@@ -352,16 +391,16 @@ body.drag{user-select:none;cursor:grabbing}
     <div class="mus">
       <div class="mus-gauche">
         <div class="mus-tete">
-          <h2 id="mus-titre" data-entree style="--d:0">Musique</h2>
-          <p id="mus-chapeau" data-entree style="--d:1">Mes favoris, rangés par genre. Touche un titre, ou sa cellule sur l’anneau, pour le lancer.</p>
+          <h2 id="mus-titre" class="vh">Musique</h2>
+          <p id="mus-chapeau" class="aide-mus" data-entree style="--d:0">Touche un titre, ou sa cellule sur l’anneau, pour le lancer. Glisse un titre vers la playlist pour l’y ajouter.</p>
           <p class="aide-clavier" data-entree style="--d:1">Espace pause · ← → titre · Maj + ← → ±5 s</p>
         </div>
         <div class="platine" id="platineBoite" data-entree style="--d:2">
           <canvas id="platine" role="img" aria-label="Anneau de la playlist : une cellule par titre, la cellule allumée est le titre en cours"></canvas>
-          <div class="moyeu" aria-live="polite"><p class="ec-titre" id="ecTitre"></p><p class="ec-artiste" id="ecArtiste"></p></div>
+          <div class="moyeu vh" aria-live="polite"><p class="ec-titre" id="ecTitre"></p><p class="ec-artiste" id="ecArtiste"></p></div>
+          <div class="yt-boite" id="ytBoite" aria-hidden="true"><div id="ytCible"></div></div>
         </div>
         <div class="anneaux" id="anneaux" hidden><button id="aPrec" type="button" aria-label="Anneau précédent">‹</button><span id="aInfo" aria-live="polite"></span><button id="aSuiv" type="button" aria-label="Anneau suivant">›</button></div>
-        <div class="yt-boite" id="ytBoite" aria-hidden="true"><div id="ytCible"></div></div>
       </div>
       <div class="lecteur" id="lecteur" role="region" aria-label="Lecteur">
         <div class="lect-boutons">
@@ -388,13 +427,16 @@ body.drag{user-select:none;cursor:grabbing}
           <input id="q" type="search" placeholder="Chercher un titre ou un artiste" aria-label="Chercher un titre ou un artiste">
           <label class="case"><input id="mix" type="checkbox"> mix, sets, albums</label>
           <button id="alea" type="button" aria-pressed="false">Aléatoire</button>
+          <button id="toutAj" type="button" hidden>Tout ajouter</button>
         </div>
+        <div class="pistes-zone">
         <table class="pistes">
           <caption class="vh">Les titres</caption>
           <thead class="vh"><tr><th scope="col">Titre</th><th scope="col">Artiste</th><th scope="col">Genre</th></tr></thead>
           <tbody id="pistes"></tbody>
         </table>
         <button id="plus" class="plus" type="button" hidden>Afficher plus</button>
+        </div>
       </div>
           <aside class="mus-panneau" id="panneau" aria-label="Playlist">
         <div class="pan-tete">
@@ -933,7 +975,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 10';
+const BUILD = 'v-backend 24 oct, 12';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -946,11 +988,16 @@ function construireMusique(D) {
   const cnt = {}; M.tous.forEach(t => { cnt[t.genre] = (cnt[t.genre] || 0) + 1; });
   M.genresOrdre = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x]);
   const f = $('#filtres'); f.textContent = '';
+  const boutons = [];
   [null, ...M.genresOrdre].forEach(gn => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = gn ? `${gn} (${cnt[gn]})` : 'Tous'; b.setAttribute('aria-pressed', String(gn === M.genreFiltre));
-    b.addEventListener('click', () => { M.genreFiltre = gn; M.montre = PAGE; [...f.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); reconstruire(M.cur, true); });
-    f.appendChild(b);
+    b.addEventListener('click', () => {
+      M.genreFiltre = (gn && gn === M.genreFiltre) ? null : gn;   // recliquer sur le genre actif = retour à « Tous »
+      M.montre = PAGE; boutons.forEach(x => x.b.setAttribute('aria-pressed', String(x.gn === M.genreFiltre))); reconstruire(M.cur, true);
+    });
+    boutons.push({ gn, b }); f.appendChild(b);
   });
+  $('#toutAj').addEventListener('click', ajouterTous);
   $('#q').addEventListener('input', e => { M.q = e.target.value; M.montre = PAGE; reconstruire(M.cur, true); });
   $('#mix').addEventListener('change', e => { M.mix = e.target.checked; M.montre = PAGE; reconstruire(M.cur, true); });
   M.alea = !!mem.lire('alea', false); $('#alea').setAttribute('aria-pressed', String(M.alea));
@@ -1002,7 +1049,7 @@ function tableau() {
   M.biblio.slice(0, M.montre).forEach(tr => {
     const row = document.createElement('tr'); row.dataset.id = tr.youtube;
     row.innerHTML = '<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button><button type="button" class="p-plus" aria-label="Ajouter à la playlist ouverte" title="Ajouter à la playlist ouverte">＋</button></td><td class="p-artiste"></td><td class="p-genre"></td>';
-    row.querySelector('.p-jouer').textContent = tr.titre + (tr.mix ? ' (mix/set)' : '');
+    row.querySelector('.p-jouer').textContent = tr.titre + (tr.mix ? ' (mix/set)' : ''); row.querySelector('.p-jouer').title = tr.titre;
     row.querySelector('.p-artiste').textContent = tr.artiste || '—'; row.querySelector('.p-artiste').dataset.genre = tr.genre;
     row.querySelector('.p-genre').textContent = tr.genre;
     row.querySelector('.p-plus').addEventListener('click', e => { e.stopPropagation(); const nom = plCourante(true); if (nom) ajouterA(nom, tr); });
@@ -1012,8 +1059,18 @@ function tableau() {
     tb.appendChild(row);
   });
   $('#plus').hidden = M.biblio.length <= M.montre;
-  const nt = M.biblio.length, pl = nt > 1 ? 's' : '';
-  $('#mus-chapeau').textContent = `${nt} titre${pl} sur ${M.tous.length}. Touche un titre, ou sa cellule sur l’anneau, pour le lancer. Glisse un titre vers la playlist pour l’y ajouter.`;
+  const filtre = !!(M.q.trim() || M.genreFiltre), bt = $('#toutAj');   // « tout ajouter » : seulement quand la liste est filtrée
+  bt.hidden = !filtre || !M.biblio.length; bt.textContent = `Tout ajouter (${M.biblio.length})`;
+}
+function ajouterTous() {   // ajoute toute la liste filtrée (pas seulement les lignes affichées) à la playlist ouverte, sans doublon
+  const liste = M.biblio; if (!liste.length) return;
+  const nom = plCourante(true); if (!nom) return;
+  if (liste.length > 50 && !confirm(`Ajouter ${liste.length} titres à « ${nom} » ?`)) return;
+  const l = M.pl[nom], deja = new Set(l); let n = 0;
+  liste.forEach(t => { if (!deja.has(t.youtube)) { l.push(t.youtube); deja.add(t.youtube); n++; } });
+  sauverPl(); majSelecteur(); panneau();
+  mlg(n ? `${n} titre${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} à « ${nom} »${n < liste.length ? ` (${liste.length - n} déjà présent${liste.length - n > 1 ? 's' : ''})` : ''}.` : `Tous ces titres sont déjà dans « ${nom} ».`);
+  if (M.ctx === 'pl' && M.plActive === nom) reconstruire(M.cur, true);
 }
 function visible(i) { return true; }   // l'anneau est déjà filtré
 function choisir(i, premier) {
