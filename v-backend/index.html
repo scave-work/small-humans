@@ -218,6 +218,7 @@ tr.cache{display:none}
 .pan-tete{display:flex;gap:6px;padding:10px;border-bottom:1px solid #22314F}
 .pan-tete select{flex:1;min-width:0;min-height:40px;padding:6px 8px;background:var(--nuit);color:var(--ink);border:1px solid #22314F;font:inherit}
 .pan-tete button{min-width:40px;min-height:40px;background:var(--nuit);color:var(--ink);font-size:20px;line-height:1}
+.pan-tete button:disabled{opacity:.3;cursor:default}
 .pan-compte{margin:8px 12px 2px;font-size:13px;color:var(--acier);min-height:1.2em}
 .pan-liste{list-style:none;margin:0;padding:0 6px;flex:1;overflow-y:auto;min-height:60px}
 .pan-item{display:grid;grid-template-columns:22px 64px minmax(0,1fr) 28px;gap:8px;align-items:center;padding:5px 4px;border-bottom:1px solid #16223F;cursor:grab;user-select:none;touch-action:pan-y;transition:opacity .12s,transform .12s}
@@ -469,6 +470,7 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
           <label class="vh" for="plVue">Playlist ouverte</label>
           <select id="plVue"></select>
           <button id="plNouv" type="button" aria-label="Nouvelle playlist" title="Nouvelle playlist">＋</button>
+          <button id="plSuppr" type="button" aria-label="Supprimer la playlist" title="Supprimer la playlist" disabled>✕</button>
           <button id="plMenu" type="button" aria-label="Autres actions" aria-haspopup="true" title="Autres actions">⋯</button>
           <input id="plFic" type="file" accept="application/json,.json" hidden>
         </div>
@@ -1002,7 +1004,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 19';
+const BUILD = 'v-backend 24 oct, 20';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1214,7 +1216,9 @@ function majSelecteur() {
   groupe('Styles', offs.map(n => [n, `${n} (${M.off[n].length})`]));
   sel.value = existe(M.plActive) ? M.plActive : (noms[0] || '');
   if (!M.plActive && noms.length) { M.plActive = sel.value; }
+  majCroix();
 }
+function majCroix() { const b = $('#plSuppr'); if (b) b.disabled = !(M.plActive && M.pl[M.plActive] && !estOff(M.plActive)); }
 function ajouterA(nom, tr, pos) {
   if (estOff(nom) && M.off[nom].includes(tr.youtube)) { mlg(`« ${tr.titre} » est déjà dans « ${nom} ».`); return; }
   nom = modifiable(nom); const l = M.pl[nom]; if (!l) return;
@@ -1338,8 +1342,9 @@ function finirDrag() {
 document.addEventListener('touchmove', e => { if (DR.on) e.preventDefault(); }, { passive: false });
 function initPlaylists() {
   majSelecteur(); panneau();
-  $('#plVue').addEventListener('change', e => { M.plActive = e.target.value || null; sauverPl(); panneau(); if (M.ctx === 'pl') reconstruire(M.cur, true); });
+  $('#plVue').addEventListener('change', e => { M.plActive = e.target.value || null; sauverPl(); majCroix(); panneau(); if (M.ctx === 'pl') reconstruire(M.cur, true); });
   $('#plNouv').addEventListener('click', () => { const n = creerPl(prompt('Nom de la nouvelle playlist ?', '')); if (n) { M.plActive = n; sauverPl(); majSelecteur(); panneau(); } });
+  $('#plSuppr').addEventListener('click', supprimerPl);
   $('#plMenu').addEventListener('click', () => { if ($('#menuPl').hidden) ouvrirActions($('#plMenu')); else fermerMenu(); });
   $('#plFic').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return; const rd = new FileReader();
