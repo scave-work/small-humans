@@ -100,7 +100,7 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .passer button{text-decoration:underline;text-underline-offset:.2em}
 
 /* ---------- galerie ---------- */
-#galerie{padding:calc(var(--barre) + clamp(20px,5vh,72px)) var(--marge) calc(var(--zone-basse) + clamp(56px,8vh,120px));min-height:100svh}
+#galerie{padding:calc(var(--barre) + clamp(10px,2vh,40px)) var(--marge) calc(var(--zone-basse) + clamp(56px,8vh,120px));min-height:100svh}
 .gal-tete{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;align-items:end;margin-bottom:clamp(32px,6vh,72px)}
 .gal-tete h2{grid-column:1/8;margin:0;font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-transform:uppercase;line-height:1.05}
 .gal-tete p{grid-column:8/13;max-width:42ch}
@@ -111,7 +111,7 @@ body.deux-lignes .soustitre .st-sep{display:none}
 .tableau .action::after{content:"";position:absolute;inset:0}
 .tableau p{max-width:34ch}
 .tableau .etat{margin-top:6px;font-size:var(--t-small);color:var(--acier);min-height:1.55em}
-.tableau .action{display:inline-block;margin-top:14px;min-height:44px;padding:10px 18px;font-weight:500;color:var(--acier);text-align:left}
+.tableau .action{display:inline-block;margin-top:10px;min-height:44px;padding:10px 18px;font-weight:500;color:var(--acier);text-align:left}
 .tableau .action.entrer{background:var(--accent);color:var(--accent-ink);transition:background-color .18s ease}
 .tableau .action.entrer:hover{background:#8BB9FF}
 .tableau .action:active{transform:scale(.97)}
@@ -408,7 +408,6 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
   <section id="galerie" class="vue" aria-labelledby="gal-titre">
     <div class="gal-tete">
       <h2 id="gal-titre" data-entree style="--d:0">La galerie</h2>
-      <p data-entree style="--d:1">Musique, cinéma, écriture, tech et IA : choisis une passion. Seule la musique est ouverte pour l’instant.</p>
     </div>
     <ul class="tableaux" id="tableaux"></ul>
   </section>
@@ -1005,7 +1004,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 28';
+const BUILD = 'v-backend 24 oct, 29';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
