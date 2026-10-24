@@ -462,6 +462,9 @@ body.plein .lecteur{background:rgba(10,18,40,.72);backdrop-filter:blur(8px);bord
 @media (min-width:1101px){.pistes .c-titre{width:54%}.pistes .c-genre{width:150px}}
 @media (min-width:1180px){.mus{grid-template-columns:minmax(0,min(25.5vw,440px)) minmax(0,1fr) minmax(0,min(22.5vw,440px));column-gap:clamp(20px,2vw,48px)}}
 @media (min-width:1180px) and (min-height:560px){.mus-gauche{display:flex;flex-direction:column}.mus-gauche .platine{margin:auto}}   /* anneau centré verticalement dans sa colonne */
+/* Tags : le nombre entre parenthèses est plus discret que le nom du style (v47) */
+.filtres .nb{color:#6B7AA0}
+.filtres button[aria-pressed="true"] .nb{color:inherit;opacity:.7}
 </style>
 </head>
 <body data-vue="intro">
@@ -1093,7 +1096,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 24 oct, 46';
+const BUILD = 'v-backend 24 oct, 47';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1109,7 +1112,7 @@ function construireMusique(D) {
   const f = $('#filtres'); f.textContent = '';
   const boutons = [];
   [null, ...M.genresOrdre].forEach(gn => {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = gn ? `${gn} (${cnt[gn]})` : 'Tous'; b.setAttribute('aria-pressed', String(gn === M.genreFiltre));
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = gn || 'Tous'; if (gn) { const nb = document.createElement('span'); nb.className = 'nb'; nb.textContent = ` (${cnt[gn]})`; b.appendChild(nb); } b.setAttribute('aria-pressed', String(gn === M.genreFiltre));
     b.addEventListener('click', () => {
       M.genreFiltre = (gn && gn === M.genreFiltre) ? null : gn;   // recliquer sur le genre actif = retour à « Tous »
       M.montre = PAGE; boutons.forEach(x => x.b.setAttribute('aria-pressed', String(x.gn === M.genreFiltre))); reconstruire(M.cur, true);
