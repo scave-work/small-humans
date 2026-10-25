@@ -442,7 +442,11 @@ function fiche(id, obj) {
   const connu = f.statut === 'a_voir';
   const act = [h('button', { class: 'btn fort', type: 'button', on: { click: () => formulaire(Object.assign({}, f), true) } }, 'Je l’ai vu')];
   if (connu) act.push(h('div', { class: 'deux' }, h('button', { class: 'btn', type: 'button', on: { click: () => formulaire(Object.assign({}, f), false) } }, 'Modifier'), retirerBouton(id)));
-  else act.push(h('button', { class: 'btn', type: 'button', on: { click: () => formulaire(Object.assign({}, f, { statut: 'a_voir' }), false) } }, 'Mettre dans « à voir »'));
+  else {
+    const rapide = envie => { enregistrer(Object.assign({}, f, { statut: 'a_voir', envie: envie || null })); F.close(); toast('Ajouté à « à voir ».'); };
+    act.push(h('button', { class: 'btn', type: 'button', on: { click: () => rapide('') } }, 'Mettre dans « à voir »'));
+    act.push(h('div', { class: 'choix', style: '--n:3' }, Object.entries(ENVIES).map(([v, t]) => h('button', { type: 'button', on: { click: () => rapide(v) } }, t))));
+  }
   feuille(connu ? 'À voir' : 'Titre',
     h('div', { class: 'f-haut' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, infosDe(f)), f.genres && f.genres.length ? h('p', null, f.genres.join(', ')) : null, f.envie ? h('p', null, ENVIES[f.envie]) : null)),
     f.commentaire ? h('p', { class: 'f-com' }, f.commentaire) : null,
