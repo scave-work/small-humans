@@ -1,3 +1,6 @@
 
 # journal de Simon : local, jamais publie sans son accord
 cinema/data/journal.local.json
+
+# fichiers temporaires de Python
+__pycache__/
