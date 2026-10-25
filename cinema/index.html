@@ -263,7 +263,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.13 · 25 oct. 2026';
+const VERSION = '0.14 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -611,14 +611,14 @@ function majBoutons() {
 }
 async function copier() {
   const txt = exportJson(), n = Object.keys(memoire).length;
-  try { await navigator.clipboard.writeText(txt); toast(`Copié : ${n} fiche${n > 1 ? 's' : ''}. Colle-les à Claude, ou dans ajouts_cinema_${aujourdhui()}.json.`); }
+  try { await navigator.clipboard.writeText(txt); toast(`Copié : ${n} fiche${n > 1 ? 's' : ''}.`); }
   catch (e) {
     const ta = h('textarea', { class: 'export', readonly: true }, txt);
     feuille('Mes ajouts', h('p', null, 'Le presse-papier est bloqué : sélectionne tout le texte ci-dessous, copie-le, puis colle-le.'), ta);
     setTimeout(() => { ta.focus(); ta.select(); }, 60);
   }
 }
-let tToast; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tToast); tToast = setTimeout(() => t.classList.remove('on'), 4200); }
+let tToast; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tToast); tToast = setTimeout(() => t.classList.remove('on'), 1000); }
 
 /* ---------- écran de cinéma (3 derniers vus) ---------- */
 function ecran() {
