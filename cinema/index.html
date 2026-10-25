@@ -263,7 +263,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.16 · 25 oct. 2026';
+const VERSION = '0.17 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -304,7 +304,7 @@ async function chargerJournal() {
 function fusion() {
   const m = new Map(S.journal.map(f => [f.id, f]));
   for (const id in memoire) m.set(id, memoire[id]);
-  return [...m.values()];
+  return [...m.values()].filter(f => f.statut !== 'retire');   // « retire » = titre du journal retiré par Simon
 }
 const estLocal = id => id in memoire;
 const dansJournal = id => S.journal.some(f => f.id === id);
@@ -477,9 +477,12 @@ if (window.visualViewport) {
 
 const infosDe = f => [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.annee, f.duree_min ? (f.duree_min >= 60 ? Math.floor(f.duree_min / 60) + ' h ' + String(f.duree_min % 60).padStart(2, '0') : f.duree_min + ' min') + (f.type === 'serie' ? ' / épisode' : '') : ''].filter(Boolean).join(' · ');
 function retirerBouton(id) {
-  if (!estLocal(id)) return null;
   const j = dansJournal(id);
-  return h('button', { class: 'btn', type: 'button', on: { click: () => { delete memoire[id]; ecrire(); majBoutons(); rendre(); F.close(); toast(j ? 'Changements annulés.' : 'Retiré.'); } } }, j ? 'Annuler mes changements' : 'Retirer');
+  if (!estLocal(id) && !j) return null;
+  const f = fusion().find(x => x.id === id) || memoire[id] || {};
+  return h('button', { class: 'btn', type: 'button', on: { click: () => {
+    if (j) memoire[id] = { id, type: f.type, titre: f.titre, annee: f.annee, statut: 'retire', maj: aujourdhui() }; else delete memoire[id];
+    ecrire(); majBoutons(); rendre(); F.close(); toast('Retiré.'); } } }, 'Retirer');
 }
 function fiche(id, obj) {
   const f = fusion().find(x => x.id === id) || obj; if (!f) return;
