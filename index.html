@@ -296,6 +296,7 @@ body.drag{user-select:none;cursor:grabbing}
   .pistes .p-artiste{grid-column:1;grid-row:2;font-size:var(--t-body);white-space:normal}
   .pistes .p-artiste::after{content:" · " attr(data-genre)}
   .pistes .p-genre{display:none}
+  .pistes.edition .p-genre{display:block;width:auto;grid-column:1 / 3;grid-row:3;padding-top:6px}
   .pistes .p-lien{grid-column:2;grid-row:1/3;align-self:center}
   .marque{top:calc(10px + .55em)}
 }
@@ -462,6 +463,9 @@ tr.indispo .p-jouer,tr.indispo .p-artiste,tr.indispo .p-genre,.pan-item.indispo 
 a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;border-radius:999px;background:#0E1727;color:var(--accent);text-decoration:none;font-size:14px;cursor:grab}
 .aj-aide{color:var(--acier);font-size:13px;margin:10px 0 0}
 .aj-info{color:var(--accent);margin:0 0 10px}
+.pistes.edition .p-genre{overflow:visible}
+.p-ed{font:inherit;font-size:14px;color:var(--ink);background:#1A2B4A;border:0;border-radius:999px;padding:2px 10px;min-height:28px;max-width:calc(100% - 40px);cursor:pointer}
+.p-ed-x{font:inherit;font-size:14px;color:var(--acier);background:none;border:0;padding:2px 8px;min-height:28px;cursor:pointer}
 .aj-panneau .aj-lien{background:none;color:var(--acier);text-decoration:underline;font-size:13px;padding:0 4px}
 .aj-panneau .aj-lien:disabled{opacity:.4;cursor:default}
 .aj-panneau .aj-jeton{font:inherit;font-size:14px;width:100%;box-sizing:border-box;margin:8px 0;padding:6px 12px;border:0;border-radius:999px;background:#0E1727;color:var(--ink)}
@@ -605,6 +609,7 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
           <button id="topBtn" type="button" aria-haspopup="dialog" aria-expanded="false">Mon top</button>
           <button id="toutAj" type="button" hidden>Tout ajouter</button>
           <button id="ajBtn" type="button" aria-haspopup="dialog" aria-expanded="false">À ajouter</button>
+          <button id="edBtn" type="button" aria-pressed="false" title="Changer le style d’un titre ou le retirer de la liste">Éditer</button>
         </div>
         <div class="pistes-zone">
         <table class="pistes">
@@ -1164,7 +1169,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 25 oct, 74';
+const BUILD = 'v-backend 25 oct, 75';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1187,6 +1192,7 @@ function recevoirAjout(D) {   // le favori ouvre le site avec ?ajout=ID&t=titre&
 }
 const pseudoTitre = x => { const g = GENRES_AJ.includes(x.genre) ? x.genre : 'autre'; return { youtube: x.youtube, titre: x.titre, artiste: x.artiste || '', genre: g, tags: [g], source: 'ajout', artiste_fiable: false, mix: false, local: true }; };
 function fusionnerAjouts(D) {   // les ajouts apparaissent dans la liste comme les autres titres, tant qu'ils ne sont pas dans titres.json
+  appliquerCorrections(D);
   const connus = new Set(D.titres.map(t => t.youtube));
   const stock = lireAjouts(), reste = stock.filter(x => !connus.has(x.youtube));
   if (reste.length !== stock.length) mem.ecrire('ajouts', reste);   // publiés dans titres.json : on les oublie ici
@@ -1215,30 +1221,64 @@ function exporterFichier() {
   a.download = 'ajouts_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
 }
 async function envoyerAjouts() {
-  const j = jetonGH(), l = ajoutsNonEnvoyes();
-  if (!l.length) return;
+  const j = jetonGH(), l = ajoutsNonEnvoyes(), k = corrNonEnvoyees();
+  if (!l.length && !k.length) return;
   if (!j) { M.ajJeton = true; return dessinerAj(); }
   M.infoAj = 'Envoi…'; dessinerAj();
   try {
-    const corps = JSON.stringify(l.map(({ _env, ...x }) => x), null, 2);
+    const corps = JSON.stringify([...l.map(({ _env, ...x }) => x), ...k.map(({ _env, titre, ajoute_le, ...x }) => x)], null, 2);
     const r = await fetch(`https://api.github.com/repos/${DEPOT_ENVOI}/contents/musique/ajouts/ajouts_${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
-      { method: 'PUT', headers: { Authorization: 'Bearer ' + j, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Musique : ajouts envoyés depuis le site', content: btoa(unescape(encodeURIComponent(corps))) }) });
+      { method: 'PUT', headers: { Authorization: 'Bearer ' + j, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Musique : ' + (k.length ? 'ajouts et corrections' : 'ajouts') + ' envoyés depuis le site', content: btoa(unescape(encodeURIComponent(corps))) }) });
     if (r.status === 401 || r.status === 403 || r.status === 404) { M.ajJeton = true; M.infoAj = 'GitHub a refusé le jeton (périmé ou sans droit d’écriture).'; return dessinerAj(); }
     if (!r.ok) throw new Error(r.status);
     const ids = new Set(l.map(x => x.youtube));
     mem.ecrire('ajouts', lireAjouts().map(y => ids.has(y.youtube) ? { ...y, _env: true } : y)); l.forEach(x => { x._env = true; });
-    M.ajJeton = false; M.infoAj = `Envoyé (${l.length}). Ils arrivent dans la liste d’ici 1 à 2 minutes : recharge la page.`;
+    const idk = new Set(k.map(x => x.youtube)); mem.ecrire('corrections', lireCorr().map(y => idk.has(y.youtube) ? { ...y, _env: true } : y)); k.forEach(x => { x._env = true; });
+    M.ajJeton = false; M.infoAj = `Envoyé (${l.length + k.length}). Ils arrivent dans la liste d’ici 1 à 2 minutes : recharge la page.`;
   } catch (e) { M.ajJeton = true; M.infoAj = 'Échec de l’envoi : jeton mal copié ou connexion coupée. Colle-le à nouveau, ou utilise « Sauvegarder en fichier ».'; }
   dessinerAj(); majAjBtn();
 }
-function majAjBtn() { const n = ajoutsNonEnvoyes().length; $('#ajBtn').textContent = n ? `À ajouter (${n})` : 'À ajouter'; }
+/* Corrections : changer le style d'un titre ou le retirer. Mises en attente dans le navigateur (appliquées tout de suite à l'écran), envoyées avec les ajouts ;
+   le robot les applique à titres.json et les range dans musique/corrections.json (relu par les scripts de l'atelier, pour qu'une régénération ne les annule pas). */
+const lireCorr = () => { const a = mem.lire('corrections', []); return Array.isArray(a) ? a.filter(x => x && ID_YT.test(String(x.youtube)) && (x.action === 'retirer' || (x.action === 'genre' && GENRES_AJ.includes(x.genre)))) : []; };
+const corrNonEnvoyees = () => (M.corr || []).filter(x => !x._env);
+const nbEnAttente = () => ajoutsNonEnvoyes().length + corrNonEnvoyees().length;
+function appliquerCorrections(D) {   // au chargement : on rejoue les corrections que titres.json ne reflète pas encore, on oublie les autres
+  const stock = lireCorr(), parId = new Map(D.titres.map(t => [t.youtube, t])), actives = [];
+  stock.forEach(c => { const t = parId.get(c.youtube); if (c.action === 'retirer' ? t : (t && t.genre !== c.genre)) actives.push(c); });
+  if (actives.length !== stock.length) mem.ecrire('corrections', actives);
+  M.corr = actives;
+  actives.filter(c => c.action === 'genre').forEach(c => { const t = parId.get(c.youtube); t.genre = c.genre; t.tags = [c.genre]; });
+  const retires = new Set(actives.filter(c => c.action === 'retirer').map(c => c.youtube));
+  if (retires.size) D.titres = D.titres.filter(t => !retires.has(t.youtube));
+}
+function corriger(c, tr) {
+  c.ajoute_le = new Date().toISOString().slice(0, 10);
+  const l = lireCorr().filter(y => y.youtube !== c.youtube); l.push(c); mem.ecrire('corrections', l); M.corr = l;   // la dernière correction d'un titre remplace les précédentes
+  if (c.action === 'genre') { tr.genre = c.genre; tr.tags = [c.genre]; }
+  else { const i = M.tous.indexOf(tr); if (i >= 0) M.tous.splice(i, 1); M.parId.delete(c.youtube); }
+  majAjBtn(); reconstruire(M.cur, true);
+}
+function editerLigne(row, tr) {   // mode « Éditer » : le style devient une liste déroulante, plus un ✕ pour retirer le titre
+  if (M.ajouts.some(a => a.youtube === tr.youtube)) return;   // les titres pas encore publiés se règlent dans le panneau « À ajouter »
+  const cel = row.querySelector('.p-genre'); cel.textContent = '';
+  const sel = document.createElement('select'); sel.className = 'p-ed'; sel.setAttribute('aria-label', 'Style de ' + tr.titre);
+  const genres = GENRES_AJ.includes(tr.genre) ? GENRES_AJ : [tr.genre, ...GENRES_AJ];
+  [...genres].sort((u, v) => u.localeCompare(v, 'fr')).forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; if (g === tr.genre) o.selected = true; sel.appendChild(o); });
+  sel.addEventListener('change', () => corriger({ action: 'genre', youtube: tr.youtube, genre: sel.value, titre: tr.titre }, tr));
+  const x = document.createElement('button'); x.type = 'button'; x.className = 'p-ed-x'; x.textContent = '✕'; x.title = 'Retirer ce titre de la liste'; x.setAttribute('aria-label', 'Retirer ' + tr.titre);
+  x.addEventListener('click', () => { if (confirm(`Retirer « ${tr.titre} » de la liste ?`)) corriger({ action: 'retirer', youtube: tr.youtube, titre: tr.titre }, tr); });
+  [sel, x].forEach(e => { e.addEventListener('click', ev => ev.stopPropagation()); e.addEventListener('pointerdown', ev => ev.stopPropagation()); });
+  cel.append(sel, x);
+}
+function majAjBtn() { const n = nbEnAttente(); $('#ajBtn').textContent = n ? `À ajouter (${n})` : 'À ajouter'; }
 function dessinerAj() {
   const pn = $('#ajPanneau'); pn.textContent = '';
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
   const tete = el('div', 'aj-tete'); tete.appendChild(el('h3', '', `À ajouter${M.ajouts.length ? ` (${M.ajouts.length})` : ''}`));
   const fer = el('button', 'aj-x', '✕'); fer.type = 'button'; fer.setAttribute('aria-label', 'Fermer'); fer.addEventListener('click', fermerAj); tete.appendChild(fer); pn.appendChild(tete);
   if (M.infoAj) pn.appendChild(el('p', 'aj-info', M.infoAj));
-  if (!M.ajouts.length) pn.appendChild(el('p', 'aj-aide', 'Rien pour l’instant. Sur une vidéo YouTube, clique sur le favori « + Site » : le titre arrive ici.'));
+  if (!M.ajouts.length && !(M.corr || []).length) pn.appendChild(el('p', 'aj-aide', 'Rien pour l’instant. Sur une vidéo YouTube, clique sur le favori « + Site » : le titre arrive ici.'));
   M.ajouts.forEach(x => {
     const tr = M.parId.get(x.youtube); const l = el('div', 'aj-ligne');
     const pl = el('button', '', '▶'); pl.type = 'button'; pl.setAttribute('aria-label', 'Écouter'); pl.addEventListener('click', () => { if (tr) lancer(tr); });
@@ -1255,6 +1295,7 @@ function dessinerAj() {
     });
     l.append(pl, t, sel, del); pn.appendChild(l);
   });
+  (M.corr || []).forEach(c => { const l = el('div', 'aj-ligne'), t = el('div', 'aj-t', (c.action === 'retirer' ? 'Retirer : ' : `Style → ${c.genre} : `) + (c.titre || c.youtube)); if (c._env) t.appendChild(el('small', '', '  · envoyé')); l.appendChild(t); pn.appendChild(l); });
   if (M.ajJeton) {
     const c = el('input', 'aj-jeton'); c.type = 'password'; c.autocomplete = 'off'; c.placeholder = 'Colle le jeton GitHub ici'; c.setAttribute('aria-label', 'Jeton GitHub');
     const ok = el('button', 'aj-prim', 'Enregistrer et envoyer'); ok.type = 'button';
@@ -1262,7 +1303,7 @@ function dessinerAj() {
     pn.append(el('p', 'aj-aide', 'Colle ton jeton une seule fois : il reste dans ce navigateur.'), c, ok);
   }
   const bas = el('div', 'aj-bas');
-  const env = el('button', 'aj-prim', 'Envoyer'); env.type = 'button'; env.disabled = !ajoutsNonEnvoyes().length; env.addEventListener('click', envoyerAjouts);
+  const env = el('button', 'aj-prim', 'Envoyer'); env.type = 'button'; env.disabled = !nbEnAttente(); env.addEventListener('click', envoyerAjouts);
   const fav = el('a', 'aj-fav', '+ Site'); fav.href = 'javascript:' + codeFavori(); fav.title = 'Glisse ce bouton dans ta barre de favoris'; fav.addEventListener('click', e => e.preventDefault());
   const ex = el('button', 'aj-lien', 'Sauvegarder en fichier'); ex.type = 'button'; ex.disabled = !M.ajouts.length; ex.addEventListener('click', exporterFichier);
   bas.append(env, fav, ex); pn.appendChild(bas);
@@ -1276,6 +1317,10 @@ function ouvrirAj() {
 function initAjouts(msg) {
   majAjBtn(); if (msg) { mlg(msg); M.infoAj = msg; const att = setInterval(() => { if ($('#musique').classList.contains('active')) { clearInterval(att); setTimeout(ouvrirAj, 700); } }, 250); setTimeout(() => clearInterval(att), 8000); }   // le message s'affiche aussi en haut du panneau, ouvert tout de suite
   $('#ajBtn').addEventListener('click', () => { $('#ajPanneau').hidden ? ouvrirAj() : fermerAj(); });
+  $('#edBtn').addEventListener('click', () => {
+    M.edition = !M.edition; $('#edBtn').setAttribute('aria-pressed', String(M.edition)); document.querySelector('table.pistes').classList.toggle('edition', M.edition); tableau();
+    if (M.edition) mlg('Mode édition : change le style d’un titre ou retire-le (✕), puis « À ajouter » → Envoyer.');
+  });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#ajPanneau').hidden) fermerAj(); });
   document.addEventListener('pointerdown', e => { const pn = $('#ajPanneau'); if (!pn.hidden && !pn.contains(e.target) && e.target !== $('#ajBtn')) fermerAj(); });
 }
@@ -1450,7 +1495,7 @@ function tableau() {
     row.innerHTML = '<td class="p-titre"><span class="marque" aria-hidden="true"></span><button type="button" class="p-jouer"></button><button type="button" class="p-plus" aria-label="Ajouter à la playlist ouverte" title="Ajouter à la playlist ouverte">＋</button></td><td class="p-artiste"></td><td class="p-genre"></td>';
     row.querySelector('.p-jouer').textContent = tr.titre + (tr.mix ? ' (mix/set)' : ''); row.querySelector('.p-jouer').title = tr.titre;
     row.querySelector('.p-artiste').textContent = tr.artiste || '—'; row.querySelector('.p-artiste').dataset.genre = tr.genre;
-    row.querySelector('.p-genre').textContent = tr.genre;
+    row.querySelector('.p-genre').textContent = tr.genre; if (M.edition) editerLigne(row, tr);
     row.querySelector('.p-plus').addEventListener('click', e => { e.stopPropagation(); const nom = plCourante(true); if (nom) ajouterA(nom, tr); });
     if (M.cur && M.cur.youtube === tr.youtube) row.classList.add('courant');
     if (M.indispo.has(tr.youtube)) { row.classList.add('indispo'); row.querySelector('.p-titre').appendChild(lienYT(tr.youtube)); }
