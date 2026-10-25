@@ -179,6 +179,12 @@ textarea.export{min-height:180px;font-size:13px}
   dialog.haute .f-tete{position:static}
   dialog.haute .resultats{flex:1;min-height:0;overflow:auto}
   dialog.haute .feuille>.btn{flex:none}
+  dialog.clavier.haute .feuille{gap:6px;padding-top:2px;padding-bottom:6px}
+  dialog.clavier.haute .f-tete{padding:0}
+  dialog.clavier.haute .f-tete .btn{min-height:40px}
+  dialog.clavier.haute .champ>label,dialog.clavier.haute .feuille>.btn{display:none}
+  dialog.clavier.haute .champ input{min-height:44px}
+  dialog.clavier.haute .resultats button{min-height:60px}
   body:has(dialog[open]){overflow:hidden}
   .plein .feuille{height:100%;padding-bottom:0;gap:10px;grid-template-rows:auto minmax(0,1fr)}
   .plein .f-tete{position:static;padding:4px 0}
@@ -256,7 +262,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.9 · 25 oct. 2026';
+const VERSION = '0.10 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -462,7 +468,7 @@ function feuille(titre, ...contenu) {
 F.addEventListener('click', e => { if (e.target === F) F.close(); });
 /* iPhone : le clavier ne redimensionne pas la page, on suit la zone réellement visible */
 if (window.visualViewport) {
-  const suivre = () => { F.style.setProperty('--vv', Math.round(visualViewport.height * .92) + 'px'); F.style.setProperty('--vvf', Math.round(visualViewport.height) + 'px'); F.style.setProperty('--vvt', Math.round(visualViewport.offsetTop) + 'px'); };
+  const suivre = () => { F.style.setProperty('--vv', Math.round(visualViewport.height * .92) + 'px'); F.style.setProperty('--vvf', Math.round(visualViewport.height) + 'px'); F.style.setProperty('--vvt', Math.round(visualViewport.offsetTop) + 'px'); F.classList.toggle('clavier', visualViewport.height < innerHeight * .8); };
   F.addEventListener('focusin', () => { suivre(); setTimeout(suivre, 300); });
   visualViewport.addEventListener('resize', suivre); visualViewport.addEventListener('scroll', suivre); suivre();
 }
