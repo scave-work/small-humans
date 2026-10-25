@@ -49,6 +49,16 @@ def genres_par_id(src):
     return g
 
 
+def date_fr(src, tid):
+    """Date de sortie en France d'un film (salle de préférence). TMDB donne sinon la toute première date mondiale (festival, autre pays)."""
+    for r in src.get(f'movie/{tid}/release_dates', region=None).get('results', []):
+        if r.get('iso_3166_1') != 'FR': continue
+        salle = [d['release_date'][:10] for d in r.get('release_dates', []) if d.get('type') in (2, 3) and d.get('release_date')]
+        autre = [d['release_date'][:10] for d in r.get('release_dates', []) if d.get('type') in (4, 5, 6) and d.get('release_date')]
+        return min(salle or autre) if (salle or autre) else None
+    return None
+
+
 def fiche_depuis_details(type_tmdb, tid, det, genre_ids, noms):
     """Fiche du catalogue à partir de la réponse détaillée de TMDB (None si le titre n'a pas de nom ou de date)."""
     anime = 16 in genre_ids and det.get('original_language') == 'ja'
@@ -91,6 +101,7 @@ def construire(src, pages, films_avant=90, films_apres=180, series_jours=365):
                 genre_ids = [x['id'] for x in det.get('genres', [])] or r.get('genre_ids', [])
                 fiche = fiche_depuis_details(type_tmdb, r['id'], det, genre_ids, noms)
                 if not fiche: continue
+                if type_tmdb == 'movie': fiche['sortie'] = date_fr(src, r['id']) or fiche['sortie']
                 date_s = fiche['sortie']
                 if type_tmdb == 'movie' and not (films_min <= date_s <= films_max): continue
                 if type_tmdb == 'tv' and date_s < series_min: continue
@@ -111,7 +122,9 @@ def construire(src, pages, films_avant=90, films_apres=180, series_jours=365):
                     if not det: continue
                     genre_ids = [x['id'] for x in det.get('genres', [])] or r.get('genre_ids', [])
                     fiche = fiche_depuis_details(type_tmdb, r['id'], det, genre_ids, noms)
-                    if fiche: fiche['plateforme'] = nom; sortie.append(fiche)
+                    if fiche:
+                        if type_tmdb == 'movie': fiche['sortie'] = date_fr(src, r['id']) or fiche['sortie']
+                        fiche['plateforme'] = nom; sortie.append(fiche)
     sortie.sort(key=lambda t: (t['sortie'], t['titre']), reverse=True)
     return sortie
 
