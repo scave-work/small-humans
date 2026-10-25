@@ -8,6 +8,7 @@ permissions:
 jobs:
   maj:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -17,9 +18,13 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: python -I cinema/scripts/cinema_catalogue.py --sortie cinema/data/catalogue.json
+      - name: Récupérer les synopsis des nouveaux titres
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: python -I cinema/scripts/cinema_synopsis.py
       - name: Enregistrer si le catalogue a changé
         run: |
           git config user.name "catalogue-cinema"
           git config user.email "actions@users.noreply.github.com"
-          git add cinema/data/catalogue.json
+          git add cinema/data/catalogue.json cinema/data/synopsis
           git diff --cached --quiet || (git commit -m "Catalogue cinema : mise a jour automatique" && git push)

@@ -40,9 +40,13 @@ jobs:
           OPT=""
           if [ "$REFAIRE" = "true" ]; then OPT="--refaire"; fi
           python -I cinema/scripts/cinema_base.py --debut "$DEBUT" --fin "$FIN" --films "$FILMS" --series "$SERIES" --dossier cinema/data/base $OPT
+      - name: Récupérer les synopsis
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: python -I cinema/scripts/cinema_synopsis.py
       - name: Enregistrer
         run: |
           git config user.name "catalogue-cinema"
           git config user.email "actions@users.noreply.github.com"
-          git add cinema/data/base
+          git add cinema/data/base cinema/data/synopsis
           git diff --cached --quiet || (git commit -m "Base cinema : mise a jour automatique" && git pull --rebase && git push)

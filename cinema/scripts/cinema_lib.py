@@ -5,7 +5,7 @@ import json, os, re, sys
 from datetime import date
 
 TYPES = {'film', 'serie', 'anime'}
-STATUTS = {'vu', 'a_voir'}
+STATUTS = {'vu', 'a_voir', 'retire'}   # 'retire' = demande de suppression envoyée par le site, jamais écrite dans le journal
 ENVIES = {'hate', 'pourquoi_pas', 'un_jour'}
 # La source de visionnage (cinéma, plateforme, torrent) n'est jamais enregistrée : décision de Simon, 2026-10-25.
 CHAMPS = {'id', 'type', 'titre', 'annee', 'statut', 'date_vu', 'note', 'commentaire', 'envie', 'genres',
@@ -47,7 +47,7 @@ def valider(fiche):
     if not ID.match(str(fiche.get('id', ''))): p.append('id invalide')
     if fiche.get('type') not in TYPES: p.append('type invalide (film, serie, anime)')
     if not str(fiche.get('titre', '')).strip(): p.append('titre manquant')
-    if fiche.get('statut') not in STATUTS: p.append('statut invalide (vu, a_voir)')
+    if fiche.get('statut') not in STATUTS: p.append('statut invalide (vu, a_voir, retire)')
     n = fiche.get('note')
     if n is not None and not (isinstance(n, (int, float)) and 0.5 <= n <= 5 and (n * 2) == int(n * 2)):
         p.append('note : de 0,5 à 5 par demi-étoile, ou vide')

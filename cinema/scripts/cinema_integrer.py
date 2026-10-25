@@ -2,7 +2,7 @@
 Usage : python -I backend/v-cinema/scripts/cinema_integrer.py FICHIER.json [--journal data/journal.json] [--a-sec]
 Format d'un export : {"titres": [ fiche, ... ]} (ou une simple liste de fiches). Une fiche = voir cinema_lib.CHAMPS.
 Règles : fiche invalide -> refusée et listée (rien n'est écrit si une seule est invalide) ; même id -> la fiche
-  avec le « maj » le plus récent gagne ; aucune suppression (un titre retiré s'efface à la main dans journal.json).
+  avec le « maj » le plus récent gagne ; une fiche de statut « retire » (bouton Retirer du site) supprime le titre du journal.
 Ne fait AUCUN git et ne publie rien : le journal est copié dans le dépôt public seulement après « oui, publie ».
 """
 import os, sys
@@ -14,17 +14,20 @@ RACINE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 
 def integrer(journal, ajouts):
     par_id = {t['id']: t for t in journal['titres']}
-    nouveaux = modifies = 0
+    nouveaux = modifies = retires = 0
     for f in ajouts:
         f.setdefault('ajoute_le', lib.aujourdhui())
         f.setdefault('maj', lib.aujourdhui())
         ancien = par_id.get(f['id'])
+        if f['statut'] == 'retire':
+            if ancien is not None and str(f['maj']) >= str(ancien.get('maj', '')): par_id.pop(f['id']); retires += 1
+            continue
         if ancien is None: nouveaux += 1
         elif str(f['maj']) >= str(ancien.get('maj', '')): modifies += 1
         else: continue
         par_id[f['id']] = f
     journal['titres'] = sorted(par_id.values(), key=lambda t: (t.get('date_vu') or '', t.get('ajoute_le') or '', t['id']), reverse=True)
-    return nouveaux, modifies
+    return nouveaux, modifies, retires
 
 
 def main():
@@ -39,10 +42,10 @@ def main():
         for titre, p in refus: print(f'REFUSÉ  {titre} : ' + ' ; '.join(p))
         raise SystemExit('Rien n\'a été écrit. Corrige les fiches ci-dessus.')
     journal = lib.lire_json(chemin_journal, {'version': 1, 'titres': []})
-    n, m = integrer(journal, ajouts)
-    if '--a-sec' in a: print(f'À sec : {n} nouveaux, {m} modifiés, rien écrit.'); return
+    n, m, r = integrer(journal, ajouts)
+    if '--a-sec' in a: print(f'À sec : {n} nouveaux, {m} modifiés, {r} retirés, rien écrit.'); return
     lib.ecrire_json(chemin_journal, journal)
-    print(f'{n} nouveaux, {m} modifiés. Journal : {len(journal["titres"])} titres -> {chemin_journal}')
+    print(f'{n} nouveaux, {m} modifiés, {r} retirés. Journal : {len(journal["titres"])} titres -> {chemin_journal}')
 
 
 if __name__ == '__main__':
