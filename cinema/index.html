@@ -263,7 +263,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.15 · 25 oct. 2026';
+const VERSION = '0.16 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -479,7 +479,7 @@ const infosDe = f => [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.an
 function retirerBouton(id) {
   if (!estLocal(id)) return null;
   const j = dansJournal(id);
-  return h('button', { class: 'btn', type: 'button', on: { click: () => { if (confirm(j ? 'Annuler mes changements sur ce titre ?' : 'Retirer ce titre de mes ajouts ?')) { delete memoire[id]; ecrire(); majBoutons(); rendre(); F.close(); toast('Fait.'); } } } }, j ? 'Annuler mes changements' : 'Retirer');
+  return h('button', { class: 'btn', type: 'button', on: { click: () => { delete memoire[id]; ecrire(); majBoutons(); rendre(); F.close(); toast(j ? 'Changements annulés.' : 'Retiré.'); } } }, j ? 'Annuler mes changements' : 'Retirer');
 }
 function fiche(id, obj) {
   const f = fusion().find(x => x.id === id) || obj; if (!f) return;
