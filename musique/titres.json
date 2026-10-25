@@ -28549,17 +28549,5 @@
 "source": "ajout",
 "artiste_fiable": false,
 "mix": false
-},
-{
-"youtube": "TESTROBOT01",
-"titre": "a supprimer",
-"artiste": "TEST ROBOT",
-"genre": "edm",
-"tags": [
-"edm"
-],
-"source": "ajout",
-"artiste_fiable": true,
-"mix": false
 }
 ]
