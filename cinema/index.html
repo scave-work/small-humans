@@ -81,6 +81,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .aff{position:relative;aspect-ratio:2/3;background:var(--nuit);overflow:hidden;display:flex;align-items:flex-end;padding:8px}
 .aff[data-t="1"]{background:#16294A}.aff[data-t="2"]{background:#0F2A3A}.aff[data-t="3"]{background:#231F3F}.aff[data-t="4"]{background:#1B3358}.aff[data-t="5"]{background:#2A2A44}
 .aff i{font-style:normal;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;line-height:1.25;color:var(--acier);overflow-wrap:anywhere}
+.aff .nf{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:5px;background:#141414;display:block}
 .aff img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .tuile .t{display:block;margin-top:8px;font-size:var(--t-small);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tuile .m{display:block;margin-top:2px;font-size:var(--t-small);color:var(--acier)}
@@ -271,7 +272,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.21 · 25 oct. 2026';
+const VERSION = '0.22 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -371,7 +372,9 @@ function tuile(f) {
   const vu = f.statut === 'vu';
   const meta = vu ? (f.note ? h('span', { class: 'm' }, h('b', null, '★ ' + fmtNote(f.note)), ' · ' + fmtDate(f.date_vu)) : h('span', { class: 'm' }, fmtDate(f.date_vu)))
                   : h('span', { class: 'm' }, f.annee || '');
-  return h('button', { class: 'tuile', type: 'button', 'aria-label': f.titre + (f.annee ? ' (' + f.annee + ')' : ''), on: { click: () => fiche(f.id, f) } }, affiche(f), h('span', { class: 't' }, f.titre), meta);
+  const aff = affiche(f);
+  if (f.plateforme === 'Netflix') aff.insertAdjacentHTML('beforeend', '<svg class="nf" viewBox="0 0 24 24" role="img" aria-label="Netflix"><path d="M7 4h3.2l3.6 9.6V4H17v16h-3.1l-3.7-9.8V20H7z" fill="#E50914"/></svg>');
+  return h('button', { class: 'tuile', type: 'button', 'aria-label': f.titre + (f.annee ? ' (' + f.annee + ')' : '') + (f.plateforme ? ' sur ' + f.plateforme : ''), on: { click: () => fiche(f.id, f) } }, aff, h('span', { class: 't' }, f.titre), meta);
 }
 function rendre() {
   const p = $('#panneau'); p.textContent = '';
@@ -433,7 +436,7 @@ function rendreSorties(p) {
     let jour = '';
     l.forEach(f => {
       if (f.sortie !== jour) { jour = f.sortie; g.append(h('h3', { class: 'jour' }, new Date(jour + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))); }
-      g.append(tuile(deja.get(f.id) || f));
+      g.append(tuile(Object.assign({}, f, deja.get(f.id) || {})));
     });
   });
   p.append(g);

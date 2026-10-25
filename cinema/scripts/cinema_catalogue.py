@@ -15,6 +15,8 @@ import cinema_lib as lib
 API = 'https://api.themoviedb.org/3'
 RACINE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LISTES = [('movie', 'movie/now_playing'), ('movie', 'movie/upcoming'), ('tv', 'tv/on_the_air')]
+PLATEFORMES = {8: 'Netflix'}   # identifiant TMDB -> nom ; nouveautés de ces plateformes en France (films et séries)
+FENETRE_PLATEFORMES = (-30, 30)   # jours autour d'aujourd'hui
 
 
 class Source:
@@ -93,6 +95,23 @@ def construire(src, pages, films_avant=90, films_apres=180, series_jours=365):
                 if type_tmdb == 'movie' and not (films_min <= date_s <= films_max): continue
                 if type_tmdb == 'tv' and date_s < series_min: continue
                 sortie.append(fiche)
+    for pid, nom in PLATEFORMES.items():
+        a, b = (auj + timedelta(FENETRE_PLATEFORMES[0])).isoformat(), (auj + timedelta(FENETRE_PLATEFORMES[1])).isoformat()
+        for type_tmdb, chemin, champ in (('movie', 'discover/movie', 'primary_release_date'), ('tv', 'discover/tv', 'first_air_date')):
+            for page in range(1, pages + 1):
+                filtre = {'with_watch_providers': pid, 'watch_region': 'FR', f'{champ}.gte': a, f'{champ}.lte': b, 'sort_by': 'popularity.desc', 'page': page}
+                for r in src.get(chemin, **filtre).get('results', []):
+                    cle = (type_tmdb, r['id'])
+                    if cle in vus:
+                        for f in sortie:
+                            if (f['tmdb']['type'], f['tmdb']['id']) == cle: f['plateforme'] = nom
+                        continue
+                    vus.add(cle)
+                    det = src.get(f'{type_tmdb}/{r["id"]}')
+                    if not det: continue
+                    genre_ids = [x['id'] for x in det.get('genres', [])] or r.get('genre_ids', [])
+                    fiche = fiche_depuis_details(type_tmdb, r['id'], det, genre_ids, noms)
+                    if fiche: fiche['plateforme'] = nom; sortie.append(fiche)
     sortie.sort(key=lambda t: (t['sortie'], t['titre']), reverse=True)
     return sortie
 
