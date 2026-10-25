@@ -172,6 +172,28 @@ textarea.export{min-height:180px;font-size:13px}
   dialog{width:min(620px,92vw);margin:auto;max-height:88svh}
   .tuile:hover{transform:translateY(-3px)}
 }
+
+@media (max-width:759px){
+  dialog.plein{height:var(--vvf,100dvh);max-height:none;margin:0;overflow:hidden}
+  .plein .feuille{height:100%;padding-bottom:0;gap:10px;grid-template-rows:auto minmax(0,1fr)}
+  .plein .f-tete{position:static;padding:4px 0}
+  .plein .corps{display:flex;flex-direction:column;gap:10px;min-height:0;height:100%}
+  .plein .f-haut.petit{grid-template-columns:52px minmax(0,1fr);gap:12px}
+  .plein .f-haut.petit h3{font-size:17px}
+  .plein .f-haut.petit p{margin-top:2px;font-size:var(--t-small)}
+  .plein .f-haut.petit p+p{display:none}
+  .plein .champ.com{flex:1;min-height:0}
+  .plein .champ.com textarea{flex:1;min-height:64px;resize:none}
+  .plein .collant{margin:auto calc(-1 * var(--marge)) 0;bottom:0}
+}
+.corps{display:grid;gap:18px}
+.champ.com{display:flex;flex-direction:column}
+.note-tete{display:flex;align-items:center;gap:12px}
+.note-tete .lib{color:var(--acier);font-size:var(--t-small)}
+.note-tete .val{margin-left:auto;min-width:0}
+.effacer{min-height:44px;padding:0 4px;text-decoration:underline;text-underline-offset:.2em;color:var(--acier)}
+.f-actions.ligne{grid-auto-flow:column;grid-auto-columns:1fr}
+.f-actions.ligne .btn{min-height:48px;font-size:15px;padding:0 8px}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
@@ -229,7 +251,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.7 · 25 oct. 2026';
+const VERSION = '0.8 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -427,7 +449,7 @@ function rendreStats(p, vus, heures) {
 /* ---------- feuille ---------- */
 const F = $('#feuille');
 function feuille(titre, ...contenu) {
-  F.textContent = ''; F.classList.remove('haute');
+  F.textContent = ''; F.classList.remove('haute', 'plein');
   F.append(h('div', { class: 'feuille' }, h('div', { class: 'f-tete' }, h('h2', { id: 'f-titre' }, titre), h('button', { class: 'btn', type: 'button', on: { click: () => F.close() } }, 'Fermer')), contenu));
   if (!F.open) F.showModal();
   F.scrollTop = 0;
@@ -435,7 +457,7 @@ function feuille(titre, ...contenu) {
 F.addEventListener('click', e => { if (e.target === F) F.close(); });
 /* iPhone : le clavier ne redimensionne pas la page, on suit la zone réellement visible */
 if (window.visualViewport) {
-  const suivre = () => { F.style.setProperty('--vv', Math.round(visualViewport.height * .92) + 'px'); };
+  const suivre = () => { F.style.setProperty('--vv', Math.round(visualViewport.height * .92) + 'px'); F.style.setProperty('--vvf', Math.round(visualViewport.height) + 'px'); };
   visualViewport.addEventListener('resize', suivre); visualViewport.addEventListener('scroll', suivre); suivre();
 }
 
@@ -476,16 +498,15 @@ function champNote(init, onChange) {
   e.addEventListener('pointerup', () => { actif = false; }); e.addEventListener('pointercancel', () => { actif = false; });
   e.addEventListener('keydown', ev => { const d = { ArrowRight: .5, ArrowUp: .5, ArrowLeft: -.5, ArrowDown: -.5 }[ev.key]; if (d) { ev.preventDefault(); set(n + d); } else if (ev.key === 'Home') { ev.preventDefault(); set(0); } else if (ev.key === 'End') { ev.preventDefault(); set(5); } });
   set(n);
-  return h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Note, par demi-étoile'),
-    h('div', { class: 'note-etoiles' }, h('button', { class: 'btn', type: 'button', 'aria-label': 'Moins une demi-étoile', on: { click: () => set(n - .5) } }, '−'), e, h('button', { class: 'btn', type: 'button', 'aria-label': 'Plus une demi-étoile', on: { click: () => set(n < .5 ? .5 : n + .5) } }, '+')),
-    h('div', { class: 'note-etoiles' }, v, h('button', { class: 'btn', type: 'button', style: 'font-size:15px;padding:0 14px;min-height:44px', on: { click: () => set(0) } }, 'Effacer')));
+  return h('div', { class: 'champ note' }, h('div', { class: 'note-tete' }, h('span', { class: 'lib' }, 'Note'), v, h('button', { class: 'effacer', type: 'button', on: { click: () => set(0) } }, 'Effacer')),
+    h('div', { class: 'note-etoiles' }, h('button', { class: 'btn', type: 'button', 'aria-label': 'Moins une demi-étoile', on: { click: () => set(n - .5) } }, '−'), e, h('button', { class: 'btn', type: 'button', 'aria-label': 'Plus une demi-étoile', on: { click: () => set(n < .5 ? .5 : n + .5) } }, '+')));
 }
 
 function formulaire(f, passerVu) {
   const neuf = !fusion().some(x => x.id === f.id);
   if (passerVu) { f.statut = 'vu'; delete f.envie; }
   if (f.statut === 'vu' && !f.date_vu) f.date_vu = aujourdhui();
-  const corps = h('div', { style: 'display:grid;gap:18px' });
+  const corps = h('div', { class: 'corps' });
   const msg = h('p', { class: 'alerte', role: 'alert' });
   const dessiner = () => {
     corps.textContent = '';
@@ -494,8 +515,8 @@ function formulaire(f, passerVu) {
       h('div', { class: 'choix' }, [['vu', 'Vu'], ['a_voir', 'À voir']].map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.statut === v), on: { click: () => { f.statut = v; if (v === 'vu' && !f.date_vu) f.date_vu = aujourdhui(); dessiner(); } } }, t)))));
     if (f.statut === 'vu') {
       corps.append(champNote(f.note, n => { f.note = n; }));
-      corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-com' }, 'Commentaire (facultatif)'), h('textarea', { id: 'ch-com', maxlength: 1000, on: { input: e => { f.commentaire = e.target.value; } } }, f.commentaire || '')));
-      corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-date' }, 'Date de visionnage'), h('input', { id: 'ch-date', type: 'date', value: f.date_vu, max: aujourdhui(), on: { change: e => { f.date_vu = e.target.value; } } })));
+      corps.append(h('div', { class: 'champ com' }, h('label', { for: 'ch-com' }, 'Commentaire (facultatif)'), h('textarea', { id: 'ch-com', maxlength: 1000, on: { input: e => { f.commentaire = e.target.value; } } }, f.commentaire || '')));
+      corps.append(h('div', { class: 'champ date' }, h('label', { for: 'ch-date' }, 'Date de visionnage'), h('input', { id: 'ch-date', type: 'date', value: f.date_vu, max: aujourdhui(), on: { change: e => { f.date_vu = e.target.value; } } })));
     } else {
       corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Envie (facultatif)'),
         h('div', { class: 'choix', style: '--n:3' }, Object.entries(ENVIES).map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.envie === v), on: { click: () => { f.envie = f.envie === v ? null : v; dessiner(); } } }, t)))));
@@ -504,7 +525,7 @@ function formulaire(f, passerVu) {
       const ex = [];
       if (f.statut === 'vu') ex.push(h('button', { class: 'btn', type: 'button', on: { click: () => { f.statut = 'a_voir'; dessiner(); } } }, 'Repasser en « à voir »'));
       ex.push(retirerBouton(f.id));
-      corps.append(h('div', { class: 'f-actions' }, ex));
+      corps.append(h('div', { class: 'f-actions ligne' }, ex));
     }
     corps.append(h('div', { class: 'collant' }, msg, h('button', { class: 'btn fort', type: 'button', on: { click: sauver } }, f.statut === 'vu' ? 'Enregistrer' : 'Enregistrer dans « à voir »')));
   };
@@ -514,6 +535,7 @@ function formulaire(f, passerVu) {
   };
   dessiner();
   feuille(neuf ? 'Ajouter' : (f.statut === 'vu' ? 'Vu' : 'Modifier'), corps);
+  F.classList.add('plein');
 }
 
 /* ---------- ajout : recherche dans la base ---------- */
