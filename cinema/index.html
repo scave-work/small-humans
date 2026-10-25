@@ -316,7 +316,7 @@ async function chargerJournal() {
 function fusion() {
   const m = new Map(S.journal.map(f => [f.id, f]));
   for (const id in memoire) m.set(id, memoire[id]);
-  return [...m.values()].filter(f => f.statut !== 'retire');   // « retire » = titre du journal retiré par Simon
+  return [...m.values()].filter(f => f.statut !== 'retire');   // « retire » = titre du journal retiré par l'utilisateur
 }
 const estLocal = id => id in memoire;
 const dansJournal = id => S.journal.some(f => f.id === id);
