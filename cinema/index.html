@@ -272,7 +272,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.22 · 25 oct. 2026';
+const VERSION = '0.23 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -653,7 +653,42 @@ function manuel() {
 function exportJson() { return JSON.stringify({ version: 1, titres: Object.values(memoire).map(propre) }, null, 1); }
 function majBoutons() {
   const n = Object.keys(memoire).length;
-  const b = $('#b-copie'); b.disabled = !n; b.textContent = n ? `Copier mes ajouts (${n})` : 'Copier mes ajouts';
+  const b = $('#b-copie'); b.disabled = !n; b.textContent = n ? `Envoyer mes ajouts (${n})` : 'Envoyer mes ajouts';
+}
+/* envoi : un fichier déposé dans cinema/data/ajouts/ par l'API GitHub, un robot l'intègre au journal public.
+   Le jeton (droit d'écriture sur ce seul dépôt) est collé une fois et reste dans ce navigateur : jamais dans le code. */
+const CLE_JETON = 'sh-cine-jeton', DEPOT = 'scave-work/small-humans';
+const jeton = () => { try { return localStorage.getItem(CLE_JETON) || ''; } catch (e) { return ''; } };
+function reglageJeton(raison) {
+  const c = h('input', { id: 'ch-jeton', type: 'password', autocomplete: 'off', placeholder: 'Colle le jeton ici' });
+  feuille('Envoi des ajouts',
+    raison ? h('p', { class: 'alerte', role: 'alert' }, raison) : null,
+    h('p', null, 'Pour envoyer sans copier, colle une fois un jeton GitHub (droit « Contents : Read and write » sur le seul dépôt small-humans). Il reste dans ce navigateur.'),
+    h('div', { class: 'champ' }, h('label', { for: 'ch-jeton' }, 'Jeton GitHub'), c),
+    h('button', { class: 'btn fort', type: 'button', on: { click: () => { try { localStorage.setItem(CLE_JETON, c.value.trim()); } catch (e) { /* tant pis */ } F.close(); if (c.value.trim()) envoyer(); } } }, 'Enregistrer et envoyer'),
+    h('button', { class: 'btn', type: 'button', on: { click: () => { F.close(); copier(); } } }, 'Copier à la place'));
+}
+async function envoyer() {
+  const j = jeton(), n = Object.keys(memoire).length;
+  if (!n) return;
+  if (!j) return reglageJeton();
+  const nom = `cinema/data/ajouts/ajouts_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+  toast('Envoi…');
+  try {
+    const r = await fetch(`https://api.github.com/repos/${DEPOT}/contents/${nom}`, { method: 'PUT', headers: { Authorization: 'Bearer ' + j, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Cinéma : ajouts envoyés depuis le site', content: btoa(unescape(encodeURIComponent(exportJson()))) }) });
+    if (r.status === 401 || r.status === 403 || r.status === 404) return reglageJeton('GitHub a refusé le jeton (périmé ou sans droit d’écriture).');
+    if (!r.ok) throw new Error(r.status);
+    toast('Envoyé.');
+  } catch (e) { toast('Échec : pas envoyé.'); }
+}
+/* au chargement : on oublie les ajouts que le journal public contient déjà (identiques), et les retraits déjà pris en compte */
+function nettoyer() {
+  let change = false;
+  for (const id in memoire) {
+    const m = memoire[id], j = S.journal.find(x => x.id === id);
+    if (m.statut === 'retire' ? !j : (j && JSON.stringify(propre(j), Object.keys(propre(j)).sort()) === JSON.stringify(propre(m), Object.keys(propre(m)).sort()))) { delete memoire[id]; change = true; }
+  }
+  if (change) ecrire();
 }
 async function copier() {
   const txt = exportJson(), n = Object.keys(memoire).length;
@@ -686,10 +721,10 @@ $('#f-annee').addEventListener('change', e => { S.annee = e.target.value; S.mont
 $('#f-genre').addEventListener('change', e => { S.genre = e.target.value; S.montre = PAGE; rendre(); });
 $('#f-tri').addEventListener('change', e => { S.tri = e.target.value; S.montre = PAGE; rendre(); });
 $('#b-ajout').addEventListener('click', ajout);
-$('#b-copie').addEventListener('click', copier);
+$('#b-copie').addEventListener('click', envoyer);
 
 (async () => {
-  lire(); await chargerJournal(); majBoutons();
+  lire(); await chargerJournal(); nettoyer(); majBoutons();
   $('#version').textContent = `v${VERSION}` + (S.exemple ? ' · exemple' : '');
   $('#pied').textContent = stockageOk ? '' : 'Ce navigateur ne garde pas mes ajouts : pense à les copier.';
   ecran(); rendre();
