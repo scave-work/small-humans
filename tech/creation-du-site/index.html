@@ -75,12 +75,12 @@ summary{cursor:pointer;color:#6FA8FF;min-height:44px;display:flex;align-items:ce
 <text class="tx s" x="270" y="307" text-anchor="middle">lit les JSON statiques</text>
 <line class="ar" x1="270" y1="238" x2="270" y2="268"/><path class="ah" d="M266 262 L270 269 L274 262"/>
 <text class="tx s" x="180" y="340" text-anchor="middle">navigateur → API GitHub : dépose un JSON dans</text>
-<text class="tx s" x="180" y="356" text-anchor="middle">cinema/data/ajouts/ (jeton collé dans le navigateur)</text>
+<text class="tx s" x="180" y="356" text-anchor="middle">cinema/data/ajouts/ (jeton limité à ce dépôt)</text>
 </svg>
 <p class="k">Règle : le privé ne contient aucun secret non plus ; le public ne contient ni brouillon ni donnée perso. Le site reste utilisable sans Claude (JSON lisibles).</p>
 
 <h2>2. Arborescences</h2>
-<pre>small-humans-atelier/            (privé)
+<pre>atelier/                        (privé)
 ├─ CLAUDE.md                    règles lues à chaque session
 ├─ 00_CONTEXTE.md               décisions datées + état
 ├─ README.md                    carte des dossiers
@@ -98,7 +98,7 @@ summary{cursor:pointer;color:#6FA8FF;min-height:44px;display:flex;align-items:ce
 ├─ dessins/        dessins originaux (lecture seule)
 └─ .claude/skills/ design-taste-frontend</pre>
 <pre>small-humans/                  (public → GitHub Pages)
-├─ index.html     galerie (accueil)
+├─ index.html     galerie (accueil) + page Musique (?vue=musique)
 ├─ titres.json    2 300+ titres musique
 ├─ OFL.txt        licence de la police
 ├─ cinema/        index.html, data/ (journal, catalogue,
@@ -205,8 +205,8 @@ node backend/v-backend/tests/test_site.js     # Playwright, faux lecteur YouTube
 # copier index.html + titres.json à la racine du dépôt public, contrôle des secrets, push</pre>
 
 <h2>7. Pipeline cinéma</h2>
-<svg viewBox="0 0 360 332" role="img" xmlns="http://www.w3.org/2000/svg"><rect class="bx" x="10" y="6" width="340" height="46" rx="6"/><text class="tx b" x="180" y="25" text-anchor="middle">Page cinema/ (téléphone)</text><text class="tx s" x="180" y="42" text-anchor="middle">fiche vu / à voir / retiré</text><line class="ar" x1="180" y1="52" x2="180" y2="69"/><path class="ah" d="M176 65 L180 71 L184 65"/><rect class="bx" x="10" y="74" width="340" height="46" rx="6"/><text class="tx b" x="180" y="93" text-anchor="middle">PUT API GitHub avec jeton collé dans le navigateur</text><text class="tx s" x="180" y="110" text-anchor="middle">jamais dans le code</text><line class="ar" x1="180" y1="120" x2="180" y2="137"/><path class="ah" d="M176 133 L180 139 L184 133"/><rect class="bx" x="10" y="142" width="340" height="46" rx="6"/><text class="tx b" x="180" y="161" text-anchor="middle">cinema/data/ajouts/*.json</text><text class="tx s" x="180" y="178" text-anchor="middle">déclencheur du workflow ajouts-cinema</text><line class="ar" x1="180" y1="188" x2="180" y2="205"/><path class="ah" d="M176 201 L180 207 L184 201"/><rect class="bx" x="10" y="210" width="340" height="46" rx="6"/><text class="tx b" x="180" y="229" text-anchor="middle">cinema_integrer.py</text><text class="tx s" x="180" y="246" text-anchor="middle">valide, fusionne par id, « maj » le plus récent gagne</text><line class="ar" x1="180" y1="256" x2="180" y2="273"/><path class="ah" d="M176 269 L180 275 L184 269"/><rect class="bx" x="10" y="278" width="340" height="46" rx="6"/><text class="tx b" x="180" y="297" text-anchor="middle">cinema/data/journal.json</text><text class="tx s" x="180" y="314" text-anchor="middle">commit + push par le robot</text></svg>
-<div class="tw"><table><thead><tr><th>Workflow</th><th>Déclencheur</th><th>Secret</th><th>Effet</th></tr></thead><tbody><tr><td>catalogue-cinema.yml</td><td>cron lundi 04:00 UTC + manuel</td><td>TMDB_API_KEY</td><td>cinema_catalogue.py puis cinema_synopsis.py → catalogue.json, synopsis/</td></tr><tr><td>base-cinema.yml</td><td>manuel (début, fin, films/an, séries/an, refaire)</td><td>TMDB_API_KEY</td><td>cinema_base.py puis cinema_synopsis.py → base/AAAA.json, synopsis/</td></tr><tr><td>ajouts-cinema.yml</td><td>push sur cinema/data/ajouts/*.json + manuel</td><td>aucun</td><td>cinema_integrer.py → journal.json (verrou de concurrence)</td></tr></tbody></table></div>
+<svg viewBox="0 0 360 332" role="img" xmlns="http://www.w3.org/2000/svg"><rect class="bx" x="10" y="6" width="340" height="46" rx="6"/><text class="tx b" x="180" y="25" text-anchor="middle">Page cinema/ (téléphone)</text><text class="tx s" x="180" y="42" text-anchor="middle">fiche vu / à voir / retiré</text><line class="ar" x1="180" y1="52" x2="180" y2="69"/><path class="ah" d="M176 65 L180 71 L184 65"/><rect class="bx" x="10" y="74" width="340" height="46" rx="6"/><text class="tx b" x="180" y="93" text-anchor="middle">dépôt d'un JSON via l'API GitHub</text><text class="tx s" x="180" y="110" text-anchor="middle">jamais dans le code</text><line class="ar" x1="180" y1="120" x2="180" y2="137"/><path class="ah" d="M176 133 L180 139 L184 133"/><rect class="bx" x="10" y="142" width="340" height="46" rx="6"/><text class="tx b" x="180" y="161" text-anchor="middle">cinema/data/ajouts/*.json</text><text class="tx s" x="180" y="178" text-anchor="middle">déclencheur du workflow ajouts-cinema</text><line class="ar" x1="180" y1="188" x2="180" y2="205"/><path class="ah" d="M176 201 L180 207 L184 201"/><rect class="bx" x="10" y="210" width="340" height="46" rx="6"/><text class="tx b" x="180" y="229" text-anchor="middle">cinema_integrer.py</text><text class="tx s" x="180" y="246" text-anchor="middle">valide, fusionne par id, « maj » le plus récent gagne</text><line class="ar" x1="180" y1="256" x2="180" y2="273"/><path class="ah" d="M176 269 L180 275 L184 269"/><rect class="bx" x="10" y="278" width="340" height="46" rx="6"/><text class="tx b" x="180" y="297" text-anchor="middle">cinema/data/journal.json</text><text class="tx s" x="180" y="314" text-anchor="middle">commit + push par le robot</text></svg>
+<div class="tw"><table><thead><tr><th>Workflow</th><th>Déclencheur</th><th>Secret</th><th>Effet</th></tr></thead><tbody><tr><td>catalogue-cinema.yml</td><td>cron lundi 04:00 UTC + manuel</td><td>clé TMDB (secret GitHub)</td><td>cinema_catalogue.py puis cinema_synopsis.py → catalogue.json, synopsis/</td></tr><tr><td>base-cinema.yml</td><td>manuel (début, fin, films/an, séries/an, refaire)</td><td>clé TMDB (secret GitHub)</td><td>cinema_base.py puis cinema_synopsis.py → base/AAAA.json, synopsis/</td></tr><tr><td>ajouts-cinema.yml</td><td>push sur cinema/data/ajouts/*.json + manuel</td><td>aucun</td><td>cinema_integrer.py → journal.json (verrou de concurrence)</td></tr></tbody></table></div>
 <ul>
 <li>Données : <code>journal.json</code> (vus / à voir), <code>catalogue.json</code> (sorties, remplacé à chaque run), <code>base/AAAA.json</code> et <code>synopsis/AAAA.json</code> (1 fichier par année).</li>
 <li>Test sans réseau : <code>--fixture DOSSIER</code> ; clé TMDB uniquement via variable d'environnement <code>TMDB_API_KEY</code>.</li>
@@ -214,7 +214,7 @@ node backend/v-backend/tests/test_site.js     # Playwright, faux lecteur YouTube
 
 <h2>8. Commandes utiles</h2>
 <pre># serveur local (aucun Node)
-python -m http.server 8765 --directory C:/Users/scave/small-humans
+python -m http.server 8765 --directory .
 
 # déplacer sans perdre l'historique
 git mv ancien nouveau
