@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>Cinéma — Small Humans</title>
 <meta name="description" content="Small Humans : le journal des films, séries et anime vus, avec notes et envies.">
 <meta name="theme-color" content="#05080F">
@@ -53,7 +53,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 @keyframes salue{0%,55%,100%{transform:rotate(0)}65%{transform:rotate(-14deg)}75%{transform:rotate(8deg)}85%{transform:rotate(-12deg)}}
 
 /* onglets */
-.onglets{display:flex;gap:28px;margin-top:28px}
+.onglets{display:flex;gap:clamp(14px,4vw,28px);margin-top:28px}
 .onglets button{min-height:48px;padding:0 2px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;font-size:15px;color:var(--acier);border-bottom:3px solid transparent;transition:color .18s ease}
 .onglets button:hover{color:var(--ink)}
 .onglets button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
@@ -66,6 +66,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .puce{min-height:44px;background:var(--nuit);padding:0 18px;border-radius:999px;transition:background-color .18s ease;font-size:15px}
 .puce:hover{background:var(--nuit2)}
 .puce[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.recherche{width:100%;min-height:44px;background:var(--nuit);border:0;border-radius:999px;padding:0 18px}
 .menus{display:flex;gap:8px}
 .menus select{flex:1 1 0;width:0;min-width:0;min-height:44px;background:var(--nuit);border:0;border-radius:0;padding:0 28px 0 14px;border-radius:999px;appearance:none;-webkit-appearance:none;text-overflow:ellipsis;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23BABBCF' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .menus select[hidden]{display:none}
@@ -75,7 +76,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:18px 8px;margin-top:8px}
 .mois{grid-column:1/-1;font-size:17px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-top:18px}
 .mois:first-child{margin-top:4px}
-.tuile{display:block;text-align:left;transition:transform .18s var(--ease)}
+.tuile{display:block;align-self:start;text-align:left;transition:transform .18s var(--ease)}
 .aff{position:relative;aspect-ratio:2/3;background:var(--nuit);overflow:hidden;display:flex;align-items:flex-end;padding:8px}
 .aff[data-t="1"]{background:#16294A}.aff[data-t="2"]{background:#0F2A3A}.aff[data-t="3"]{background:#231F3F}.aff[data-t="4"]{background:#1B3358}.aff[data-t="5"]{background:#2A2A44}
 .aff i{font-style:normal;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;line-height:1.25;color:var(--acier);overflow-wrap:anywhere}
@@ -114,8 +115,9 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .toast.on{opacity:1;transform:none}
 
 /* feuille (fiche, ajout, formulaire) */
-dialog{border:0;padding:0;background:var(--bg);color:var(--ink);width:100%;max-width:none;max-height:92svh;margin:auto 0 0;overflow:auto;overscroll-behavior:contain}
+dialog{border:0;padding:0;background:var(--bg);color:var(--ink);width:100%;max-width:none;max-height:92dvh;margin:auto 0 0;overflow:auto;overscroll-behavior:contain}
 dialog::backdrop{background:rgba(5,8,15,.78)}
+dialog.haute{height:92dvh}
 dialog[open]{animation:monte .28s var(--ease)}
 @keyframes monte{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .feuille{padding:8px var(--marge) calc(28px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;display:grid;gap:18px}
@@ -186,11 +188,13 @@ textarea.export{min-height:180px;font-size:13px}
   <div class="onglets" role="tablist" aria-label="Vue">
     <button role="tab" id="o-vus" aria-selected="true" data-vue="vus">Vus</button>
     <button role="tab" id="o-avoir" aria-selected="false" data-vue="avoir">À voir</button>
+    <button role="tab" id="o-base" aria-selected="false" data-vue="base">Non vus</button>
     <button role="tab" id="o-stats" aria-selected="false" data-vue="stats">Stats</button>
   </div>
 
   <div class="outils" id="outils">
     <div class="puces" role="group" aria-label="Type"></div>
+    <input id="f-q" class="recherche" type="search" placeholder="Chercher un titre" aria-label="Chercher dans les titres pas encore vus" autocomplete="off" hidden>
     <div class="menus">
       <select id="f-annee" aria-label="Année de visionnage"></select>
       <select id="f-genre" aria-label="Genre"></select>
@@ -250,7 +254,7 @@ function lire() { try { const v = localStorage.getItem(CLE); memoire = v ? JSON.
 function ecrire() { try { localStorage.setItem(CLE, JSON.stringify(memoire)); } catch (e) { stockageOk = false; } }
 
 /* ---------- données ---------- */
-const S = { journal: [], exemple: false, vue: 'vus', type: '', annee: '', genre: '', tri: 'date-desc', montre: PAGE, base: null, baseEnCours: false };
+const S = { journal: [], exemple: false, vue: 'vus', type: '', annee: '', genre: '', tri: 'date-desc', montre: PAGE, base: null, promesse: null, q: '' };
 
 async function chargerJournal() {
   for (const url of ['data/journal.json', 'data/journal.local.json', 'data/exemple.json']) {
@@ -320,18 +324,19 @@ function tuile(f) {
   const vu = f.statut === 'vu';
   const meta = vu ? (f.note ? h('span', { class: 'm' }, h('b', null, '★ ' + fmtNote(f.note)), ' · ' + fmtDate(f.date_vu)) : h('span', { class: 'm' }, fmtDate(f.date_vu)))
                   : h('span', { class: 'm' }, f.annee || '');
-  return h('button', { class: 'tuile', type: 'button', 'aria-label': f.titre + (f.annee ? ' (' + f.annee + ')' : ''), on: { click: () => fiche(f.id) } }, affiche(f), h('span', { class: 't' }, f.titre), meta);
+  return h('button', { class: 'tuile', type: 'button', 'aria-label': f.titre + (f.annee ? ' (' + f.annee + ')' : ''), on: { click: () => fiche(f.id, f) } }, affiche(f), h('span', { class: 't' }, f.titre), meta);
 }
 function rendre() {
   const p = $('#panneau'); p.textContent = '';
-  const stats = S.vue === 'stats';
-  $('#outils').hidden = stats; $('#compte').hidden = stats;
-  ['vus', 'avoir', 'stats'].forEach(v => { const b = $('#o-' + v); b.setAttribute('aria-selected', String(v === S.vue)); });
+  const stats = S.vue === 'stats', base = S.vue === 'base';
+  $('#outils').hidden = stats; $('#compte').hidden = stats; $('#f-q').hidden = !base;
+  ['vus', 'avoir', 'base', 'stats'].forEach(v => { const b = $('#o-' + v); b.setAttribute('aria-selected', String(v === S.vue)); });
   const tout = fusion();
   const vus = tout.filter(f => f.statut === 'vu');
   const heures = Math.round(vus.filter(f => f.type === 'film').reduce((s, f) => s + (f.duree_min || 0), 0) / 60);
   $('#resume').textContent = `${vus.length} titres vus, ${heures} h de films, et ${tout.length - vus.length} à voir.`;
   if (stats) return rendreStats(p, vus, heures);
+  if (base) return rendreBase(p, tout);
   majMenus(tout);
   let l = listeFiltree();
   $('#compte').textContent = `${l.length} titre${l.length > 1 ? 's' : ''}`;
@@ -356,6 +361,30 @@ function rendre() {
   p.append(g);
   if (l.length > S.montre) p.append(h('button', { class: 'btn plus', type: 'button', on: { click: () => { S.montre += PAGE; rendre(); } } }, `Afficher plus (${l.length - S.montre})`));
 }
+const TRIS = { vus: [['date-desc', 'Plus récents'], ['date-asc', 'Plus anciens'], ['note', 'Mieux notés'], ['titre', 'A → Z']], base: [['date-desc', 'Sorties récentes'], ['date-asc', 'Sorties anciennes'], ['titre', 'A → Z']] };
+function menusBase(items) {
+  const garde = (sel, its, vide, val) => { sel.textContent = ''; sel.append(h('option', { value: '' }, vide)); its.forEach(([v, t]) => sel.append(h('option', { value: v }, t))); sel.value = val; };
+  garde($('#f-annee'), [...new Set(items.map(f => String(f.annee)))].sort().reverse().map(a => [a, a]), 'Année', S.annee);
+  garde($('#f-genre'), [...new Set(items.flatMap(f => f.genres || []))].sort((a, b) => a.localeCompare(b, 'fr')).map(a => [a, a]), 'Genre', S.genre);
+  const t = $('#f-tri'); t.textContent = ''; TRIS.base.forEach(([v, x]) => t.append(h('option', { value: v }, x))); t.value = S.tri;
+  $('#f-annee').hidden = false; t.hidden = false; $('#f-annee').setAttribute('aria-label', 'Année de sortie');
+}
+function rendreBase(p, tout) {
+  if (!S.base) { $('#compte').textContent = 'Chargement de la base (2006 à 2026)…'; chargerBase().then(rendre); return; }
+  const vus = new Set(tout.filter(f => f.statut === 'vu').map(f => f.id));
+  const items = S.base.filter(x => !vus.has(x.f.id));
+  menusBase(items.map(x => x.f));
+  const mots = norm(S.q.trim()).split(/\s+/).filter(Boolean);
+  const l = items.filter(x => (!S.type || x.f.type === S.type) && (!S.annee || String(x.f.annee) === S.annee) && (!S.genre || (x.f.genres || []).includes(S.genre)) && mots.every(m => x.n.includes(m))).map(x => x.f);
+  if (S.tri === 'date-desc') l.sort((a, b) => b.annee - a.annee); else if (S.tri === 'date-asc') l.sort((a, b) => a.annee - b.annee); else l.sort((a, b) => a.titre.localeCompare(b.titre, 'fr'));
+  $('#compte').textContent = `${l.length} titre${l.length > 1 ? 's' : ''} pas encore vus`;
+  const g = h('div', { class: 'grille' });
+  if (!l.length) g.append(h('p', { class: 'vide' }, 'Rien avec ces filtres.'));
+  let an = '';
+  l.slice(0, S.montre).forEach(f => { if (S.tri.startsWith('date') && f.annee !== an) { an = f.annee; g.append(h('h2', { class: 'mois' }, String(an))); } g.append(tuile(f)); });
+  p.append(g);
+  if (l.length > S.montre) p.append(h('button', { class: 'btn plus', type: 'button', on: { click: () => { S.montre += PAGE; rendre(); } } }, `Afficher plus (${l.length - S.montre})`));
+}
 function majMenus(tout) {
   const garde = (sel, items, vide, val) => {
     sel.textContent = ''; sel.append(h('option', { value: '' }, vide)); items.forEach(([v, t]) => sel.append(h('option', { value: v }, t))); sel.value = val;
@@ -366,7 +395,8 @@ function majMenus(tout) {
   const gens = [...new Set(lst.flatMap(f => f.genres || []))].sort((a, b) => a.localeCompare(b, 'fr'));
   garde($('#f-annee'), ans.map(a => [a, a]), 'Année', S.annee);
   garde($('#f-genre'), gens.map(a => [a, a]), 'Genre', S.genre);
-  $('#f-annee').hidden = !vu; $('#f-tri').hidden = !vu; $('#f-tri').value = S.tri;
+  $('#f-annee').hidden = !vu; $('#f-tri').hidden = !vu; $('#f-annee').setAttribute('aria-label', 'Année de visionnage');
+  const t = $('#f-tri'); t.textContent = ''; TRIS.vus.forEach(([v, x]) => t.append(h('option', { value: v }, x))); t.value = S.tri;
 }
 function rendreStats(p, vus, heures) {
   const n = t => vus.filter(f => f.type === t).length;
@@ -393,26 +423,28 @@ function rendreStats(p, vus, heures) {
 /* ---------- feuille ---------- */
 const F = $('#feuille');
 function feuille(titre, ...contenu) {
-  F.textContent = '';
+  F.textContent = ''; F.classList.remove('haute');
   F.append(h('div', { class: 'feuille' }, h('div', { class: 'f-tete' }, h('h2', { id: 'f-titre' }, titre), h('button', { class: 'btn', type: 'button', on: { click: () => F.close() } }, 'Fermer')), contenu));
   if (!F.open) F.showModal();
   F.scrollTop = 0;
 }
 F.addEventListener('click', e => { if (e.target === F) F.close(); });
 
-function fiche(id) {
-  const f = fusion().find(x => x.id === id); if (!f) return;
-  const vu = f.statut === 'vu';
-  const infos = [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.annee, f.duree_min ? (f.duree_min >= 60 ? Math.floor(f.duree_min / 60) + ' h ' + String(f.duree_min % 60).padStart(2, '0') : f.duree_min + ' min') + (f.type === 'serie' ? ' / épisode' : '') : ''].filter(Boolean).join(' · ');
-  const act = [];
-  if (!vu) act.push(h('button', { class: 'btn fort', type: 'button', on: { click: () => formulaire(Object.assign({}, f), true) } }, 'Je l’ai vu'));
-  act.push(h('div', { class: 'deux' },
-    h('button', { class: 'btn', type: 'button', on: { click: () => formulaire(Object.assign({}, f), false) } }, vu ? 'Modifier / noter' : 'Modifier'),
-    estLocal(id) ? h('button', { class: 'btn', type: 'button', on: { click: () => { if (confirm(dansJournal(id) ? 'Annuler mes changements sur ce titre ?' : 'Retirer ce titre de mes ajouts ?')) { delete memoire[id]; ecrire(); majBoutons(); rendre(); F.close(); toast('Fait.'); } } } }, dansJournal(id) ? 'Annuler mes changements' : 'Retirer') : null));
-  feuille(vu ? 'Vu' : 'À voir',
-    h('div', { class: 'f-haut' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, infos), f.genres && f.genres.length ? h('p', null, f.genres.join(', ')) : null,
-      vu ? h('p', null, 'Vu le ' + fmtDate(f.date_vu, true)) : (f.envie ? h('p', null, ENVIES[f.envie]) : null),
-      vu ? h('div', { style: 'margin-top:12px' }, f.note ? [etoiles(f.note, 140), h('p', null, fmtNote(f.note) + ' sur 5')] : h('p', null, 'Pas encore noté')) : null)),
+const infosDe = f => [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.annee, f.duree_min ? (f.duree_min >= 60 ? Math.floor(f.duree_min / 60) + ' h ' + String(f.duree_min % 60).padStart(2, '0') : f.duree_min + ' min') + (f.type === 'serie' ? ' / épisode' : '') : ''].filter(Boolean).join(' · ');
+function retirerBouton(id) {
+  if (!estLocal(id)) return null;
+  const j = dansJournal(id);
+  return h('button', { class: 'btn', type: 'button', on: { click: () => { if (confirm(j ? 'Annuler mes changements sur ce titre ?' : 'Retirer ce titre de mes ajouts ?')) { delete memoire[id]; ecrire(); majBoutons(); rendre(); F.close(); toast('Fait.'); } } } }, j ? 'Annuler mes changements' : 'Retirer');
+}
+function fiche(id, obj) {
+  const f = fusion().find(x => x.id === id) || obj; if (!f) return;
+  if (f.statut === 'vu') return formulaire(Object.assign({}, f), false);   // un titre vu s'ouvre directement sur la note et le commentaire
+  const connu = f.statut === 'a_voir';
+  const act = [h('button', { class: 'btn fort', type: 'button', on: { click: () => formulaire(Object.assign({}, f), true) } }, 'Je l’ai vu')];
+  if (connu) act.push(h('div', { class: 'deux' }, h('button', { class: 'btn', type: 'button', on: { click: () => formulaire(Object.assign({}, f), false) } }, 'Modifier'), retirerBouton(id)));
+  else act.push(h('button', { class: 'btn', type: 'button', on: { click: () => formulaire(Object.assign({}, f, { statut: 'a_voir' }), false) } }, 'Mettre dans « à voir »'));
+  feuille(connu ? 'À voir' : 'Titre',
+    h('div', { class: 'f-haut' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, infosDe(f)), f.genres && f.genres.length ? h('p', null, f.genres.join(', ')) : null, f.envie ? h('p', null, ENVIES[f.envie]) : null)),
     f.commentaire ? h('p', { class: 'f-com' }, f.commentaire) : null,
     h('div', { class: 'f-actions' }, act));
 }
@@ -444,35 +476,40 @@ function formulaire(f, passerVu) {
   const msg = h('p', { class: 'alerte', role: 'alert' });
   const dessiner = () => {
     corps.textContent = '';
-    corps.append(h('div', { class: 'f-haut petit' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, [f.annee, TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : ''].filter(Boolean).join(' · ')))));
-    corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Statut'),
+    corps.append(h('div', { class: 'f-haut petit' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, infosDe(f)), f.genres && f.genres.length ? h('p', null, f.genres.join(', ')) : null)));
+    if (neuf) corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Statut'),
       h('div', { class: 'choix' }, [['vu', 'Vu'], ['a_voir', 'À voir']].map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.statut === v), on: { click: () => { f.statut = v; if (v === 'vu' && !f.date_vu) f.date_vu = aujourdhui(); dessiner(); } } }, t)))));
     if (f.statut === 'vu') {
-      corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-date' }, 'Date de visionnage'), h('input', { id: 'ch-date', type: 'date', value: f.date_vu, max: aujourdhui(), on: { change: e => { f.date_vu = e.target.value; } } })));
       corps.append(champNote(f.note, n => { f.note = n; }));
       corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-com' }, 'Commentaire (facultatif)'), h('textarea', { id: 'ch-com', maxlength: 1000, on: { input: e => { f.commentaire = e.target.value; } } }, f.commentaire || '')));
+      corps.append(h('div', { class: 'champ' }, h('label', { for: 'ch-date' }, 'Date de visionnage'), h('input', { id: 'ch-date', type: 'date', value: f.date_vu, max: aujourdhui(), on: { change: e => { f.date_vu = e.target.value; } } })));
     } else {
       corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Envie (facultatif)'),
         h('div', { class: 'choix', style: '--n:3' }, Object.entries(ENVIES).map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.envie === v), on: { click: () => { f.envie = f.envie === v ? null : v; dessiner(); } } }, t)))));
     }
-    corps.append(h('div', { class: 'collant' }, msg, h('button', { class: 'btn fort', type: 'button', on: { click: sauver } }, f.statut === 'vu' ? 'Enregistrer comme vu' : 'Enregistrer dans « à voir »')));
+    if (!neuf) {
+      const ex = [];
+      if (f.statut === 'vu') ex.push(h('button', { class: 'btn', type: 'button', on: { click: () => { f.statut = 'a_voir'; dessiner(); } } }, 'Repasser en « à voir »'));
+      ex.push(retirerBouton(f.id));
+      corps.append(h('div', { class: 'f-actions' }, ex));
+    }
+    corps.append(h('div', { class: 'collant' }, msg, h('button', { class: 'btn fort', type: 'button', on: { click: sauver } }, f.statut === 'vu' ? 'Enregistrer' : 'Enregistrer dans « à voir »')));
   };
   const sauver = () => {
     if (f.statut === 'vu' && !/^\d{4}-\d{2}-\d{2}$/.test(f.date_vu || '')) { msg.textContent = 'Il faut une date de visionnage.'; return; }
-    enregistrer(f); F.close(); toast(f.statut === 'vu' ? 'Noté comme vu.' : 'Ajouté à « à voir ».');
-    S.vue = f.statut === 'vu' ? 'vus' : 'avoir'; rendre();
+    enregistrer(f); F.close(); toast(f.statut === 'vu' ? 'Enregistré.' : 'Ajouté à « à voir ».');
   };
   dessiner();
-  feuille(neuf ? 'Ajouter' : 'Modifier', corps);
+  feuille(neuf ? 'Ajouter' : (f.statut === 'vu' ? 'Vu' : 'Modifier'), corps);
 }
 
 /* ---------- ajout : recherche dans la base ---------- */
-async function chargerBase() {
-  if (S.base || S.baseEnCours) return; S.baseEnCours = true;
-  const ans = []; for (let a = 2026; a >= 2006; a--) ans.push(a);
-  const res = await Promise.allSettled(ans.map(a => fetch(`data/base/${a}.json`).then(r => r.ok ? r.json() : Promise.reject())));
-  S.base = res.flatMap(r => r.status === 'fulfilled' ? (r.value.titres || []) : []).map(f => ({ f, n: norm(f.titre) }));
-  S.baseEnCours = false;
+function chargerBase() {
+  return S.promesse || (S.promesse = (async () => {
+    const ans = []; for (let a = 2026; a >= 2006; a--) ans.push(a);
+    const res = await Promise.allSettled(ans.map(a => fetch(`data/base/${a}.json`).then(r => r.ok ? r.json() : Promise.reject())));
+    S.base = res.flatMap(r => r.status === 'fulfilled' ? (r.value.titres || []) : []).map(f => ({ f, n: norm(f.titre) }));
+  })());
 }
 function ajout() {
   const liste = h('ul', { class: 'resultats' });
@@ -492,6 +529,7 @@ function ajout() {
   let t; q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(chercher, 180); });
   feuille('Ajouter', h('div', { class: 'champ' }, h('label', { for: 'ch-q' }, 'Chercher dans la base'), q), etat, liste,
     h('button', { class: 'btn', type: 'button', on: { click: manuel } }, 'Saisir à la main'));
+  F.classList.add('haute');
   setTimeout(() => { chargerBase(); q.focus(); }, 60);
 }
 function manuel() {
@@ -542,12 +580,13 @@ function ecran() {
 }
 
 /* ---------- branchements ---------- */
-document.querySelectorAll('.onglets button').forEach(b => b.addEventListener('click', () => { S.vue = b.dataset.vue; S.montre = PAGE; S.annee = ''; S.genre = ''; rendre(); }));
+document.querySelectorAll('.onglets button').forEach(b => b.addEventListener('click', () => { S.vue = b.dataset.vue; S.montre = PAGE; S.annee = ''; S.genre = ''; S.tri = 'date-desc'; S.q = ''; $('#f-q').value = ''; rendre(); }));
 const pc = $('.puces');
 [['', 'Tout'], ['film', 'Films'], ['serie', 'Séries'], ['anime', 'Anime']].forEach(([v, t]) => {
   const b = h('button', { class: 'puce', type: 'button', 'aria-pressed': String(v === ''), on: { click: () => { S.type = v; S.montre = PAGE; pc.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); rendre(); } } }, t);
   pc.append(b);
 });
+$('#f-q').addEventListener('input', e => { S.q = e.target.value; S.montre = PAGE; rendre(); });
 $('#f-annee').addEventListener('change', e => { S.annee = e.target.value; S.montre = PAGE; rendre(); });
 $('#f-genre').addEventListener('change', e => { S.genre = e.target.value; S.montre = PAGE; rendre(); });
 $('#f-tri').addEventListener('change', e => { S.tri = e.target.value; S.montre = PAGE; rendre(); });
