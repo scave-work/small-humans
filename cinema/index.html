@@ -667,7 +667,7 @@ function reglageJeton(raison) {
   const c = h('input', { id: 'ch-jeton', type: 'password', autocomplete: 'off', placeholder: 'Colle le jeton ici' });
   feuille('Envoi des ajouts',
     raison ? h('p', { class: 'alerte', role: 'alert' }, raison) : null,
-    h('p', null, 'Pour envoyer sans copier, colle une fois un jeton GitHub (droit « Contents : Read and write » sur le seul dépôt small-humans). Il reste dans ce navigateur.'),
+    h('p', null, 'Colle ton jeton une seule fois : il reste dans ce navigateur.'),
     h('div', { class: 'champ' }, h('label', { for: 'ch-jeton' }, 'Jeton GitHub'), c),
     h('button', { class: 'btn fort', type: 'button', on: { click: () => { try { localStorage.setItem(CLE_JETON, c.value.trim()); } catch (e) { /* tant pis */ } F.close(); if (c.value.trim()) envoyer(); } } }, 'Enregistrer et envoyer'),
     h('button', { class: 'btn', type: 'button', on: { click: () => { F.close(); copier(); } } }, 'Copier à la place'));
