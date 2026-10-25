@@ -28549,5 +28549,17 @@
 "source": "ajout",
 "artiste_fiable": false,
 "mix": false
+},
+{
+"youtube": "TESTROBOT01",
+"titre": "a supprimer",
+"artiste": "TEST ROBOT",
+"genre": "ambient",
+"tags": [
+"ambient"
+],
+"source": "ajout",
+"artiste_fiable": true,
+"mix": false
 }
 ]
