@@ -56,6 +56,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .onglets{display:flex;gap:clamp(14px,4vw,28px);margin-top:28px}
 .onglets button{min-height:48px;padding:0 2px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;font-size:15px;color:var(--acier);border-bottom:3px solid transparent;transition:color .18s ease}
 .onglets button:hover{color:var(--ink)}
+@media (max-width:759px){.onglets{gap:12px}.onglets button{letter-spacing:.06em;font-size:13px}}
 .onglets button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .onglets button:active,.btn:active,.puce:active,.tuile:active{transform:scale(.97)}
 
@@ -137,6 +138,7 @@ dialog[open]{animation:monte .28s var(--ease)}
 .collant .btn{width:100%;border-radius:0;min-height:60px}
 .f-actions .deux{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .champ{display:grid;gap:6px}
+.grille .jour{grid-column:1/-1;margin:6px 0 0;font-size:var(--t-small);font-weight:500;color:var(--acier);text-transform:capitalize}
 .f-syn{color:var(--acier);line-height:1.5;margin:0}
 details.syn{color:var(--acier)}
 details.syn[hidden],.f-syn[hidden]{display:none}
@@ -231,6 +233,7 @@ textarea.export{min-height:180px;font-size:13px}
     <button role="tab" id="o-vus" aria-selected="true" data-vue="vus">Vus</button>
     <button role="tab" id="o-avoir" aria-selected="false" data-vue="avoir">À voir</button>
     <button role="tab" id="o-base" aria-selected="false" data-vue="base">Non vus</button>
+    <button role="tab" id="o-sorties" aria-selected="false" data-vue="sorties">Sorties</button>
     <button role="tab" id="o-stats" aria-selected="false" data-vue="stats">Stats</button>
   </div>
 
@@ -268,7 +271,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.18 · 25 oct. 2026';
+const VERSION = '0.19 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -372,15 +375,16 @@ function tuile(f) {
 }
 function rendre() {
   const p = $('#panneau'); p.textContent = '';
-  const stats = S.vue === 'stats', base = S.vue === 'base';
-  $('#outils').hidden = stats; $('#compte').hidden = stats; $('#f-q').hidden = !base;
-  ['vus', 'avoir', 'base', 'stats'].forEach(v => { const b = $('#o-' + v); b.setAttribute('aria-selected', String(v === S.vue)); });
+  const stats = S.vue === 'stats', base = S.vue === 'base', sorties = S.vue === 'sorties';
+  $('#outils').hidden = stats || sorties; $('#compte').hidden = stats || sorties; $('#f-q').hidden = !base;
+  ['vus', 'avoir', 'base', 'sorties', 'stats'].forEach(v => { const b = $('#o-' + v); b.setAttribute('aria-selected', String(v === S.vue)); });
   const tout = fusion();
   const vus = tout.filter(f => f.statut === 'vu');
   const heures = Math.round(vus.filter(f => f.type === 'film').reduce((s, f) => s + (f.duree_min || 0), 0) / 60);
   $('#resume').textContent = `${vus.length} titres vus, ${heures} h de films, et ${tout.length - vus.length} à voir.`;
   if (stats) return rendreStats(p, vus, heures);
   if (base) return rendreBase(p, tout);
+  if (sorties) return rendreSorties(p);
   majMenus(tout);
   let l = listeFiltree();
   $('#compte').textContent = `${l.length} titre${l.length > 1 ? 's' : ''}`;
@@ -412,6 +416,27 @@ function menusBase(items) {
   garde($('#f-genre'), [...new Set(items.flatMap(f => f.genres || []))].sort((a, b) => a.localeCompare(b, 'fr')).map(a => [a, a]), 'Genre', S.genre);
   const t = $('#f-tri'); t.textContent = ''; TRIS.base.forEach(([v, x]) => t.append(h('option', { value: v }, x))); t.value = S.tri;
   $('#f-annee').hidden = false; t.hidden = false; $('#f-annee').setAttribute('aria-label', 'Année de sortie');
+}
+/* sorties de la semaine : data/catalogue.json (mis à jour chaque lundi par le robot GitHub) */
+function rendreSorties(p) {
+  if (!S.catalogue) { p.append(h('p', { class: 'vide' }, 'Chargement des sorties…')); fetch('data/catalogue.json').then(r => r.ok ? r.json() : { titres: [] }).catch(() => ({ titres: [] })).then(d => { S.catalogue = d.titres || []; rendre(); }); return; }
+  const iso = d => d.toLocaleDateString('sv-SE'), auj = new Date(), lundi = new Date(auj);
+  lundi.setDate(auj.getDate() - ((auj.getDay() + 6) % 7));
+  const bornes = n => { const a = new Date(lundi), b = new Date(lundi); a.setDate(a.getDate() + 7 * n); b.setDate(b.getDate() + 7 * n + 6); return [iso(a), iso(b)]; };
+  const [a0, b0] = bornes(0), [a1, b1] = bornes(1);
+  const deja = new Map(fusion().map(f => [f.id, f]));
+  const dans = (x, y) => S.catalogue.filter(f => f.sortie >= x && f.sortie <= y).sort((m, n) => m.sortie.localeCompare(n.sortie) || m.titre.localeCompare(n.titre, 'fr'));
+  const g = h('div', { class: 'grille' });
+  [['Cette semaine', dans(a0, b0)], ['La semaine prochaine', dans(a1, b1)]].forEach(([titre, l]) => {
+    g.append(h('h2', { class: 'mois' }, titre));
+    if (!l.length) { g.append(h('p', { class: 'vide' }, 'Rien de prévu.')); return; }
+    let jour = '';
+    l.forEach(f => {
+      if (f.sortie !== jour) { jour = f.sortie; g.append(h('h3', { class: 'jour' }, new Date(jour + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))); }
+      g.append(tuile(deja.get(f.id) || f));
+    });
+  });
+  p.append(g);
 }
 function rendreBase(p, tout) {
   if (!S.base) { $('#compte').textContent = 'Chargement de la base (2006 à 2026)…'; chargerBase().then(rendre); return; }
