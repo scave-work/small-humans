@@ -661,7 +661,7 @@ function majBoutons() {
 }
 /* envoi : un fichier déposé dans cinema/data/ajouts/ par l'API GitHub, un robot l'intègre au journal public.
    Le jeton (droit d'écriture sur ce seul dépôt) est collé une fois et reste dans ce navigateur : jamais dans le code. */
-const CLE_JETON = 'sh-cine-jeton', DEPOT = 'scave-work/small-humans';
+const CLE_JETON = 'sh-cine-jeton', DEPOT = 'small-humans/small-humans.github.io';
 const jeton = () => { try { return localStorage.getItem(CLE_JETON) || ''; } catch (e) { return ''; } };
 function reglageJeton(raison) {
   const c = h('input', { id: 'ch-jeton', type: 'password', autocomplete: 'off', placeholder: 'Colle le jeton ici' });
