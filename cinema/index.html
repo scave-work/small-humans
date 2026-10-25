@@ -271,7 +271,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.20 · 25 oct. 2026';
+const VERSION = '0.21 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -425,7 +425,7 @@ function rendreSorties(p) {
   const bornes = n => { const a = new Date(lundi), b = new Date(lundi); a.setDate(a.getDate() + 7 * n); b.setDate(b.getDate() + 7 * n + 6); return [iso(a), iso(b)]; };
   const [a0, b0] = bornes(0), [a1, b1] = bornes(1);
   const deja = new Map(fusion().map(f => [f.id, f]));
-  const dans = (x, y) => S.catalogue.filter(f => f.sortie >= x && f.sortie <= y).sort((m, n) => m.sortie.localeCompare(n.sortie) || m.titre.localeCompare(n.titre, 'fr'));
+  const dans = (x, y) => S.catalogue.filter(f => f.sortie >= x && f.sortie <= y && (deja.get(f.id) || {}).statut !== 'vu').sort((m, n) => m.sortie.localeCompare(n.sortie) || m.titre.localeCompare(n.titre, 'fr'));
   const g = h('div', { class: 'grille' });
   [['Cette semaine', dans(a0, b0)], ['La semaine prochaine', dans(a1, b1)]].forEach(([titre, l]) => {
     g.append(h('h2', { class: 'mois' }, titre));
