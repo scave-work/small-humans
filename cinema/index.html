@@ -69,7 +69,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .puce[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .recherche{width:100%;min-height:44px;background:var(--nuit);border:0;border-radius:999px;padding:0 18px}
 .menus{display:flex;gap:8px}
-.menus select{flex:1 1 0;width:0;min-width:0;min-height:44px;background:var(--nuit);border:0;border-radius:0;padding:0 28px 0 14px;border-radius:999px;appearance:none;-webkit-appearance:none;text-overflow:ellipsis;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23BABBCF' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.menus select{flex:1 1 0;width:0;min-width:0;min-height:44px;background:var(--nuit);border:0;border-radius:0;padding:0 26px 0 12px;border-radius:999px;appearance:none;-webkit-appearance:none;text-overflow:ellipsis;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23BABBCF' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .menus select[hidden]{display:none}
 .compte{color:var(--acier);font-size:var(--t-small);margin-top:12px;min-height:1.5em}
 
@@ -271,7 +271,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.19 · 25 oct. 2026';
+const VERSION = '0.20 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -409,7 +409,7 @@ function rendre() {
   p.append(g);
   if (l.length > S.montre) p.append(h('button', { class: 'btn plus', type: 'button', on: { click: () => { S.montre += PAGE; rendre(); } } }, `Afficher plus (${l.length - S.montre})`));
 }
-const TRIS = { vus: [['date-desc', 'Plus récents'], ['date-asc', 'Plus anciens'], ['note', 'Mieux notés'], ['titre', 'A → Z']], base: [['date-desc', 'Sorties récentes'], ['date-asc', 'Sorties anciennes'], ['titre', 'A → Z']] };
+const TRIS = { vus: [['date-desc', 'Récents'], ['date-asc', 'Anciens'], ['note', 'Notes'], ['titre', 'A → Z']], base: [['date-desc', 'Récents'], ['date-asc', 'Anciens'], ['titre', 'A → Z']] };
 function menusBase(items) {
   const garde = (sel, its, vide, val) => { sel.textContent = ''; sel.append(h('option', { value: '' }, vide)); its.forEach(([v, t]) => sel.append(h('option', { value: v }, t))); sel.value = val; };
   garde($('#f-annee'), [...new Set(items.map(f => String(f.annee)))].sort().reverse().map(a => [a, a]), 'Année', S.annee);
