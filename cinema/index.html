@@ -112,6 +112,9 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .btn.fort:hover{background:#8BB9FF}
 .btn:disabled{opacity:.45;cursor:default}
 .actions .btn{flex:none;padding:0 20px;font-size:15px;line-height:1.2;border-radius:999px;background:var(--nuit2);min-height:52px}.actions .btn.fort{background:var(--accent);color:var(--accent-ink)}
+.actions #b-copie{position:relative;width:52px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.actions #b-copie[hidden]{display:none}
+.actions #b-copie .nb{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:600;line-height:20px;text-align:center}
 .version{position:fixed;right:var(--marge);top:0;height:var(--barre);display:flex;align-items:center;z-index:11;font-size:13px;color:var(--acier);pointer-events:none;margin:0}
 .pied{margin-top:56px;color:var(--acier);font-size:var(--t-small)}
 .toast{position:fixed;left:var(--marge);right:var(--marge);bottom:calc(var(--actions) + 20px + env(safe-area-inset-bottom));z-index:30;background:var(--ink);color:var(--accent-ink);padding:12px 20px;border-radius:999px;text-align:center;max-width:520px;margin:0 auto;transform:translateY(90px) scale(.92);opacity:0;pointer-events:none;transition:opacity .18s ease-in,transform .22s cubic-bezier(.4,0,1,1)}
@@ -262,7 +265,7 @@ textarea.export{min-height:180px;font-size:13px}
 <div class="actions">
   <div class="rangee">
     <button class="btn fort" id="b-ajout" type="button">+ Ajouter</button>
-    <button class="btn" id="b-copie" type="button">Copier mes ajouts</button>
+    <button class="btn" id="b-copie" type="button" aria-label="Envoyer mes ajouts" hidden><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span class="nb" id="nb"></span></button>
   </div>
 </div>
 <p class="version" id="version"></p>
@@ -272,7 +275,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.23 · 25 oct. 2026';
+const VERSION = '0.24 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -306,7 +309,7 @@ const S = { journal: [], exemple: false, vue: 'vus', type: '', annee: '', genre:
 
 async function chargerJournal() {
   for (const url of ['data/journal.json', 'data/journal.local.json', 'data/exemple.json']) {
-    try { const r = await fetch(url); if (!r.ok) continue; const d = await r.json(); S.journal = d.titres || d; S.exemple = !!d.exemple; return; } catch (e) { /* suivant */ }
+    try { const r = await fetch(url, { cache: 'no-cache' }); if (!r.ok) continue; const d = await r.json(); S.journal = d.titres || d; S.exemple = !!d.exemple; return; } catch (e) { /* suivant */ }
   }
   S.journal = [];
 }
@@ -650,10 +653,11 @@ function manuel() {
 }
 
 /* ---------- copier mes ajouts ---------- */
-function exportJson() { return JSON.stringify({ version: 1, titres: Object.values(memoire).map(propre) }, null, 1); }
+function exportJson() { return JSON.stringify({ version: 1, titres: enAttente().map(propre) }, null, 1); }
+const enAttente = () => Object.values(memoire).filter(f => !f._env);   // ajouts pas encore envoyés
 function majBoutons() {
-  const n = Object.keys(memoire).length;
-  const b = $('#b-copie'); b.disabled = !n; b.textContent = n ? `Envoyer mes ajouts (${n})` : 'Envoyer mes ajouts';
+  const n = enAttente().length;
+  $('#b-copie').hidden = !n; $('#nb').textContent = n;
 }
 /* envoi : un fichier déposé dans cinema/data/ajouts/ par l'API GitHub, un robot l'intègre au journal public.
    Le jeton (droit d'écriture sur ce seul dépôt) est collé une fois et reste dans ce navigateur : jamais dans le code. */
@@ -669,7 +673,7 @@ function reglageJeton(raison) {
     h('button', { class: 'btn', type: 'button', on: { click: () => { F.close(); copier(); } } }, 'Copier à la place'));
 }
 async function envoyer() {
-  const j = jeton(), n = Object.keys(memoire).length;
+  const j = jeton(), n = enAttente().length;
   if (!n) return;
   if (!j) return reglageJeton();
   const nom = `cinema/data/ajouts/ajouts_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
@@ -678,7 +682,8 @@ async function envoyer() {
     const r = await fetch(`https://api.github.com/repos/${DEPOT}/contents/${nom}`, { method: 'PUT', headers: { Authorization: 'Bearer ' + j, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Cinéma : ajouts envoyés depuis le site', content: btoa(unescape(encodeURIComponent(exportJson()))) }) });
     if (r.status === 401 || r.status === 403 || r.status === 404) return reglageJeton('GitHub a refusé le jeton (périmé ou sans droit d’écriture).');
     if (!r.ok) throw new Error(r.status);
-    toast('Envoyé.');
+    for (const id in memoire) memoire[id]._env = true;   // envoyé : on le garde à l'écran jusqu'à ce que le journal public le contienne
+    ecrire(); majBoutons(); toast('Envoyé.');
   } catch (e) { toast('Échec : pas envoyé.'); }
 }
 /* au chargement : on oublie les ajouts que le journal public contient déjà (identiques), et les retraits déjà pris en compte */
@@ -691,7 +696,7 @@ function nettoyer() {
   if (change) ecrire();
 }
 async function copier() {
-  const txt = exportJson(), n = Object.keys(memoire).length;
+  const txt = exportJson(), n = enAttente().length;
   try { await navigator.clipboard.writeText(txt); toast(`Copié : ${n} fiche${n > 1 ? 's' : ''}.`); }
   catch (e) {
     const ta = h('textarea', { class: 'export', readonly: true }, txt);
