@@ -70,9 +70,9 @@ body[data-vue="intro"] .nav{display:none}
 .voyant{width:10px;height:14px;border-radius:2px;background:var(--coque);transition:background-color .12s ease}
 .son[aria-pressed="true"]{color:var(--ink)}
 .son[aria-pressed="true"] .voyant{background:var(--ink);box-shadow:var(--halo)} /* taste-skill-ignore : halo autorisé par Simon (titre ou cellule allumée, un seul niveau) */
-.son .court{display:none}
+.son svg{opacity:.35;transition:opacity .18s ease}
+.son[aria-pressed="false"] .i-coupe,.son[aria-pressed="true"] .i-actif{opacity:1}
 @media (max-width:600px){
-  .son .long{display:none} .son .court{display:inline}
   .titre{font-size:16px}
   body[data-vue="galerie"] .nav a[href="#galerie"], body[data-vue="musique"] .nav a[href="#musique"]{display:none}
 }
@@ -534,9 +534,8 @@ a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;bo
   <h1 id="titre" class="titre" aria-label="Small Humans"><span class="mot" data-mot="SMALL"></span><span class="espace"> </span><span class="mot" data-mot="HUMANS"></span></h1>
   <nav class="nav" aria-label="Navigation">
     <a href="#galerie">Galerie</a>
-    <a href="#musique">Musique</a>
   </nav>
-  <button class="son" id="son" type="button" aria-pressed="false" aria-label="Activer le son"><span class="voyant" aria-hidden="true"></span><span class="long" id="sonTexte">Son coupé</span><span class="court">Son</span></button>
+  <button class="son" id="son" type="button" aria-pressed="false" aria-label="Activer le son"><svg class="i-coupe" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="i-actif" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></button>
 </header>
 
 <main>
@@ -989,7 +988,6 @@ const Son = {
     if (this.on && !this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { this.on = false; } }
     if (this.on && this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
     const b = $('#son'); b.setAttribute('aria-pressed', String(this.on)); b.setAttribute('aria-label', this.on ? 'Couper le son' : 'Activer le son');
-    $('#sonTexte').textContent = this.on ? 'Son activé' : 'Son coupé';
     if (this.on) this.clic();
   },
   clic() {   // clic de console discret
