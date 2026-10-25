@@ -1,0 +1,25 @@
+{
+ "version": 1,
+ "titres": [
+  {
+   "id": "tmdb-movie-1561726",
+   "type": "film",
+   "titre": "Masterplan",
+   "annee": 2026,
+   "statut": "vu",
+   "date_vu": "2026-10-16",
+   "genres": [
+    "Action",
+    "Thriller"
+   ],
+   "duree_min": 110,
+   "affiche": "/a13BTR3jJWr2ARoLvTC3f5gQhfw.jpg",
+   "tmdb": {
+    "id": 1561726,
+    "type": "movie"
+   },
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25"
+  }
+ ]
+}
