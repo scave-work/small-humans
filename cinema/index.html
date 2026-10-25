@@ -138,6 +138,7 @@ dialog[open]{animation:monte .28s var(--ease)}
 .f-actions .deux{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .champ{display:grid;gap:6px}
 .champ>label,.champ>.lib{color:var(--acier);font-size:var(--t-small)}
+.champ input[type=date]{display:block;min-width:0;max-width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none;text-align:left}
 .champ input,.champ textarea,.champ select{width:100%;min-height:48px;background:var(--nuit);border:0;border-radius:0;padding:10px 12px}
 .champ textarea{min-height:96px;resize:vertical}
 .choix{display:grid;grid-template-columns:repeat(var(--n,2),1fr);gap:8px}
@@ -262,7 +263,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.12 · 25 oct. 2026';
+const VERSION = '0.13 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -536,7 +537,7 @@ function formulaire(f, passerVu) {
     }
     if (!neuf) {
       const ex = [];
-      if (f.statut === 'vu') ex.push(h('button', { class: 'btn', type: 'button', on: { click: () => { f.statut = 'a_voir'; dessiner(); } } }, 'Repasser en « à voir »'));
+      if (f.statut === 'vu') ex.push(h('button', { class: 'btn', type: 'button', on: { click: () => { f.statut = 'a_voir'; dessiner(); } } }, 'Remettre à voir'));
       ex.push(retirerBouton(f.id));
       corps.append(h('div', { class: 'f-actions ligne' }, ex));
     }
