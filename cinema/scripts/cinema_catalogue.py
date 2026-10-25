@@ -5,7 +5,7 @@ Clé : variable d'environnement TMDB_API_KEY (clé « API Key » v3 gratuite). J
   --fixture DOSSIER : lit des réponses TMDB enregistrées au lieu d'appeler le réseau (tests, sans clé).
 Ce que ça fait : films à l'affiche et à venir en France, séries en cours de diffusion ; détaille chacun (durée, genres) ;
   classe « anime » ce qui est animé (genre 16) et en japonais. N'écrit que des données publiques TMDB (pas de secret).
-Le catalogue est REMPLACÉ à chaque exécution ; le journal de Simon (journal.json) n'est jamais touché.
+Le catalogue est REMPLACÉ à chaque exécution ; le journal (journal.json) n'est jamais touché.
 """
 import json, os, sys, time, urllib.parse, urllib.request
 from datetime import date, timedelta
