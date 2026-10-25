@@ -7,7 +7,7 @@ from datetime import date
 TYPES = {'film', 'serie', 'anime'}
 STATUTS = {'vu', 'a_voir', 'retire'}   # 'retire' = demande de suppression envoyée par le site, jamais écrite dans le journal
 ENVIES = {'hate', 'pourquoi_pas', 'un_jour'}
-# La source de visionnage (cinéma, plateforme, torrent) n'est jamais enregistrée : décision de Simon, 2026-10-25.
+# La source de visionnage (cinéma, plateforme, torrent) n'est jamais enregistrée : décision du 2026-10-25.
 CHAMPS = {'id', 'type', 'titre', 'annee', 'statut', 'date_vu', 'note', 'commentaire', 'envie', 'genres',
           'duree_min', 'affiche', 'tmdb', 'ajoute_le', 'maj'}
 DATE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
