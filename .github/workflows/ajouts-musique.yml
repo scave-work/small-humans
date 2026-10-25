@@ -1,0 +1,38 @@
+name: Ajouts musique
+# Le site (bouton « Envoyer » de la galerie) dépose un fichier dans musique/ajouts/ ; ce robot l'intègre à musique/titres.json puis le supprime.
+on:
+  push:
+    paths:
+      - 'musique/ajouts/*.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ajouts-musique
+  cancel-in-progress: false
+jobs:
+  integrer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Intégrer et enregistrer (3 essais si deux envois se croisent)
+        run: |
+          git config user.name "ajouts-musique"
+          git config user.email "actions@users.noreply.github.com"
+          shopt -s nullglob
+          for essai in 1 2 3; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            fichiers=(musique/ajouts/*.json)
+            [ ${#fichiers[@]} -eq 0 ] && exit 0
+            python -I .github/scripts/ajouts_musique.py || exit 1
+            git rm -q "${fichiers[@]}"
+            git add musique/titres.json
+            git commit -q -m "Musique : ajouts integres a la galerie (envoi depuis le site)"
+            git push -q origin HEAD:main && exit 0
+            echo "Push refuse (un autre envoi est arrive), nouvel essai $essai"
+          done
+          exit 1
