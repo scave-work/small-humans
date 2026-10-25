@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comment ce site a été fait – Small Humans</title>
+<style>
+:root{color-scheme:dark}
+body{margin:0;background:#0b1020;color:#dfe6f7;font:17px/1.6 Raleway,system-ui,sans-serif}
+main{max-width:34rem;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.5rem;margin:.2em 0 .1em}
+.date{color:#46557a;font-size:.85rem;margin:0 0 1.5em}
+a{color:#6FA8FF}
+h2{font-size:1.1rem;margin:1.8em 0 .3em}
+li{margin:.3em 0}
+</style>
+</head>
+<body>
+<main>
+<p><a href="../">← Tech &amp; IA</a></p>
+<h1>Comment ce site a été fait</h1>
+<p class="date">25 octobre 2026</p>
+<p>Ce site, je ne l'ai pas codé seul : je l'ai construit en discutant avec Claude, une IA qui écrit et modifie du code dans mon dossier de travail. Voici comment on s'y prend quand on débute avec ce genre d'outil, et ce que j'ai appris en route.</p>
+
+<h2>Deux dépôts : un privé, un public</h2>
+<p>Le site vit dans un dépôt GitHub public, publié gratuitement par GitHub Pages. À côté, un dépôt privé, « l'atelier », garde ce qui n'a rien à faire en ligne : consignes, brouillons, décisions, dessins originaux. Règle de base : rien de secret dans le public, jamais.</p>
+
+<h2>Un fichier de consignes et un journal de décisions</h2>
+<p>Claude oublie tout d'une conversation à l'autre. Alors j'ai deux fichiers qu'il relit au départ : un <code>CLAUDE.md</code> (les règles du projet : répondre en français, donner les commandes prêtes à coller, ne rien supprimer sans demander) et un journal où chaque décision que je prends est notée tout de suite. Quand je change d'avis, je le dis, et ça s'écrit.</p>
+
+<h2>Beaucoup de prompts, des passations</h2>
+<p>Un seul gros prompt ne suffit pas. J'ai procédé par petites demandes, une étape à la fois, avec des maquettes à valider avant de généraliser un style. Quand une conversation devient trop longue, Claude s'embrouille : on écrit alors une « passation » (où on en est, quelles règles, quels pièges) et on repart d'une session neuve avec un prompt de reprise.</p>
+
+<h2>Des skills</h2>
+<p>Un skill est un mode d'emploi réutilisable qu'on donne à Claude pour un type de tâche. J'en ai utilisé un pour la direction visuelle (éviter le look « fait par une IA »), et d'autres sont prévus pour ajouter un film, gérer la musique ou publier avec un contrôle des secrets.</p>
+
+<h2>Des robots pour les tâches répétitives</h2>
+<p>Pour le cinéma, des petits robots GitHub (les « Actions ») tournent tout seuls : ils mettent à jour le catalogue de nouveautés, la base des titres et intègrent les films que j'ajoute depuis mon téléphone. Le site reste utilisable sans Claude : les données sont de simples fichiers JSON lisibles.</p>
+
+<h2>Ce que je retiens</h2>
+<ul>
+<li>Écrire les décisions, sinon elles se perdent.</li>
+<li>Avancer par petites étapes et valider à l'œil avant de continuer.</li>
+<li>Garder le privé et le public bien séparés.</li>
+<li>Tester sur le téléphone, c'est là que le journal de films sert vraiment.</li>
+</ul>
+</main>
+</body>
+</html>
