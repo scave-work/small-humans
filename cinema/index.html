@@ -131,7 +131,9 @@ dialog[open]{animation:monte .28s var(--ease)}
 .f-actions{display:grid;gap:8px}
 .f-haut.petit{grid-template-columns:72px minmax(0,1fr);align-items:center}
 .f-haut.petit .aff{padding:4px}.f-haut.petit .aff i{font-size:9px}
-.collant{position:sticky;bottom:0;background:var(--bg);padding:12px 0 2px;display:grid;gap:8px}
+.collant{position:sticky;bottom:calc(-28px - env(safe-area-inset-bottom));margin:0 calc(-1 * var(--marge)) calc(-28px - env(safe-area-inset-bottom));background:var(--bg);padding:0 0 env(safe-area-inset-bottom);display:grid;gap:0}
+.collant .alerte{padding:8px var(--marge) 0}
+.collant .btn{width:100%;border-radius:0;min-height:60px}
 .f-actions .deux{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .champ{display:grid;gap:6px}
 .champ>label,.champ>.lib{color:var(--acier);font-size:var(--t-small)}
