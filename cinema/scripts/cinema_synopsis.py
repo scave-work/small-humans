@@ -17,8 +17,7 @@ SITE = os.path.normpath(os.path.join(ICI, '..')) if os.path.isdir(os.path.join(I
 
 def ecrire(chemin, donnees):
     os.makedirs(os.path.dirname(chemin), exist_ok=True)
-    with open(chemin, 'w', encoding='utf-8', newline='
-') as f: json.dump(donnees, f, ensure_ascii=False, sort_keys=True, indent=0)
+    with open(chemin, 'w', encoding='utf-8') as f: json.dump(donnees, f, ensure_ascii=False, sort_keys=True, indent=0)
 
 
 def titres_connus(site):
