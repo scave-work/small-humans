@@ -117,7 +117,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 /* feuille (fiche, ajout, formulaire) */
 dialog{border:0;padding:0;background:var(--bg);color:var(--ink);width:100%;max-width:none;max-height:92dvh;margin:auto 0 0;overflow:auto;overscroll-behavior:contain}
 dialog::backdrop{background:rgba(5,8,15,.78)}
-dialog.haute{height:92dvh}
+dialog.haute{height:var(--vv,92dvh);max-height:var(--vv,92dvh)}
 dialog[open]{animation:monte .28s var(--ease)}
 @keyframes monte{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .feuille{padding:8px var(--marge) calc(28px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;display:grid;gap:18px}
@@ -431,6 +431,11 @@ function feuille(titre, ...contenu) {
   F.scrollTop = 0;
 }
 F.addEventListener('click', e => { if (e.target === F) F.close(); });
+/* iPhone : le clavier ne redimensionne pas la page, on suit la zone réellement visible */
+if (window.visualViewport) {
+  const suivre = () => { F.style.setProperty('--vv', Math.round(visualViewport.height * .92) + 'px'); };
+  visualViewport.addEventListener('resize', suivre); visualViewport.addEventListener('scroll', suivre); suivre();
+}
 
 const infosDe = f => [TYPES[f.type] ? TYPES[f.type].replace(/s$/, '') : '', f.annee, f.duree_min ? (f.duree_min >= 60 ? Math.floor(f.duree_min / 60) + ' h ' + String(f.duree_min % 60).padStart(2, '0') : f.duree_min + ' min') + (f.type === 'serie' ? ' / épisode' : '') : ''].filter(Boolean).join(' · ');
 function retirerBouton(id) {
