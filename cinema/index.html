@@ -14,7 +14,7 @@
   --marge:clamp(16px,2.4vw,44px);
   --t-small:14px; --t-body:clamp(16px,15px + .25vw,19px); --t-lead:clamp(18px,15px + .6vw,26px); --t-head:clamp(30px,16px + 2.6vw,64px);
   --suivi:.25em; --ease:cubic-bezier(.22,1,.36,1);
-  --barre:60px; --actions:74px;
+  --barre:60px; --actions:64px;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -102,7 +102,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .barres .r i{display:block;height:100%;background:var(--accent)}
 
 /* barre d'actions du bas */
-.actions{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:0 var(--marge) calc(22px + env(safe-area-inset-bottom));pointer-events:none}.actions .btn{pointer-events:auto}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:0 var(--marge) calc(12px + env(safe-area-inset-bottom));pointer-events:none}.actions .btn{pointer-events:auto}
 .actions .rangee{display:flex;justify-content:flex-end;gap:8px;max-width:1180px;margin:0 auto}
 .btn{min-height:52px;padding:0 18px;border-radius:999px;background:var(--nuit2);transition:background-color .18s ease,transform .12s ease;font-weight:500}
 .btn:hover{background:#243a60}
@@ -110,7 +110,7 @@ h1{font-size:var(--t-head);font-weight:300;letter-spacing:var(--suivi);text-tran
 .btn.fort:hover{background:#8BB9FF}
 .btn:disabled{opacity:.45;cursor:default}
 .actions .btn{flex:none;padding:0 20px;font-size:15px;line-height:1.2;border-radius:999px;background:var(--nuit2);min-height:52px}.actions .btn.fort{background:var(--accent);color:var(--accent-ink)}
-.version{position:fixed;left:var(--marge);bottom:calc(2px + env(safe-area-inset-bottom));z-index:21;font-size:12px;color:var(--acier);background:var(--bg);padding:2px 8px 2px 0;pointer-events:none}
+.version{position:fixed;right:var(--marge);top:0;height:var(--barre);display:flex;align-items:center;z-index:11;font-size:13px;color:var(--acier);pointer-events:none;margin:0}
 .pied{margin-top:56px;color:var(--acier);font-size:var(--t-small)}
 .toast{position:fixed;left:var(--marge);right:var(--marge);bottom:calc(var(--actions) + 20px + env(safe-area-inset-bottom));z-index:30;background:var(--ink);color:var(--accent-ink);padding:12px 16px;max-width:520px;margin:0 auto;transform:translateY(12px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s var(--ease)}
 .toast.on{opacity:1;transform:none}
@@ -229,7 +229,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.6 · 25 oct. 2026';
+const VERSION = '0.7 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
