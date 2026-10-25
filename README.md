@@ -10,5 +10,4 @@ Site : https://small-humans.github.io/
 - `cinema/` : le journal de films, séries et anime.
 - `tech/` : articles tech & IA (liste dans `tech/articles.json`).
 - `archive/` : anciennes maquettes, gardées pour mémoire.
-- `v-backend/` : simple redirection pour les anciens liens.
 - `OFL.txt` : licence de la police embarquée.
