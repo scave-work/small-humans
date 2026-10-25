@@ -684,7 +684,7 @@ async function envoyer() {
     if (!r.ok) throw new Error(r.status);
     for (const id in memoire) memoire[id]._env = true;   // envoyé : on le garde à l'écran jusqu'à ce que le journal public le contienne
     ecrire(); majBoutons(); toast('Envoyé.');
-  } catch (e) { toast('Échec : pas envoyé.'); }
+  } catch (e) { reglageJeton('Échec de l’envoi : le jeton est peut-être mal copié (ou la connexion a coupé). Colle-le à nouveau.'); }
 }
 /* au chargement : on oublie les ajouts que le journal public contient déjà (identiques), et les retraits déjà pris en compte */
 function nettoyer() {
