@@ -1,6 +1,54 @@
 [
-  {"titre": "Classer ma musique avec le BPM", "date": "2026-10-24", "sujets": ["Musique", "IA"], "resume": "Trouver le tempo de chaque morceau pour faire des playlists « full chill » et « full énergique ».", "lien": "bpm/"},
-  {"titre": "Exemple : monter un petit serveur à la maison", "date": "2026-10-20", "sujets": ["Réseau"], "resume": "Texte d'exemple pour la maquette, pas un vrai article.", "lien": "#", "exemple": true},
-  {"titre": "Exemple : apprendre à travailler avec Claude", "date": "2026-10-18", "sujets": ["IA", "Projets"], "resume": "Texte d'exemple pour la maquette, pas un vrai article.", "lien": "#", "exemple": true},
-  {"titre": "Exemple : ce site, comment il est fait", "date": "2026-10-15", "sujets": ["Projets", "Réseau"], "resume": "Texte d'exemple pour la maquette, pas un vrai article.", "lien": "#", "exemple": true}
+  {
+    "titre": "Comment ce site a été fait",
+    "date": "2026-10-25",
+    "sujets": [
+      "IA",
+      "Projets"
+    ],
+    "resume": "Discuter avec Claude pour construire un site : deux dépôts, des consignes, des passations, des skills et des robots.",
+    "lien": "creation-du-site/"
+  },
+  {
+    "titre": "Classer ma musique avec le BPM",
+    "date": "2026-10-24",
+    "sujets": [
+      "Musique",
+      "IA"
+    ],
+    "resume": "Trouver le tempo de chaque morceau pour faire des playlists « full chill » et « full énergique ».",
+    "lien": "bpm/"
+  },
+  {
+    "titre": "Exemple : monter un petit serveur à la maison",
+    "date": "2026-10-20",
+    "sujets": [
+      "Réseau"
+    ],
+    "resume": "Texte d'exemple pour la maquette, pas un vrai article.",
+    "lien": "#",
+    "exemple": true
+  },
+  {
+    "titre": "Exemple : apprendre à travailler avec Claude",
+    "date": "2026-10-18",
+    "sujets": [
+      "IA",
+      "Projets"
+    ],
+    "resume": "Texte d'exemple pour la maquette, pas un vrai article.",
+    "lien": "#",
+    "exemple": true
+  },
+  {
+    "titre": "Exemple : ce site, comment il est fait",
+    "date": "2026-10-15",
+    "sujets": [
+      "Projets",
+      "Réseau"
+    ],
+    "resume": "Texte d'exemple pour la maquette, pas un vrai article.",
+    "lien": "#",
+    "exemple": true
+  }
 ]
