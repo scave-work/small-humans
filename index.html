@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Small Humans</title>
@@ -461,6 +462,9 @@ tr.indispo .p-jouer,tr.indispo .p-artiste,tr.indispo .p-genre,.pan-item.indispo 
 a.aj-fav{display:inline-block;min-height:30px;line-height:30px;padding:0 14px;border-radius:999px;background:#0E1727;color:var(--accent);text-decoration:none;font-size:14px;cursor:grab}
 .aj-aide{color:var(--acier);font-size:13px;margin:10px 0 0}
 .aj-info{color:var(--accent);margin:0 0 10px}
+.aj-panneau .aj-lien{background:none;color:var(--acier);text-decoration:underline;font-size:13px;padding:0 4px}
+.aj-panneau .aj-lien:disabled{opacity:.4;cursor:default}
+.aj-panneau .aj-jeton{font:inherit;font-size:14px;width:100%;box-sizing:border-box;margin:8px 0;padding:6px 12px;border:0;border-radius:999px;background:#0E1727;color:var(--ink)}
 .mus-outils .case input{accent-color:var(--accent)}
 .mus-corps .mus-outils{gap:6px 8px}   /* la ligne de recherche à l'échelle des tags (15 px, 32 px de haut) */
 .mus-corps .mus-outils input[type=search],.mus-corps .mus-outils .case,.mus-corps .mus-outils button{min-height:32px;font-size:15px}
@@ -1160,7 +1164,7 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 25 oct, 73';
+const BUILD = 'v-backend 25 oct, 74';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1184,7 +1188,9 @@ function recevoirAjout(D) {   // le favori ouvre le site avec ?ajout=ID&t=titre&
 const pseudoTitre = x => { const g = GENRES_AJ.includes(x.genre) ? x.genre : 'autre'; return { youtube: x.youtube, titre: x.titre, artiste: x.artiste || '', genre: g, tags: [g], source: 'ajout', artiste_fiable: false, mix: false, local: true }; };
 function fusionnerAjouts(D) {   // les ajouts apparaissent dans la liste comme les autres titres, tant qu'ils ne sont pas dans titres.json
   const connus = new Set(D.titres.map(t => t.youtube));
-  M.ajouts = lireAjouts().filter(x => !connus.has(x.youtube));
+  const stock = lireAjouts(), reste = stock.filter(x => !connus.has(x.youtube));
+  if (reste.length !== stock.length) mem.ecrire('ajouts', reste);   // publiés dans titres.json : on les oublie ici
+  M.ajouts = reste;
   D.titres = D.titres.concat(M.ajouts.map(pseudoTitre));
 }
 function codeFavori() {   // le favori : lit l'adresse et le titre de la page YouTube ouverte (ou la page Spotify) et ouvre ce site
@@ -1199,7 +1205,33 @@ function codeFavori() {   // le favori : lit l'adresse et le titre de la page Yo
     "window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(t))}" +
     "else{alert('Ouvre une vidéo YouTube ou un titre Spotify.')}})()";
 }
-function majAjBtn() { const n = M.ajouts.length; $('#ajBtn').textContent = n ? `À ajouter (${n})` : 'À ajouter'; }
+/* Envoi direct : le site dépose un fichier dans musique/ajouts/ du dépôt public (jeton GitHub, le même que la page Cinéma : même origine, même mémoire du navigateur) ;
+   le robot .github/workflows/ajouts-musique.yml l'intègre à musique/titres.json en 1 à 2 minutes. « Sauvegarder en fichier » reste le secours (script 13). */
+const CLE_JETON = 'sh-cine-jeton', DEPOT_ENVOI = 'small-humans/small-humans.github.io';
+const jetonGH = () => { try { return localStorage.getItem(CLE_JETON) || ''; } catch (e) { return ''; } };
+const ajoutsNonEnvoyes = () => M.ajouts.filter(x => !x._env);
+function exporterFichier() {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(M.ajouts.map(({ _env, ...x }) => x), null, 2)], { type: 'application/json' }));
+  a.download = 'ajouts_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
+}
+async function envoyerAjouts() {
+  const j = jetonGH(), l = ajoutsNonEnvoyes();
+  if (!l.length) return;
+  if (!j) { M.ajJeton = true; return dessinerAj(); }
+  M.infoAj = 'Envoi…'; dessinerAj();
+  try {
+    const corps = JSON.stringify(l.map(({ _env, ...x }) => x), null, 2);
+    const r = await fetch(`https://api.github.com/repos/${DEPOT_ENVOI}/contents/musique/ajouts/ajouts_${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+      { method: 'PUT', headers: { Authorization: 'Bearer ' + j, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Musique : ajouts envoyés depuis le site', content: btoa(unescape(encodeURIComponent(corps))) }) });
+    if (r.status === 401 || r.status === 403 || r.status === 404) { M.ajJeton = true; M.infoAj = 'GitHub a refusé le jeton (périmé ou sans droit d’écriture).'; return dessinerAj(); }
+    if (!r.ok) throw new Error(r.status);
+    const ids = new Set(l.map(x => x.youtube));
+    mem.ecrire('ajouts', lireAjouts().map(y => ids.has(y.youtube) ? { ...y, _env: true } : y)); l.forEach(x => { x._env = true; });
+    M.ajJeton = false; M.infoAj = `Envoyé (${l.length}). Ils arrivent dans la liste d’ici 1 à 2 minutes : recharge la page.`;
+  } catch (e) { M.ajJeton = true; M.infoAj = 'Échec de l’envoi : jeton mal copié ou connexion coupée. Colle-le à nouveau, ou utilise « Sauvegarder en fichier ».'; }
+  dessinerAj(); majAjBtn();
+}
+function majAjBtn() { const n = ajoutsNonEnvoyes().length; $('#ajBtn').textContent = n ? `À ajouter (${n})` : 'À ajouter'; }
 function dessinerAj() {
   const pn = $('#ajPanneau'); pn.textContent = '';
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
@@ -1210,7 +1242,7 @@ function dessinerAj() {
   M.ajouts.forEach(x => {
     const tr = M.parId.get(x.youtube); const l = el('div', 'aj-ligne');
     const pl = el('button', '', '▶'); pl.type = 'button'; pl.setAttribute('aria-label', 'Écouter'); pl.addEventListener('click', () => { if (tr) lancer(tr); });
-    const t = el('div', 'aj-t', x.titre); if (x.artiste) t.appendChild(el('small', '', '  ' + x.artiste));
+    const t = el('div', 'aj-t', x.titre); if (x.artiste) t.appendChild(el('small', '', '  ' + x.artiste)); if (x._env) t.appendChild(el('small', '', '  · envoyé'));
     const sel = el('select'); sel.setAttribute('aria-label', 'Style');
     const o0 = el('option', '', 'style ?'); o0.value = ''; sel.appendChild(o0);
     [...GENRES_AJ].sort((u, v) => u.localeCompare(v, 'fr')).forEach(g => { const o = el('option', '', g); o.value = g; if (g === x.genre) o.selected = true; sel.appendChild(o); });
@@ -1223,17 +1255,20 @@ function dessinerAj() {
     });
     l.append(pl, t, sel, del); pn.appendChild(l);
   });
+  if (M.ajJeton) {
+    const c = el('input', 'aj-jeton'); c.type = 'password'; c.autocomplete = 'off'; c.placeholder = 'Colle le jeton GitHub ici'; c.setAttribute('aria-label', 'Jeton GitHub');
+    const ok = el('button', 'aj-prim', 'Enregistrer et envoyer'); ok.type = 'button';
+    ok.addEventListener('click', () => { const v = c.value.trim(); if (!v) return; try { localStorage.setItem(CLE_JETON, v); } catch (e) { /* tant pis */ } M.ajJeton = false; envoyerAjouts(); });
+    pn.append(el('p', 'aj-aide', 'Colle ton jeton une seule fois : il reste dans ce navigateur.'), c, ok);
+  }
   const bas = el('div', 'aj-bas');
-  const ex = el('button', 'aj-prim', 'Exporter le fichier'); ex.type = 'button'; ex.disabled = !M.ajouts.length;
-  ex.addEventListener('click', () => {
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(M.ajouts, null, 2)], { type: 'application/json' }));
-    a.download = 'ajouts_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
-  });
+  const env = el('button', 'aj-prim', 'Envoyer'); env.type = 'button'; env.disabled = !ajoutsNonEnvoyes().length; env.addEventListener('click', envoyerAjouts);
   const fav = el('a', 'aj-fav', '+ Site'); fav.href = 'javascript:' + codeFavori(); fav.title = 'Glisse ce bouton dans ta barre de favoris'; fav.addEventListener('click', e => e.preventDefault());
-  bas.append(ex, fav); pn.appendChild(bas);
-  pn.appendChild(el('p', 'aj-aide', 'Ces titres restent dans ce navigateur. Pour les rendre permanents : « Exporter le fichier », puis lancer Integrer_mes_ajouts.bat. Favori : glisse « + Site » dans ta barre de favoris (Ctrl+Maj+B pour l’afficher).'));
+  const ex = el('button', 'aj-lien', 'Sauvegarder en fichier'); ex.type = 'button'; ex.disabled = !M.ajouts.length; ex.addEventListener('click', exporterFichier);
+  bas.append(env, fav, ex); pn.appendChild(bas);
+  pn.appendChild(el('p', 'aj-aide', 'Ces titres restent dans ce navigateur jusqu’à l’envoi. Favori : glisse « + Site » dans ta barre de favoris (Ctrl+Maj+B pour l’afficher).'));
 }
-function fermerAj() { M.infoAj = ''; $('#ajPanneau').hidden = true; $('#ajBtn').setAttribute('aria-expanded', 'false'); }
+function fermerAj() { M.infoAj = ''; M.ajJeton = false; $('#ajPanneau').hidden = true; $('#ajBtn').setAttribute('aria-expanded', 'false'); }
 function ouvrirAj() {
   const pn = $('#ajPanneau'), b = $('#ajBtn').getBoundingClientRect(); dessinerAj(); pn.hidden = false; $('#ajBtn').setAttribute('aria-expanded', 'true');
   const w = pn.offsetWidth; pn.style.top = Math.round(b.bottom + 8) + 'px'; pn.style.left = Math.max(8, Math.min(Math.round(b.left), innerWidth - w - 8)) + 'px';
@@ -2140,7 +2175,7 @@ async function demarrer() {
   let D = null;
   try {
     D = {"titre":"SMALL HUMANS","passions":[{"id":"musique","court":"MUSIQUE","nom":"Musique","phrase":"Mes favoris rangés par genre, à écouter d’un clic.","ouvert":true},{"id":"cinema","court":"CINÉMA","nom":"Cinéma, séries, anime","phrase":"Tout ce que je regarde, noté ou non, et la liste à voir.","ouvert":true,"lien":"cinema/"},{"id":"ecriture","court":"ÉCRITURE","nom":"Écriture","phrase":"Mes textes, protégés par un mot de passe.","ouvert":false},{"id":"tech","court":"TECH & IA","nom":"Tech & IA","phrase":"Mes projets perso et ce que j’apprends avec l’IA.","ouvert":true,"lien":"tech/"}],"genres":["synthwave","electronica","electro-melodique","house-techno","french-touch","neoclassique"],"titres":[{"titre":"Un nouveau soleil","artiste":"M83","genre":"synthwave","youtube":"36mlX318Q3w"},{"titre":"Strands Unravel","artiste":"DEADLIFE","genre":"synthwave","youtube":"cGYtl4L6ajY"},{"titre":"The Way Home","artiste":"Magic Sword","genre":"synthwave","youtube":"mCikIkXslP0"},{"titre":"Roller Mobster","artiste":"Carpenter Brut","genre":"synthwave","youtube":"qFfybn_W8Ak"},{"titre":"Rhubarb","artiste":"Aphex Twin","genre":"electronica","youtube":"_AWIqXzvX-U"},{"titre":"Resonance","artiste":"HOME","genre":"electronica","youtube":"8GW6sLrK40k"},{"titre":"Vanished","artiste":"Crystal Castles","genre":"electronica","youtube":"9XViPhRnOiQ"},{"titre":"Two Thousand and Seventeen","artiste":"Four Tet","genre":"electronica","youtube":"CUYboWbVe0A"},{"titre":"Inner Peace","artiste":"CloZee","genre":"electro-melodique","youtube":"1IQiwy_m8_U"},{"titre":"Beyond","artiste":"OVERWERK","genre":"electro-melodique","youtube":"9Vjt_K7rsnw"},{"titre":"Snowflakes","artiste":"Rawtekk","genre":"electro-melodique","youtube":"a-GHEHTtNrE"},{"titre":"Push Through","artiste":"DROELOE","genre":"electro-melodique","youtube":"aZrkZGApUcw"},{"titre":"La Parisienne","artiste":"Worakls","genre":"house-techno","youtube":"5zwjkfmMwb4"},{"titre":"Little Voices","artiste":"Lane 8","genre":"house-techno","youtube":"8jXUSxq30hA"},{"titre":"Burnt","artiste":"Kiasmos","genre":"house-techno","youtube":"c4f7GtBR3RM"},{"titre":"Arquipelago","artiste":"Gui Boratto","genre":"house-techno","youtube":"7Y2W2-oSqOU"},{"titre":"Vertigo Valley","artiste":"French 79","genre":"french-touch","youtube":"hD9rzo6g5JU"},{"titre":"Haine-moi","artiste":"Møme","genre":"french-touch","youtube":"Gq_0sz0_Wkg"},{"titre":"Monaco","artiste":"Bon Entendeur","genre":"french-touch","youtube":"bKUMaibnQKU"},{"titre":"Prelude","artiste":"The Blaze","genre":"french-touch","youtube":"76r4l-BV9U4"},{"titre":"Infra 5","artiste":"Max Richter","genre":"neoclassique","youtube":"B4Kybxu7fiQ"},{"titre":"Non-eternal","artiste":"Max Richter","genre":"neoclassique","youtube":"bMzEClKWUxc"},{"titre":"Love","artiste":"Ben Lukas Boysen","genre":"neoclassique","youtube":"j7usC68u6kk"},{"titre":"Cantorum","artiste":"Penguin Cafe","genre":"neoclassique","youtube":"mRcceK-0G7w"}]};
-    try { const r = await fetch('musique/titres.json?b=' + encodeURIComponent(BUILD)); if (!r.ok) throw 0; D.titres = await r.json(); }
+    try { const r = await fetch('musique/titres.json?b=' + encodeURIComponent(BUILD), { cache: 'no-cache' }); if (!r.ok) throw 0; D.titres = await r.json(); }
     catch (e) { erreur('Les titres (musique/titres.json) n’ont pas pu être lus : on garde les titres d’exemple. Ouvre la page depuis GitHub Pages ou un petit serveur local, pas en double-clic.'); }
   } catch (e) {
     erreur('Les données n’ont pas pu être lues.');
