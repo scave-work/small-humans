@@ -1,0 +1,24 @@
+{
+ "version": 1,
+ "titres": [
+  {
+   "id": "tmdb-tv-213562",
+   "type": "serie",
+   "titre": "Crystal Lake",
+   "annee": 2026,
+   "statut": "vu",
+   "date_vu": "2026-10-15",
+   "genres": [
+    "Drame",
+    "Mystère"
+   ],
+   "affiche": "/v1XEjgqIlHvbjbEG6YSZVGTVUg0.jpg",
+   "tmdb": {
+    "id": 213562,
+    "type": "tv"
+   },
+   "ajoute_le": "2026-10-25",
+   "maj": "2026-10-25"
+  }
+ ]
+}
