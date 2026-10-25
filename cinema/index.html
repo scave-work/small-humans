@@ -262,7 +262,7 @@ textarea.export{min-height:180px;font-size:13px}
 <script>
 (() => {
 'use strict';
-const VERSION = '0.11 · 25 oct. 2026';
+const VERSION = '0.12 · 25 oct. 2026';
 const IMG = 'https://image.tmdb.org/t/p/';
 const CLE = 'sh-cine-ajouts';
 const CHAMPS = ['id','type','titre','annee','statut','date_vu','note','commentaire','envie','genres','duree_min','affiche','tmdb','ajoute_le','maj'];
@@ -282,6 +282,7 @@ function h(tag, a, ...fils) {
 }
 const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const aujourdhui = () => new Date().toLocaleDateString('sv-SE');
+const dateParDefaut = f => (/^\d{4}-\d{2}-\d{2}$/.test(f.sortie || '') && f.sortie < aujourdhui()) ? f.sortie : aujourdhui();   // date de sortie si connue et passée
 const fmtNote = n => String(n).replace('.', ',');
 const fmtDate = (d, long) => new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', long ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'short' });
 
@@ -517,14 +518,14 @@ function champNote(init, onChange) {
 function formulaire(f, passerVu) {
   const neuf = !fusion().some(x => x.id === f.id);
   if (passerVu) { f.statut = 'vu'; delete f.envie; }
-  if (f.statut === 'vu' && !f.date_vu) f.date_vu = aujourdhui();
+  if (f.statut === 'vu' && !f.date_vu) f.date_vu = dateParDefaut(f);
   const corps = h('div', { class: 'corps' });
   const msg = h('p', { class: 'alerte', role: 'alert' });
   const dessiner = () => {
     corps.textContent = '';
     corps.append(h('div', { class: 'f-haut petit' }, affiche(f, 'grand'), h('div', null, h('h3', null, f.titre), h('p', null, infosDe(f)), f.genres && f.genres.length ? h('p', null, f.genres.join(', ')) : null)));
     if (neuf) corps.append(h('div', { class: 'champ' }, h('span', { class: 'lib' }, 'Statut'),
-      h('div', { class: 'choix' }, [['vu', 'Vu'], ['a_voir', 'À voir']].map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.statut === v), on: { click: () => { f.statut = v; if (v === 'vu' && !f.date_vu) f.date_vu = aujourdhui(); dessiner(); } } }, t)))));
+      h('div', { class: 'choix' }, [['vu', 'Vu'], ['a_voir', 'À voir']].map(([v, t]) => h('button', { type: 'button', 'aria-pressed': String(f.statut === v), on: { click: () => { f.statut = v; if (v === 'vu' && !f.date_vu) f.date_vu = dateParDefaut(f); dessiner(); } } }, t)))));
     if (f.statut === 'vu') {
       corps.append(champNote(f.note, n => { f.note = n; }));
       corps.append(h('div', { class: 'champ com' }, h('label', { for: 'ch-com' }, 'Commentaire (facultatif)'), h('textarea', { id: 'ch-com', maxlength: 1000, on: { input: e => { f.commentaire = e.target.value; } } }, f.commentaire || '')));
