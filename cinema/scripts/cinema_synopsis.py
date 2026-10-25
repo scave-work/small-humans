@@ -15,6 +15,12 @@ ICI = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(ICI, '..')) if os.path.isdir(os.path.join(ICI, '..', 'data', 'base')) else os.path.normpath(os.path.join(ICI, '..', '..', '..', '..', 'small-humans', 'cinema'))
 
 
+def ecrire(chemin, donnees):
+    os.makedirs(os.path.dirname(chemin), exist_ok=True)
+    with open(chemin, 'w', encoding='utf-8', newline='
+') as f: json.dump(donnees, f, ensure_ascii=False, sort_keys=True, indent=0)
+
+
 def titres_connus(site):
     """{id: (annee, type_tmdb, id_tmdb)} pour la base (data/base/*.json) et les journaux."""
     out = {}
@@ -49,10 +55,10 @@ def main():
             existants[annee][i] = texte   # chaîne vide = TMDB n'a pas de résumé en français (on ne redemande pas)
             sale.add(annee)
             if n % 100 == 0:
-                for an in sale: lib.ecrire_json(os.path.join(dossier, f'{an}.json'), existants[an])
+                for an in sale: ecrire(os.path.join(dossier, f'{an}.json'), existants[an])
                 sale.clear(); print(f'{n} / {len(reste)}')
     finally:
-        for an in sale: lib.ecrire_json(os.path.join(dossier, f'{an}.json'), existants[an])
+        for an in sale: ecrire(os.path.join(dossier, f'{an}.json'), existants[an])
     print('Terminé.')
 
 
