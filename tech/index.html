@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tech &amp; IA – Small Humans</title>
+<style>
+@font-face{font-family:Raleway;src:url(../cinema/Raleway.woff2) format("woff2");font-weight:100 900;font-display:swap}
+:root{color-scheme:dark;--fond:#0b1020;--carte:#121a33;--bord:#24305a;--texte:#dfe6f7;--doux:#8f9bc4;--accent:#6FA8FF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fond);color:var(--texte);font:17px/1.55 Raleway,system-ui,sans-serif}
+main{max-width:40rem;margin:0 auto;padding:20px 16px 64px}
+a{color:var(--accent)}
+.retour{text-decoration:none;display:inline-block;padding:10px 0}
+h1{font-weight:300;letter-spacing:.2em;text-transform:uppercase;font-size:1.5rem;margin:.4em 0 .2em}
+.intro{color:var(--doux);margin:0 0 1.2em}
+.pastilles{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 1.4em;padding:0;list-style:none}
+.pastilles button{font:inherit;font-size:.9rem;color:var(--texte);background:transparent;border:1px solid var(--bord);border-radius:999px;min-height:44px;padding:0 16px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease}
+.pastilles button:hover{border-color:var(--accent)}
+.pastilles button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#0b1020}
+.pastilles .n{opacity:.6;margin-left:6px;font-size:.8rem}
+.liste{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.liste a.carte{display:block;text-decoration:none;color:inherit;background:var(--carte);border:1px solid var(--bord);border-radius:10px;padding:14px 16px;transition:border-color .15s ease}
+.liste a.carte:hover{border-color:var(--accent)}
+.carte h2{font-size:1.05rem;font-weight:600;margin:0 0 2px}
+.carte .meta{color:var(--doux);font-size:.82rem;margin:0 0 6px}
+.carte p{margin:0;color:var(--doux);font-size:.95rem}
+.tag{display:inline-block;border:1px solid var(--bord);border-radius:999px;padding:0 8px;margin-left:6px;font-size:.75rem}
+.vide{color:var(--doux)}
+</style>
+</head>
+<body>
+<main>
+<a class="retour" href="../">← Small Humans</a>
+<h1>Tech &amp; IA</h1>
+<p class="intro">Mes projets perso et ce que j'apprends avec l'IA. <em>Maquette : les articles « Exemple » sont des faux.</em></p>
+<ul class="pastilles" id="pastilles" aria-label="Filtrer par sujet"></ul>
+<ul class="liste" id="liste"></ul>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const dateFr = d => new Date(d + 'T12:00').toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
+let articles = [], sujet = new URLSearchParams(location.search).get('sujet') || '';
+function dessiner() {
+  const sujets = [...new Set(articles.flatMap(a => a.sujets))].sort((a, b) => a.localeCompare(b, 'fr'));
+  if (sujet && !sujets.includes(sujet)) sujet = '';
+  const pastille = (nom, n, val) => `<li><button type="button" data-sujet="${val}" aria-pressed="${sujet === val}">${nom}<span class="n">${n}</span></button></li>`;
+  $('#pastilles').innerHTML = pastille('Tout', articles.length, '') + sujets.map(s => pastille(s, articles.filter(a => a.sujets.includes(s)).length, s)).join('');
+  const vus = articles.filter(a => !sujet || a.sujets.includes(sujet)).sort((a, b) => b.date.localeCompare(a.date));
+  $('#liste').innerHTML = vus.length ? vus.map(a => `<li><a class="carte" href="${a.lien}"><h2>${a.titre}</h2><p class="meta">${dateFr(a.date)}${a.sujets.map(s => `<span class="tag">${s}</span>`).join('')}</p><p>${a.resume}</p></a></li>`).join('') : '<li class="vide">Aucun article pour ce sujet.</li>';
+}
+$('#pastilles').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  sujet = b.dataset.sujet;
+  history.replaceState(null, '', location.pathname + (sujet ? '?sujet=' + encodeURIComponent(sujet) : ''));
+  dessiner();
+});
+fetch('articles.json').then(r => r.json()).then(j => { articles = j; dessiner(); })
+  .catch(() => { $('#liste').innerHTML = '<li class="vide">Les articles n\'ont pas pu être lus. Ouvre la page depuis GitHub Pages ou un petit serveur local.</li>'; });
+</script>
+</body>
+</html>
