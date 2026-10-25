@@ -70,8 +70,8 @@ body[data-vue="intro"] .nav{display:none}
 .voyant{width:10px;height:14px;border-radius:2px;background:var(--coque);transition:background-color .12s ease}
 .son[aria-pressed="true"]{color:var(--ink)}
 .son[aria-pressed="true"] .voyant{background:var(--ink);box-shadow:var(--halo)} /* taste-skill-ignore : halo autorisé par Simon (titre ou cellule allumée, un seul niveau) */
-.son svg{opacity:.35;transition:opacity .18s ease}
-.son[aria-pressed="false"] .i-coupe,.son[aria-pressed="true"] .i-actif{opacity:1}
+.son .i-actif,.son[aria-pressed="true"] .i-coupe{display:none}
+.son[aria-pressed="true"] .i-actif{display:block}
 @media (max-width:600px){
   .titre{font-size:16px}
   body[data-vue="galerie"] .nav a[href="#galerie"], body[data-vue="musique"] .nav a[href="#musique"]{display:none}
