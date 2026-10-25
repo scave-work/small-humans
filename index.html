@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Small Humans</title>
@@ -1161,14 +1160,14 @@ function cellsPlatine() {   // les titres de la page courante, répartis réguli
   return M.D.titres.map((_, i) => -Math.PI / 2 + (i + .5) * TAU / n);
 }
 let ANG = [];
-const BUILD = 'v-backend 25 oct, 72';
+const BUILD = 'v-backend 25 oct, 73';
 const N_ANNEAU = 36, PAGE = 100;
 let PY = null, apiDemandee = false, apiPrete = false, attente = null;
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const suiteTexte = () => { const n = M.file.length; return n ? `À suivre : « ${M.file[0].titre} »${n > 1 ? ` (+${n - 1})` : ''}` : ''; };   // le prochain morceau = le premier de la file
 const mlg = t => { $('#lMsg').textContent = t || suiteTexte(); };
 /* ---------- « À ajouter » : titres trouvés sur YouTube/Spotify avec le favori « + Site » ----------
-   Gardés dans CE navigateur seulement (jamais écrits dans les données publiques), puis exportés en fichier et intégrés par backend/scripts/13_integrer_ajouts.py. */
+   Gardés dans CE navigateur seulement (jamais écrits dans les données publiques), puis exportés en fichier et intégrés par musique/scripts/13_integrer_ajouts.py. */
 const GENRES_AJ = ['house-techno', 'electro-melodique', 'electro-pop', 'electronica', 'french-touch', 'synthwave', 'trance-psy', 'hard-edm', 'edm', 'bass', 'dub-reggae', 'chill', 'ambient', 'neoclassique', 'ost', 'folk-world', 'hiphop', 'rock-metal', 'pop-indie', 'epic', 'funk-jazz', 'autre'];
 const ID_YT = /^[\w-]{11}$/;
 const lireAjouts = () => { const a = mem.lire('ajouts', []); return Array.isArray(a) ? a.filter(x => x && ID_YT.test(String(x.youtube)) && typeof x.titre === 'string') : []; };
