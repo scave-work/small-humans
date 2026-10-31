@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comment on a mené les animations 3D</title>
+<style>
+:root{--bg:#0b1020;--panel:#141b33;--line:#2a3560;--tx:#e6e9f5;--mut:#9aa3c7;--lk:#6FA8FF;--ok:#7fd6a0;--ko:#ff8a7a;--wait:#f2c46d;--new:#c59bff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 Raleway,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:2rem;margin:.2em 0}h2{margin:2.2em 0 .5em;border-bottom:1px solid var(--line);padding-bottom:.2em}h3{margin:1.4em 0 .3em}
+a{color:var(--lk)}p.lead{color:var(--mut);font-size:1.05rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.tag{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:99px;border:1px solid currentColor;margin-right:6px}
+.ok{color:var(--ok)}.ko{color:var(--ko)}.wait{color:var(--wait)}.new{color:var(--new)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;margin:10px 0}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}
+code{background:#0006;padding:1px 5px;border-radius:4px;font-size:.88em}
+pre{background:#0008;border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto;font-size:.85rem;white-space:pre-wrap}
+svg{width:100%;height:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+svg text{fill:var(--tx);font:13px Raleway,system-ui,sans-serif}svg .m{fill:var(--mut);font-size:11px}
+.note{color:var(--mut);font-size:.9rem}
+details{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}summary{cursor:pointer;font-weight:600}
+@media(max-width:640px){h1{font-size:1.5rem}}
+.pit{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:8px}
+.pit div{background:#0b1020;border:1px solid var(--line);border-left:4px solid var(--ko);border-radius:8px;padding:8px 10px;font-size:.9rem}
+.pit b{display:block;color:var(--ko);font-size:1.3rem;line-height:1}
+.ba td:nth-child(2){background:#ff8a7a14}.ba td:nth-child(3){background:#c59bff14}
+</style>
+</head>
+<body>
+<main>
+<p class="note"><a href="../">← Cheminement des rendus</a> · 2026-10-31</p>
+<h1>Comment on a mené les animations 3D</h1>
+<p class="lead">Les pages « cheminement » montrent <em>ce qui</em> a été fabriqué (île, phare, porte). Celle-ci montre <em>comment</em> on a travaillé : la méthode, ses versions, les outils, ce qui a servi, ce qui a fait perdre du temps, et la marche à suivre pour le prochain projet. Légende : <span class="tag ok">gardé</span><span class="tag ko">abandonné / a échoué</span><span class="tag wait">en attente</span><span class="tag new">v3 : adoptée, à tester</span></p>
+
+<div class="card"><strong>En trois phrases.</strong> La méthode a bien tenu pour le <em>mouvement</em> (porte sur formes grises validée en 13 minutes). Elle a échoué pour le <em>décor</em> : 7 retours de Simon et 10 commits en 41 minutes sur un seul point (« est-ce crédible ? »), parce que le rendu était plafonné par l'outil (formes de base écrites en code, symétriques), jugé sur de petites captures et sans image de référence réellement vue. La version 3, adoptée le 31 oct (section 6), corrige cela avant d'écrire une ligne de code.</div>
+
+<svg viewBox="0 0 940 170" role="img" aria-label="Le chemin en trois temps">
+ <g text-anchor="middle">
+  <rect x="20" y="20" width="270" height="110" rx="10" fill="#0b1020" stroke="#7fd6a0"/><text x="155" y="48" font-weight="700">1. Ce qu'on a fait</text>
+  <text class="m" x="155" y="72">phare (30 oct) puis porte (31 oct)</text><text class="m" x="155" y="90">fiche, mouvement gris, décor</text><text class="m" x="155" y="108">mouvement validé en 13 min</text>
+  <rect x="335" y="20" width="270" height="110" rx="10" fill="#0b1020" stroke="#ff8a7a"/><text x="470" y="48" font-weight="700">2. Ce qui a raté</text>
+  <text class="m" x="470" y="72">décor : 7 retours, 10 commits, 41 min</text><text class="m" x="470" y="90">outil pauvre (formes de base)</text><text class="m" x="470" y="108">références non vues, petites captures</text>
+  <rect x="650" y="20" width="270" height="110" rx="10" fill="#0b1020" stroke="#c59bff"/><text x="785" y="48" font-weight="700">3. Maintenant (v3)</text>
+  <text class="m" x="785" y="72">références vues avant la fiche</text><text class="m" x="785" y="90">image fixe du décor avant la 3D</text><text class="m" x="785" y="108">3e retour : arrêt et diagnostic</text>
+ </g>
+ <g stroke="#9aa3c7" stroke-width="2" marker-end="url(#a)"><line x1="290" y1="75" x2="333" y2="75"/><line x1="605" y1="75" x2="648" y2="75"/></g>
+</svg>
+
+<h2>Lire en 1 minute : avant, maintenant, pièges</h2>
+<table class="ba">
+<tr><th></th><th>AVANT (appliqué jusqu'au 31 oct)</th><th>MAINTENANT (v3, adoptée, à tester)</th></tr>
+<tr><td>Références</td><td>fiche validée sans image ; vidéo citée mais non ouverte</td><td>2 images ouvertes et vues avant la fiche</td></tr>
+<tr><td>Questions</td><td>sur l'animation seulement</td><td>+ niveau de finition, + moyens (code seul / modèles libres / Blender)</td></tr>
+<tr><td>Décor</td><td>code → petite capture → retouche, en boucle</td><td>planche d'ambiance en image fixe validée <em>avant</em> la 3D</td></tr>
+<tr><td>« Fini »</td><td>seulement le mouvement</td><td>critère esthétique écrit (plein écran, pas de symétrie, échelle)</td></tr>
+<tr><td>Contrôle</td><td>tuiles d'environ 430 px</td><td>capture en grand (1920 px) pour la matière</td></tr>
+<tr><td>Boucles</td><td>règle des 3 retours, comptée par détail</td><td>comptée par question ; au 3e : diagnostic écrit avant retouche</td></tr>
+<tr><td>Modèles</td><td>Sonnet medium pour tout, Opus en rattrapage</td><td>Sonnet pour le mouvement ; Opus high dès le 1er essai du décor, avec les images</td></tr>
+</table>
+<div class="card"><h3 class="ko" style="margin-top:0">Les 8 pièges à retenir</h3><div class="pit"><div><b>1</b>Citer une référence sans l'ouvrir (« non vu » = zéro).</div><div><b>2</b>Découper un même problème en détails (falaise, blocs, dalles, roche) : le compteur de retours repart à zéro et la boucle continue.</div><div><b>3</b>Juger une matière sur une petite capture.</div><div><b>4</b>Croire qu'un modèle plus fort règle un plafond d'outil (formes de base, symétrie dans le code).</div><div><b>5</b>Lancer un sous-agent sans lui donner les images de Simon ni de vrai temps de regarder.</div><div><b>6</b>Changer de style en cours de route (3 changements en 15 min sur le phare).</div><div><b>7</b>Commiter vite (1 commit / 1-2 min) : on ajuste un chiffre, on ne repense pas la forme.</div><div><b>8</b>Traiter comme « animation » (type A) un sujet qui est en fait un décor (type B).</div></div></div>
+<div class="card"><strong>Statut :</strong> la v3 est <strong>adoptée le 2026-10-31</strong> (accord de Simon) : elle est écrite dans <code>docs/METHODE.md</code> (« Évolution v3 »), <code>docs/GUIDE_PROMPTS.md</code> et la règle 11 de <code>CLAUDE.md</code>, donc chargée par les prochaines sessions. Pas encore testée sur un vrai projet. Non tranché : autoriser les modèles/textures libres dans <code>animation3d/CLAUDE.md</code> (aujourd'hui « éviter modèles importés »).</div>
+
+<h2>1. La méthode a évolué en 4 versions</h2>
+<svg viewBox="0 0 940 250" role="img" aria-label="Frise des versions de la méthode">
+ <line x1="30" y1="120" x2="910" y2="120" stroke="#2a3560" stroke-width="3"/>
+ <g>
+  <circle cx="90" cy="120" r="9" fill="#ff8a7a"/><text x="90" y="80" text-anchor="middle">25 oct · logo</text><text class="m" x="90" y="98" text-anchor="middle">3 sessions, 4 rendus</text>
+  <text class="m" x="90" y="150" text-anchor="middle">sens et références</text><text class="m" x="90" y="165" text-anchor="middle">arrivés trop tard</text>
+  <circle cx="290" cy="120" r="9" fill="#7fd6a0"/><text x="290" y="80" text-anchor="middle">25 oct · v1</text><text class="m" x="290" y="98" text-anchor="middle">4 phases, fiche modèle</text>
+  <text class="m" x="290" y="150" text-anchor="middle">État → Explorer →</text><text class="m" x="290" y="165" text-anchor="middle">Décider → Construire</text>
+  <circle cx="490" cy="120" r="9" fill="#ff8a7a"/><text x="490" y="80" text-anchor="middle">30 oct · phare</text><text class="m" x="490" y="98" text-anchor="middle">5 couches en 16 min</text>
+  <text class="m" x="490" y="150" text-anchor="middle">« très moche » ;</text><text class="m" x="490" y="165" text-anchor="middle">sujet gelé</text>
+  <circle cx="690" cy="120" r="9" fill="#7fd6a0"/><text x="690" y="80" text-anchor="middle">31 oct · v2</text><text class="m" x="690" y="98" text-anchor="middle">types A/B, planche 2e retour</text>
+  <text class="m" x="690" y="150" text-anchor="middle">mouvement validé vite ;</text><text class="m" x="690" y="165" text-anchor="middle">décor en boucle</text>
+  <circle cx="880" cy="120" r="9" fill="#c59bff"/><text x="880" y="80" text-anchor="middle">31 oct · v3</text><text class="m" x="880" y="98" text-anchor="middle">proposée (critique)</text>
+  <text class="m" x="880" y="150" text-anchor="middle">références vues,</text><text class="m" x="880" y="165" text-anchor="middle">planche d'abord</text>
+ </g>
+ <text class="m" x="30" y="225">Sources : docs/METHODE.md, docs/GUIDE_PROMPTS.md, animation3d/PLAN_ACTION.md, animation3d/analyse/CRITIQUE_METHODE.md</text>
+</svg>
+
+<details open><summary>v1 · les 4 phases (25 oct)</summary>
+<p>Phase 0 <strong>État</strong> (Claude lit l'existant et dit ce qui est périmé) → 1 <strong>Explorer</strong> (options, questions) → 2 <strong>Décider</strong> (Simon tranche, la fiche est écrite) → 3 <strong>Construire</strong> (seulement la fiche) → 4 <strong>Retenir</strong> (une ligne dans le contexte du sujet). Raccourcis : écrire <code>Phase 1 : &lt;sujet&gt;</code> puis <code>Phase 4</code>. Règle des 3 allers-retours.</p></details>
+<details><summary>Phare (30 oct) · ce que cela a montré</summary>
+<p>5 couches (ciel, mer, phare, vague, faisceaux) commitées en 16 minutes. Le style a changé 3 fois en 15 minutes avant la 3D (encre colorée, Tunic, puis formes Tunic avec couleurs d'une peinture de tempête). Sujet jugé trop gros (eau, vague, écume) et style mal adapté. Mouvement jamais vu par Claude (images fixes).</p></details>
+<details><summary>v2 · méthode pour tout le site (31 oct, décision de Simon)</summary>
+<p>Claude propose 3 approches recherchées (ce qui n'est pas ouvert est marqué « non vu ») ; l'idée est <strong>typée</strong> A (portée par l'animation) ou B (portée par le décor) ; pipeline par couche ; mouvement vérifié par images à instants fixes (<code>?p=</code>) ; <strong>planche de 3 variantes au 2e retour, nouvelle fiche au 3e</strong> ; garde-fous (reduced-motion, repli sans WebGL, etc.) seulement à la mise en production ; <code>/usage</code> noté.</p></details>
+
+<h2>2. Le pipeline v2 tel qu'appliqué à la porte</h2>
+<svg viewBox="0 0 940 200" role="img" aria-label="Pipeline de la porte">
+ <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9aa3c7"/></marker></defs>
+ <g stroke="#2a3560" fill="#0b1020">
+  <rect x="10" y="40" width="120" height="60" rx="8" stroke="#7fd6a0"/><rect x="160" y="40" width="120" height="60" rx="8" stroke="#7fd6a0"/><rect x="310" y="40" width="130" height="60" rx="8" stroke="#7fd6a0"/><rect x="470" y="40" width="130" height="60" rx="8" stroke="#ff8a7a"/><rect x="630" y="40" width="130" height="60" rx="8" stroke="#ff8a7a"/><rect x="790" y="40" width="130" height="60" rx="8" stroke="#f2c46d"/>
+ </g>
+ <g text-anchor="middle"><text x="70" y="66">Fiche S</text><text class="m" x="70" y="84">6 instants</text>
+ <text x="220" y="66">Mouvement</text><text class="m" x="220" y="84">formes grises, 13 min</text>
+ <text x="375" y="66">Habillage v1</text><text class="m" x="375" y="84">validé « Oui »</text>
+ <text x="535" y="66">Décor L, A/B/C</text><text class="m" x="535" y="84">« pas ancré »</text>
+ <text x="695" y="66">B ×4 (falaise, roche)</text><text class="m" x="695" y="84">7 retours en 41 min</text>
+ <text x="855" y="66">D / E / F (Opus)</text><text class="m" x="855" y="84">rendu arrêté</text></g>
+ <g stroke="#9aa3c7" stroke-width="2" marker-end="url(#a)"><line x1="130" y1="70" x2="158" y2="70"/><line x1="280" y1="70" x2="308" y2="70"/><line x1="440" y1="70" x2="468" y2="70"/><line x1="600" y1="70" x2="628" y2="70"/><line x1="760" y1="70" x2="788" y2="70"/></g>
+ <text class="m" x="10" y="140">Vert = a fonctionné · rouge = boucle · jaune = en attente de Simon.</text>
+ <text class="m" x="10" y="160">Le problème de la porte est devenu « type B » (le décor doit être beau en image fixe) dès la version L, mais on a continué en mode « type A ».</text>
+</svg>
+
+<h2>3. La boîte à outils (où se trouve quoi)</h2>
+<table>
+<tr><th>Élément</th><th>Rôle</th><th>Où</th><th>Statut</th></tr>
+<tr><td>Règles du projet</td><td>chargées à chaque session</td><td><code>CLAUDE.md</code> (racine) + un par sujet</td><td class="ok">gardé</td></tr>
+<tr><td>Fiche modèle</td><td>résultat visé, je veux / ne veux pas, S/L, fini quand</td><td><code>docs/FICHE_MODELE.md</code>, <code>animation3d/FICHE_PORTE.md</code></td><td class="ok">gardé (critère « fini » à compléter)</td></tr>
+<tr><td>Méthode / prompts</td><td>4 phases, v2, squelette de prompt, modèle ↔ tâche</td><td><code>docs/METHODE.md</code>, <code>docs/GUIDE_PROMPTS.md</code></td><td class="ok">gardé</td></tr>
+<tr><td>Skills</td><td><code>/da</code> profil de direction artistique ; <code>/page-demo</code> vitrine et démo HTML pur ; <code>design-taste-frontend</code> savoir de design</td><td><code>.claude/skills/</code></td><td class="ok">gardé</td></tr>
+<tr><td>Profils de DA</td><td>Ixion (site), Tunic inspiré (3D)</td><td><code>design/DA_*.md</code></td><td class="ok">gardé</td></tr>
+<tr><td>Plan d'action</td><td>faisabilité, pipeline E0–E7, vérification du mouvement</td><td><code>animation3d/PLAN_ACTION.md</code></td><td class="ok">gardé</td></tr>
+<tr><td>Contrôle sans animation</td><td><code>?p=0,0.2,…</code> (progression) et <code>?v=A|B|C</code> (variante) : une tuile par valeur</td><td>pages de <code>porte3d/</code></td><td class="ok">gardé pour la séquence ; trop petit pour juger la matière</td></tr>
+<tr><td>Planche de choix</td><td>3 variantes côte à côte</td><td><code>phare3d/planches.html</code>, <code>porte3d/planche.html</code></td><td class="ok">efficace (« mer a », « la B » tranchés en un mot)</td></tr>
+<tr><td>Serveur de test</td><td>port 8767 (<code>.claude/launch.json</code>)</td><td>navigateur intégré de Claude</td><td class="ok">gardé</td></tr>
+<tr><td>Sous-agents</td><td>Haiku pour lire/résumer ; Opus pour inventer ; avocat du diable</td><td>outil Agent</td><td class="wait">bon pour lire ; Opus mal équipé (voir §5)</td></tr>
+<tr><td>Données du cheminement</td><td>arbre, captures, leçons</td><td><code>cheminement.json</code>, <code>REFERENCE_RENDUS.md</code></td><td class="ok">gardé</td></tr>
+<tr><td>Garde-fous de production</td><td>reduced-motion, repli sans WebGL, pause onglet masqué…</td><td><code>docs/METHODE.md</code> v2 §6</td><td class="wait">pas encore appliqués</td></tr>
+</table>
+
+<h2>4. Ce qui a marché, ce qui a échoué (avec les chiffres)</h2>
+<div class="grid">
+<div class="card"><h3 class="ok">A marché</h3><ul>
+<li>Mouvement sur formes grises d'abord : validé en 13 min, 2 messages.</li>
+<li>Planche de 3 variantes : choix en un mot.</li>
+<li>Décisions notées tout de suite avec « PÉRIMÉ » : toute l'histoire se reconstitue.</li>
+<li>Haiku pour lire et résumer, à bas coût.</li>
+<li>L'analyse des images de Tunic (la roche = maçonnerie sculptée) était juste.</li></ul></div>
+<div class="card"><h3 class="ko">A échoué</h3><ul>
+<li>Fiche validée sans image de référence ; vidéo Moria jamais ouverte.</li>
+<li>Décor : 7 retours et 10 commits en 41 min sur un seul point, découpé en faux sous-points.</li>
+<li>Vérification sur des tuiles d'environ 430 px, trop petites pour juger une matière.</li>
+<li>Rendu plafonné par l'outil : formes de base, aucune texture ni modèle, symétrie écrite dans le code (boucle gauche/droite).</li>
+<li>Opus appelé trop tard (3 sous-agents d'environ 6 min), sans les images de Simon, avec « reprends tel quel ».</li></ul></div>
+</div>
+<h3>En images : où est parti le temps</h3>
+<svg viewBox="0 0 940 150" role="img" aria-label="Durées">
+ <text x="10" y="22" class="m">Minutes de travail actif</text>
+ <text x="10" y="52">Porte : mouvement</text><rect x="210" y="38" width="104" height="20" rx="4" fill="#7fd6a0"/><text class="m" x="322" y="53">13 min · validé</text>
+ <text x="10" y="86">Phare : 5 couches</text><rect x="210" y="72" width="240" height="20" rx="4" fill="#ff8a7a"/><text class="m" x="458" y="87">30 min · « très moche »</text>
+ <text x="10" y="120">Porte : décor</text><rect x="210" y="106" width="328" height="20" rx="4" fill="#ff8a7a"/><text class="m" x="546" y="121">41 min · 7 retours</text>
+</svg>
+<svg viewBox="0 0 940 150" role="img" aria-label="Les 7 retours sur le décor" style="margin-top:10px">
+ <text x="10" y="20" class="m">Les 7 retours de Simon sur « le décor est-il crédible ? » (0 à 41 min)</text>
+ <line x1="30" y1="70" x2="910" y2="70" stroke="#2a3560" stroke-width="3"/>
+ <g fill="#ff8a7a"><circle cx="30" cy="70" r="7"/><circle cx="113" cy="70" r="7"/><circle cx="237" cy="70" r="7"/><circle cx="426" cy="70" r="7"/><circle cx="488" cy="70" r="7"/><circle cx="592" cy="70" r="7"/><circle cx="730" cy="70" r="7"/></g>
+ <g class="m" text-anchor="middle"><text x="30" y="52">« pas crédible »</text><text x="113" y="95">« pas ancré »</text><text x="237" y="52">« pourquoi ici ? »</text><text x="426" y="95">« dalles »</text><text x="488" y="52">« blocs mal intégrés »</text><text x="592" y="95">« style Tunic »</text><text x="730" y="52">« symétrique, on tourne en rond »</text></g>
+ <text class="m" x="10" y="130">Planche + recadrage au 3e retour (règle respectée), puis 4 retours de plus sans nouveau recadrage.</text>
+</svg>
+<h3>Mesures</h3>
+<table>
+<tr><th>Poste</th><th>Mesure</th></tr>
+<tr><td>Mise en place du 30/10 (dépôts, skills, guides)</td><td>environ 1 h 30 de travail actif avant tout rendu</td></tr>
+<tr><td>Phare, 5 couches</td><td>30 min, environ 20 commits, jugé « très moche »</td></tr>
+<tr><td>Porte : mouvement</td><td>13 min, validé</td></tr>
+<tr><td>Porte : décor</td><td>41 min, 7 retours, 10 commits</td></tr>
+<tr><td>Contexte relu (cache), phare</td><td>37 M de jetons sur 172 appels (Sonnet)</td></tr>
+<tr><td>Contexte relu, porte</td><td>15 M jetons (Sonnet) + 2,9 M (3 sous-agents Opus)</td></tr>
+<tr><td>Coût en euros</td><td class="note">inconnu : <code>/usage</code> jamais noté</td></tr>
+</table>
+<p class="note">Modèles : tout le travail créatif en Sonnet 5.5, effort medium ; Haiku pour lire ; Opus seulement en rattrapage. Le guide prévoyait « Opus high » pour la première scène : non appliqué. Hypothèse non testée : l'écart Opus/Sonnet n'aurait rien changé tant que les contraintes étaient les mêmes.</p>
+
+<h2>5. Les causes, en une image</h2>
+<svg viewBox="0 0 940 230" role="img" aria-label="Boucle décor">
+ <g text-anchor="middle">
+  <rect x="20" y="20" width="170" height="54" rx="8" fill="#0b1020" stroke="#2a3560"/><text x="105" y="52">Rendu en formes de base</text>
+  <rect x="260" y="20" width="170" height="54" rx="8" fill="#0b1020" stroke="#2a3560"/><text x="345" y="52">Petite capture, sans réf.</text>
+  <rect x="500" y="20" width="170" height="54" rx="8" fill="#0b1020" stroke="#ff8a7a"/><text x="585" y="52">Simon : « pas crédible »</text>
+  <rect x="740" y="20" width="170" height="54" rx="8" fill="#0b1020" stroke="#2a3560"/><text x="825" y="52">Retouche d'un détail</text>
+ </g>
+ <g stroke="#9aa3c7" stroke-width="2" fill="none" marker-end="url(#a)"><line x1="190" y1="47" x2="258" y2="47"/><line x1="430" y1="47" x2="498" y2="47"/><line x1="670" y1="47" x2="738" y2="47"/><path d="M825 74 C825 150 105 150 105 76"/></g>
+ <text class="m" x="470" y="170" text-anchor="middle">La boucle tourne parce que la cause (outil + références) n'est jamais corrigée : seulement le détail.</text>
+ <text class="m" x="470" y="195" text-anchor="middle">Remède v3 : au 3e retour, arrêt et diagnostic écrit (outil ? référence ? cadrage ?) avant toute retouche.</text>
+</svg>
+
+<h2>6. <span class="new">Méthode v3 (adoptée, à tester)</span> · lancer un nouveau projet 3D</h2>
+<p class="note">Issue de la critique (<code>animation3d/analyse/CRITIQUE_METHODE.md</code>). Adoptée dans <code>docs/METHODE.md</code> le 2026-10-31.</p>
+<svg viewBox="0 0 940 150" role="img" aria-label="Flux v3">
+ <g text-anchor="middle" font-size="12">
+  <rect x="10" y="20" width="85" height="50" rx="8" fill="#0b1020" stroke="#2a3560"/><text x="52" y="38">Lire</text><text class="m" x="52" y="52">DEMARRER…</text><text class="m" x="52" y="64">+ état</text>
+  <rect x="115" y="20" width="85" height="50" rx="8" fill="#0b1020" stroke="#c59bff"/><text x="157" y="42">2 questions</text><text class="m" x="157" y="58">nouveau</text>
+  <rect x="220" y="20" width="85" height="50" rx="8" fill="#0b1020" stroke="#c59bff"/><text x="262" y="42">Références</text><text class="m" x="262" y="58">vues, nouveau</text>
+  <rect x="325" y="20" width="85" height="50" rx="8" fill="#0b1020" stroke="#2a3560"/><text x="367" y="42">Type A / B</text>
+  <rect x="430" y="20" width="95" height="50" rx="8" fill="#0b1020" stroke="#c59bff"/><text x="477" y="42">Planche fixe</text><text class="m" x="477" y="58">avant la 3D</text>
+  <rect x="545" y="20" width="95" height="50" rx="8" fill="#0b1020" stroke="#c59bff"/><text x="592" y="42">Fiche</text><text class="m" x="592" y="58">fini esthétique</text>
+  <rect x="660" y="20" width="85" height="50" rx="8" fill="#0b1020" stroke="#7fd6a0"/><text x="702" y="42">Mouvement</text><text class="m" x="702" y="58">gris, Sonnet</text>
+  <rect x="765" y="20" width="75" height="50" rx="8" fill="#0b1020" stroke="#c59bff"/><text x="802" y="42">Décor</text><text class="m" x="802" y="58">Opus high</text>
+  <rect x="855" y="20" width="75" height="50" rx="8" fill="#0b1020" stroke="#c59bff"/><text x="892" y="42">En grand</text><text class="m" x="892" y="58">1920 px</text>
+ </g>
+ <g stroke="#9aa3c7" stroke-width="2" marker-end="url(#a)"><line x1="95" y1="45" x2="113" y2="45"/><line x1="200" y1="45" x2="218" y2="45"/><line x1="305" y1="45" x2="323" y2="45"/><line x1="410" y1="45" x2="428" y2="45"/><line x1="525" y1="45" x2="543" y2="45"/><line x1="640" y1="45" x2="658" y2="45"/><line x1="745" y1="45" x2="763" y2="45"/><line x1="840" y1="45" x2="853" y2="45"/></g>
+ <text class="m" x="10" y="105">Violet = ajouté par la v3 · vert = déjà validé avant · le « oui » de Simon est demandé à chaque étape.</text>
+ <text class="m" x="10" y="125">Au 3e retour sur un même point : arrêt et diagnostic (outil ? référence ? cadrage ?) avant toute retouche.</text>
+</svg>
+<ol>
+<li><strong>Lire <code>animation3d/DEMARRER_NOUVEAU_SUJET.md</code></strong> (page d'entrée : ordre de lecture, pièges, code prêt), puis état en 2 lignes (Haiku, low, seulement pour lire le dépôt).</li>
+<li><strong>Deux questions seulement</strong> : niveau de finition (maquette de principe ou image digne d'un jeu ?) ; moyens acceptés (code seul, modèles et textures libres de droits, Blender ?).</li>
+<li><strong>Références vues</strong> : au moins 2 images <em>ouvertes</em> dans la session. Une vidéo ou une page non ouverte compte pour zéro. Les sous-agents reçoivent les chemins des images.</li>
+<li><strong>Typer</strong> : A (animation) ou B (décor). Si le décor compte, c'est B.</li>
+<li><strong>Planche d'ambiance en image fixe</strong> avant la 3D : cadrage, échelle (avec un personnage), palette, lumière. Simon valide.</li>
+<li><strong>Fiche avec « fini quand » esthétique</strong> : par exemple « vu en plein écran 1920 px, Simon dit crédible ; pas de symétrie gauche/droite ; un repère d'échelle humain ».</li>
+<li><strong>Mouvement sur formes grises</strong> (Sonnet medium suffit), validé par Simon.</li>
+<li><strong>Décor/matière</strong> : Opus high dès le premier essai, avec images et captures en grand ; <em>un point = une question</em> ; au 3e retour, arrêt et diagnostic.</li>
+<li><strong>Vérifier en grand</strong> (1920×1080 sans réduction) pour la matière ; les tuiles <code>?p=</code> servent à la séquence.</li>
+<li><strong>Clôture</strong> : Phase 4, <code>/usage</code> noté, garde-fous de production seulement si mise en ligne.</li>
+</ol>
+<h3>Alternatives si le code seul plafonne</h3>
+<table>
+<tr><th>Option</th><th>Gain</th><th>Coût / risque</th></tr>
+<tr><td>Modèles glTF libres de droits (CC0)</td><td>vraies formes asymétriques</td><td>poids, licence à noter ; contredit la règle « éviter modèles importés »</td></tr>
+<tr><td>Relief par bruit dans le code</td><td>roche et montagne naturelles</td><td>réglage, captures en grand</td></tr>
+<tr><td>2,5D : fond en image + porte en 3D</td><td>le plus crédible pour le moins de travail</td><td>il faut une image de fond</td></tr>
+<tr><td>Blender (Simon ou scripts)</td><td>qualité supérieure</td><td>apprentissage</td></tr>
+<tr><td>Style adapté au code (géométrique, papier découpé)</td><td>réussite probable</td><td>renonce à Tunic</td></tr>
+</table>
+
+<h3>Modèle de prompt de lancement</h3>
+<pre>Phase 1 : &lt;sujet&gt;.
+Références (ouvertes et vues) : &lt;image 1&gt;, &lt;image 2&gt;.
+Finition visée : &lt;maquette | image de jeu&gt;. Moyens : &lt;code seul | modèles libres | Blender&gt;.
+Type : &lt;A animation | B décor&gt;.
+Avant de coder : fais l'état (2 lignes), pose tes 2 questions, écris la fiche avec un « fini quand » esthétique,
+propose une planche d'ambiance en image fixe. Ne construis rien sans mon « oui ».
+Note à chaque essai : modèle, effort, retour, nombre d'allers-retours.</pre>
+
+<h3>Réutiliser sans tout refaire</h3>
+<svg viewBox="0 0 940 190" role="img" aria-label="Ce qui est réutilisable">
+ <g text-anchor="middle" font-size="12">
+  <rect x="20" y="15" width="280" height="150" rx="10" fill="#0b1020" stroke="#7fd6a0"/><text x="160" y="40" font-weight="700">Prêt à réutiliser</text>
+  <text class="m" x="160" y="68">pose(p) : tout l'état en fonction de p</text><text class="m" x="160" y="88">boucle au scroll + compteur fps</text><text class="m" x="160" y="108">planche ?p= et variantes ?v=</text><text class="m" x="160" y="128">mouvement de la porte (gris)</text><text class="m" x="160" y="148">→ BIBLIOTHEQUE_CODE.md</text>
+  <rect x="330" y="15" width="280" height="150" rx="10" fill="#0b1020" stroke="#f2c46d"/><text x="470" y="40" font-weight="700">Code écrit, rendu non validé</text>
+  <text class="m" x="470" y="68">blocs biseautés, ombres de contact</text><text class="m" x="470" y="88">terrain à facettes, ciel dégradé</text><text class="m" x="470" y="108">rayons de lumière (traversent les objets)</text><text class="m" x="470" y="128">relief en formule (sans bruit)</text><text class="m" x="470" y="148">→ même fichier, marqué NON VALIDÉ</text>
+  <rect x="640" y="15" width="280" height="150" rx="10" fill="#0b1020" stroke="#ff8a7a"/><text x="780" y="40" font-weight="700">Manque</text>
+  <text class="m" x="780" y="68">un décor validé (aucun)</text><text class="m" x="780" y="88">modèles glTF : jamais essayés</text><text class="m" x="780" y="108">fluidité en direct jamais vue</text><text class="m" x="780" y="128">garde-fous de production</text><text class="m" x="780" y="148">bruit de relief (Perlin/simplex)</text>
+ </g>
+</svg>
+<p class="note">Les 71 commits du dépôt gardent chaque état ; <code>REFERENCE_RENDUS.md</code> note pour chaque version la consigne, les valeurs et ton retour.</p>
+<h2>7. Pour que Claude s'améliore (base de connaissance)</h2>
+<ul>
+<li>Après chaque essai, ajouter un nœud dans <code>cheminement.json</code> (consigne, modèle, effort, capture, retour, gardé/abandonné + pourquoi) puis relancer <code>generer_reference.py</code> : la référence dense pour Claude se met à jour.</li>
+<li>Une leçon qui change la méthode va dans <code>docs/METHODE.md</code> avec la date et « PÉRIMÉ par… » pour l'ancienne règle.</li>
+<li>Avant tout nouveau projet 3D, Claude lit : cette page, <code>REFERENCE_RENDUS.md</code>, <code>CRITIQUE_METHODE.md</code>, la fiche du sujet.</li>
+</ul>
+
+<h2>Sources</h2>
+<p class="note"><code>animation3d/analyse/DIGEST_SESSIONS.md</code> (condensé, produit par Haiku, relu), <code>CRITIQUE_METHODE.md</code> (avocat du diable, Opus, vérifié contre <code>git log</code> et transcripts), <code>docs/METHODE.md</code>, <code>docs/GUIDE_PROMPTS.md</code>, <code>animation3d/PLAN_ACTION.md</code>, <code>FICHE_PORTE.md</code>, <code>REFERENCE_RENDUS.md</code>.</p>
+</main>
+</body>
+</html>

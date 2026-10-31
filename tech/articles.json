@@ -1,5 +1,15 @@
 [
   {
+    "titre": "Animations 3D : la méthode derrière les rendus",
+    "date": "2026-10-31",
+    "sujets": [
+      "IA",
+      "Projets"
+    ],
+    "resume": "Comment on a travaillé : ce qui a marché, ce qui a raté (7 retours sur un décor), et la méthode v3 pour le prochain projet, en schémas.",
+    "lien": "animations-3d/methode/"
+  },
+  {
     "titre": "Animation 3D n°3 : la porte de pierre style Tunic",
     "date": "2026-10-31",
     "sujets": [
