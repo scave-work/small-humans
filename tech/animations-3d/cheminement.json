@@ -2,16 +2,10 @@
   "titre": "Cheminement des animations 3D",
   "maj": "2026-10-31",
   "note": "Données de la page. Modifiable à la main : un nœud = un objet de « noeuds ». Champs : id, parent (id ou null), branche (phare | methode | porte), statut (garde | abandonne | en_attente | etape), date, titre, cherche, prompt (extrait de la consigne de Simon), modele, techno, retour (réaction de Simon), garde, abandonne, commit (atelier privé), capture (fichier du dossier img/, ou null). Heures : Paris. Modèle : celui de la session principale (sous-agents indiqués à part). Effort : non lisible dans les transcripts, donc non indiqué.",
-  "branches": {
-    "phare": "Le phare (30 octobre)",
-    "methode": "Changement de méthode",
-    "porte": "La porte de pierre (31 octobre)"
-  },
   "noeuds": [
     {
       "id": "tunic",
       "parent": null,
-      "branche": "phare",
       "statut": "garde",
       "date": "2026-10-30 17:46",
       "titre": "Prototype Tunic (île, renard, océan)",
@@ -23,12 +17,18 @@
       "garde": "Le rendu simple (blocs low-poly, aplats) qui plaît à Simon ; la méthode « un seul fichier, pas de build ».",
       "abandonne": "Rien : c'est la référence de ce qui marche.",
       "commit": "b04aa46",
-      "capture": "tunic.jpg"
+      "capture": "tunic.jpg",
+      "sujet": "tunic",
+      "rendus": [
+        {
+          "label": "Prototype en direct",
+          "url": "rendus/tunic.html"
+        }
+      ]
     },
     {
       "id": "maquette",
-      "parent": "tunic",
-      "branche": "phare",
+      "parent": null,
       "statut": "abandonne",
       "date": "2026-10-30 19:39",
       "titre": "Maquettes 2D du phare",
@@ -41,12 +41,22 @@
       "abandonne": "Le style « encre colorée » (hachures, contours) : pas du Tunic, qui n'a pas de contours. Décision : formes Tunic + couleurs de la peinture.",
       "commit": "f632318",
       "capture": null,
-      "legende": "Capture non reconstituée : maquette 2D en SVG, hors du serveur de rendu 3D."
+      "legende": "Capture non reconstituée : maquette 2D en SVG, hors du serveur de rendu 3D.",
+      "sujet": "phare",
+      "rendus": [
+        {
+          "label": "Maquette 2D : 3 plans",
+          "url": "rendus/phare_maquette_3plans.html"
+        },
+        {
+          "label": "Maquette 2D : composition",
+          "url": "rendus/phare_maquette_composition.html"
+        }
+      ]
     },
     {
       "id": "c1",
       "parent": "maquette",
-      "branche": "phare",
       "statut": "abandonne",
       "date": "2026-10-30 19:52",
       "titre": "Couche 1 : ciel et nuages",
@@ -58,12 +68,22 @@
       "garde": "L'idée d'une couleur de lumière unique pour tout le ciel et la mer ; les bancs qui glissent lentement.",
       "abandonne": "Boules 3D, puis sprites doux, puis cumulus à dessous plats : Plusieurs essais de nuages (commits de 19:52 à 20:21). Une planche de 3 styles (A, B, C) a dû trancher.",
       "commit": "8e570dc",
-      "capture": "phare_c1_nuages.jpg"
+      "capture": "phare_c1_nuages.jpg",
+      "sujet": "phare",
+      "rendus": [
+        {
+          "label": "Couche 1 en direct",
+          "url": "rendus/phare_c1.html"
+        },
+        {
+          "label": "Planche : 3 styles de nuage",
+          "url": "rendus/phare_c1_planche_nuages.html"
+        }
+      ]
     },
     {
       "id": "c2",
       "parent": "c1",
-      "branche": "phare",
       "statut": "abandonne",
       "date": "2026-10-30 20:02",
       "titre": "Couche 2 : mer facettée",
@@ -75,12 +95,18 @@
       "garde": "La mer à facettes (« mer A », choisie sur planche) ; les houles qui avancent vers le phare.",
       "abandonne": "Vagues qui partaient vers le large ; reflets d'une autre couleur que le ciel (corrigé par la couleur de lumière commune).",
       "commit": "214d6ea",
-      "capture": "phare_c2_mer.jpg"
+      "capture": "phare_c2_mer.jpg",
+      "sujet": "phare",
+      "rendus": [
+        {
+          "label": "Couche 2 en direct",
+          "url": "rendus/phare_c2.html"
+        }
+      ]
     },
     {
       "id": "c3",
       "parent": "c2",
-      "branche": "phare",
       "statut": "garde",
       "date": "2026-10-30 20:09",
       "titre": "Couche 3 : phare, rochers, bonhomme",
@@ -92,12 +118,18 @@
       "garde": "Le phare en blocs : c'est la partie qui lisait le mieux.",
       "abandonne": "—",
       "commit": "79cb7c3",
-      "capture": "phare_c3_phare.jpg"
+      "capture": "phare_c3_phare.jpg",
+      "sujet": "phare",
+      "rendus": [
+        {
+          "label": "Couche 3 en direct",
+          "url": "rendus/phare_c3.html"
+        }
+      ]
     },
     {
       "id": "c4",
       "parent": "c3",
-      "branche": "phare",
       "statut": "abandonne",
       "date": "2026-10-30 20:12",
       "titre": "Couche 4 : grosse vague et écume",
@@ -109,12 +141,22 @@
       "garde": "Rien (le mouvement n'a jamais été vu par Claude, seulement des images fixes).",
       "abandonne": "La vague et l'écume : le sujet le plus difficile (eau qui s'écrase), trop gros pour un premier essai.",
       "commit": "0aea345",
-      "capture": "phare_c4_vague.jpg"
+      "capture": "phare_c4_vague.jpg",
+      "sujet": "phare",
+      "rendus": [
+        {
+          "label": "Couche 4 en direct (au retour de Simon)",
+          "url": "rendus/phare_c4.html"
+        },
+        {
+          "label": "Après correction (écume réduite)",
+          "url": "rendus/phare_c4_corrige.html"
+        }
+      ]
     },
     {
       "id": "c5",
       "parent": "c4",
-      "branche": "phare",
       "statut": "abandonne",
       "date": "2026-10-30 20:16",
       "titre": "Couche 5 : faisceaux et flou — scène gelée",
@@ -126,47 +168,22 @@
       "garde": "Les gardes-fous (reduced-motion, repli sans WebGL), la couche de faisceaux, la méthode « une couche à la fois ».",
       "abandonne": "Toute la scène : gelée par Simon. Leçon : un sujet plus simple, le mouvement d'abord, et apprendre à prompter.",
       "commit": "bdd6d4e",
-      "capture": "phare_c5_final.jpg"
-    },
-    {
-      "id": "plan",
-      "parent": "c5",
-      "branche": "methode",
-      "statut": "etape",
-      "date": "2026-10-30 20:28",
-      "titre": "Critique et plan d'action",
-      "cherche": "Comprendre pourquoi ça ne marche pas et comment travailler avec three.js : limites, faisabilité, vérifier le mouvement.",
-      "prompt": "« Reprends toutes les sessions, regarde le travail produit, lance un agent critique sur le tout. » Puis : « Dans une nouvelle session, charge l'ensemble des échanges par haiku. Fais tourner d'autres agents avec un modèle plus fort pour proposer le plan d'action. » Et : « Tu n'as pas d'yeux, comment tu fais pour voir les animations ? »",
-      "modele": "Sonnet 5.5 (session de cadrage commencée en Haiku 5.5) ; sous-agents : 1 Sonnet (critique), 3 haiku (catalogue et manuel three.js), 3 haiku (résumés de transcripts), 3 Opus (faisabilité, méthode, prompts et budget)",
-      "techno": "Sous-agents en arrière-plan, catalogue des exemples three.js, séries d'images à instants fixes pour « voir » le mouvement",
-      "retour": "Simon met le sujet en pause (23:02) : « je pense pas continuer, sauvegarde l'avancement ».",
-      "garde": "PLAN_ACTION.md et CATALOGUE_THREEJS.md ; l'idée de vérifier le mouvement par une série d'images (?p=…).",
-      "abandonne": "Le « rendu réaliste » proposé comme prochain essai : annulé le lendemain par Simon.",
-      "commit": "00adcab",
-      "capture": null
-    },
-    {
-      "id": "v2",
-      "parent": "plan",
-      "branche": "methode",
-      "statut": "etape",
-      "date": "2026-10-31 14:28",
-      "titre": "Méthode v2 : Claude propose, Simon valide",
-      "cherche": "Moins d'allers-retours : cadrer avant de construire, que Claude soit force de proposition.",
-      "prompt": "« Le cadrage du test n'était pas assez bon. J'ai besoin que tu prennes plus de liberté, que tu sois de meilleur conseil / force de proposition. » « Pour le garde-fou 3D, c'est trop précipité : il faut voir le max, et après si le rendu est validé. »",
-      "modele": "Sonnet 5.5",
-      "techno": "docs/METHODE.md (phases 0 à 4, fiches, idées S/M/L, planche au 2e retour, 3 allers-retours maximum)",
-      "retour": "Simon fixe : 1 méthode pour tout le site ; elle évolue ; le choix du modèle revient à Claude.",
-      "garde": "Fiche avant de construire ; type A (animation) / B (décor) ; mouvement sur formes grises avant l'habillage.",
-      "abandonne": "Les gardes-fous en phase d'exploration : ils viennent à la mise en ligne.",
-      "commit": "5abfbc6",
-      "capture": null,
-      "legende": null
+      "capture": "phare_c5_final.jpg",
+      "sujet": "phare",
+      "rendus": [
+        {
+          "label": "Scène complète en direct",
+          "url": "rendus/phare_c5.html"
+        },
+        {
+          "label": "Planches : mer et nuages",
+          "url": "rendus/phare_c5_planches.html"
+        }
+      ]
     },
     {
       "id": "gris",
-      "parent": "v2",
-      "branche": "porte",
+      "parent": null,
       "statut": "garde",
       "date": "2026-10-31 15:10",
       "titre": "Porte : fiche S + mouvement sur formes grises",
@@ -180,12 +197,22 @@
       "commit": "acb8f33",
       "capture": "porte_gris.jpg",
       "capture2": "porte_gris_serie.jpg",
-      "legende": "À gauche p = 0,45 ; en dessous : la série p = 0, 0,2, 0,45, 0,7, 0,9, 1."
+      "legende": "À gauche p = 0,45 ; en dessous : la série p = 0, 0,2, 0,45, 0,7, 0,9, 1.",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Au scroll (formes grises)",
+          "url": "rendus/porte_gris.html"
+        },
+        {
+          "label": "Les 6 instants à la suite",
+          "url": "rendus/porte_gris.html?p=0,0.2,0.45,0.7,0.9,1"
+        }
+      ]
     },
     {
       "id": "v1",
       "parent": "gris",
-      "branche": "porte",
       "statut": "abandonne",
       "date": "2026-10-31 15:17",
       "titre": "Habillage v1 : blocs beiges, ciel nuit",
@@ -197,12 +224,18 @@
       "garde": "Le principe sans contours, l'éclairage chaud contre ombres froides.",
       "abandonne": "La porte isolée (« pas crédible ») ; la palette bleu nuit pour cet essai.",
       "commit": "c247c25",
-      "capture": "porte_habillage_v1.jpg"
+      "capture": "porte_habillage_v1.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Habillage v1 au scroll",
+          "url": "rendus/porte_v1.html"
+        }
+      ]
     },
     {
       "id": "L",
       "parent": "v1",
-      "branche": "porte",
       "statut": "abandonne",
       "date": "2026-10-31 15:23",
       "titre": "Version L : mur violet, statues, marches",
@@ -214,30 +247,18 @@
       "garde": "Palette violet et or ; blocs biseautés ; ombres de contact.",
       "abandonne": "Le mur de blocs rectangulaire posé devant le vide : rien n'explique pourquoi la porte est là.",
       "commit": "e8cc437",
-      "capture": "porte_L.jpg"
-    },
-    {
-      "id": "planche",
-      "parent": "L",
-      "branche": "porte",
-      "statut": "etape",
-      "date": "2026-10-31 15:28",
-      "titre": "Planche de 3 directions : A, B, C",
-      "cherche": "2e retour sur le décor, donc planche de choix (règle de la méthode v2).",
-      "prompt": "(Règle de méthode : au 2e retour, on propose 3 directions.) A ruine usée de face ; B portique dans la falaise ; C terrasse au-dessus de l'eau, vue d'en haut.",
-      "modele": "Sonnet 5.5",
-      "techno": "Une seule scène, variantes en direct : index.html?v=A|B|C",
-      "retour": "« La B, mais regarde l'encadré : ça reste pas crédible, pourquoi elle est placée là ? » Puis « Oui, refais B ».",
-      "garde": "B. Trouvé : le sens du lieu n'avait jamais été posé (→ sanctuaire enfoui, encadrement taillé dans la roche).",
-      "abandonne": "A et C (conservées dans le fichier, abandonnées).",
-      "commit": "7a27e7c",
-      "capture": "porte_planche_ABC.jpg",
-      "legende": "Directions A (gauche) et B (droite) à p = 0,45."
+      "capture": "porte_L.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Version L au scroll",
+          "url": "rendus/porte_L.html"
+        }
+      ]
     },
     {
       "id": "A",
-      "parent": "planche",
-      "branche": "porte",
+      "parent": "L",
       "statut": "abandonne",
       "date": "2026-10-31 15:28",
       "titre": "Direction A : ruine usée de face",
@@ -249,13 +270,51 @@
       "garde": "Les points communs aux trois directions : blocs biseautés, ombres de contact, pierres du bas verdies.",
       "abandonne": "La façade de face, qui ne répond pas à « pourquoi la porte est là ».",
       "commit": "7a27e7c",
-      "capture": "porte_planche_ABC.jpg",
-      "legende": "Vue de la planche (A à gauche, B à droite)."
+      "capture": "porte_A.jpg",
+      "legende": "A à p = 0,45.",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Direction A au scroll",
+          "url": "rendus/planche_porte/index.html?v=A"
+        },
+        {
+          "label": "La planche A / B / C",
+          "url": "rendus/planche_porte/planche.html"
+        }
+      ]
+    },
+    {
+      "sujet": "porte",
+      "id": "B",
+      "parent": "L",
+      "statut": "garde",
+      "date": "2026-10-31 15:28",
+      "titre": "Direction B : portique dans la falaise",
+      "cherche": "Une entrée creusée dans une colline avec sapins : la porte est enchâssée dans la roche au lieu d'un mur de briques.",
+      "prompt": "Variante de la planche (index.html?v=B), proposée par Claude. Simon : « la B, mais regarde l'encadré, ça reste pas crédible de pourquoi elle est placée là ».",
+      "modele": "Sonnet 5.5",
+      "techno": "Même scène, paramètre ?v=B ; colline, sapins",
+      "retour": "Choisie par Simon, avec une réserve : on ne comprend pas pourquoi la porte est là.",
+      "garde": "Le principe falaise + colline ; le recadrage qui en sort : sanctuaire enfoui, encadrement taillé dans la roche.",
+      "abandonne": "Le mur de briques de cette première version de B.",
+      "commit": "7a27e7c",
+      "capture": "porte_B.jpg",
+      "legende": "B à p = 0,45.",
+      "rendus": [
+        {
+          "label": "Direction B au scroll",
+          "url": "rendus/planche_porte/index.html?v=B"
+        },
+        {
+          "label": "La planche A / B / C",
+          "url": "rendus/planche_porte/planche.html"
+        }
+      ]
     },
     {
       "id": "C",
-      "parent": "planche",
-      "branche": "porte",
+      "parent": "L",
       "statut": "abandonne",
       "date": "2026-10-31 15:28",
       "titre": "Direction C : terrasse au-dessus de l'eau",
@@ -268,12 +327,22 @@
       "abandonne": "Écartée au choix de B.",
       "commit": "7a27e7c",
       "capture": null,
-      "legende": "Capture non reconstituée (le rendu de C n'a pas pu être isolé)."
+      "legende": "Capture de C non reconstituée : voir le rendu en direct.",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Direction C au scroll",
+          "url": "rendus/planche_porte/index.html?v=C"
+        },
+        {
+          "label": "La planche A / B / C",
+          "url": "rendus/planche_porte/planche.html"
+        }
+      ]
     },
     {
-      "id": "B",
-      "parent": "planche",
-      "branche": "porte",
+      "id": "B_moria",
+      "parent": "B",
       "statut": "abandonne",
       "date": "2026-10-31 15:37",
       "titre": "B refaite : entrée taillée dans la falaise (Moria)",
@@ -285,12 +354,18 @@
       "garde": "Le récit (sanctuaire enfoui), la porte en retrait, les niches.",
       "abandonne": "Le mur de briques et les blocs en dalles.",
       "commit": "a7ddd53",
-      "capture": "porte_B_moria.jpg"
+      "capture": "porte_B_moria.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "B refaite au scroll",
+          "url": "rendus/porte_B_moria.html?v=B"
+        }
+      ]
     },
     {
       "id": "strates",
       "parent": "B",
-      "branche": "porte",
       "statut": "abandonne",
       "date": "2026-10-31 15:40",
       "titre": "Falaise en strates continues",
@@ -302,12 +377,18 @@
       "garde": "L'idée de paroi continue ; le bon réflexe de lire la capture de Simon.",
       "abandonne": "Les blocs rapportés, l'ombrage à facettes sur la roche, les 9 dalles (→ sentier de terre).",
       "commit": "3039635",
-      "capture": "porte_B_strates.jpg"
+      "capture": "porte_B_strates.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Strates au scroll",
+          "url": "rendus/porte_B_strates.html?v=B"
+        }
+      ]
     },
     {
       "id": "lisse",
       "parent": "strates",
-      "branche": "porte",
       "statut": "abandonne",
       "date": "2026-10-31 15:43",
       "titre": "Saillies lisses, ombrage lisse, rayons raccourcis",
@@ -319,12 +400,18 @@
       "garde": "Les rayons raccourcis.",
       "abandonne": "La roche lisse « naturelle » : Tunic n'est pas naturaliste.",
       "commit": "bcc8fd1",
-      "capture": "porte_B_lisse.jpg"
+      "capture": "porte_B_lisse.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Roche lisse au scroll",
+          "url": "rendus/porte_B_lisse.html?v=B"
+        }
+      ]
     },
     {
       "id": "tunicroche",
       "parent": "lisse",
-      "branche": "porte",
       "statut": "abandonne",
       "date": "2026-10-31 15:49",
       "titre": "Roche en maçonnerie sculptée (style Tunic)",
@@ -336,12 +423,18 @@
       "garde": "L'analyse du style (valable) ; le diagnostic : un mur symétrique ne fait pas une montagne.",
       "abandonne": "La maçonnerie en paliers symétriques et le sentier de terre (gardé à l'étape précédente). Recadrage : 3 nouvelles directions.",
       "commit": "1d1be0a",
-      "capture": "porte_B_tunic.jpg"
+      "capture": "porte_B_tunic.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Maçonnerie Tunic au scroll",
+          "url": "rendus/porte_B_tunic.html?v=B"
+        }
+      ]
     },
     {
       "id": "D",
       "parent": "tunicroche",
-      "branche": "porte",
       "statut": "en_attente",
       "date": "2026-10-31 16:13",
       "titre": "Direction D : massif asymétrique",
@@ -353,12 +446,18 @@
       "garde": "À décider.",
       "abandonne": "À décider.",
       "commit": "b6c5197",
-      "capture": "porte_D.jpg"
+      "capture": "porte_D.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Direction D au scroll",
+          "url": "rendus/porte_D.html"
+        }
+      ]
     },
     {
       "id": "E",
       "parent": "tunicroche",
-      "branche": "porte",
       "statut": "en_attente",
       "date": "2026-10-31 16:13",
       "titre": "Direction E : faille",
@@ -370,12 +469,18 @@
       "garde": "À décider.",
       "abandonne": "À décider.",
       "commit": "b6c5197",
-      "capture": "porte_E.jpg"
+      "capture": "porte_E.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Direction E au scroll",
+          "url": "rendus/porte_E.html"
+        }
+      ]
     },
     {
       "id": "F",
       "parent": "tunicroche",
-      "branche": "porte",
       "statut": "en_attente",
       "date": "2026-10-31 16:13",
       "titre": "Direction F : flanc en terrasses",
@@ -387,7 +492,14 @@
       "garde": "À décider.",
       "abandonne": "À décider.",
       "commit": "b6c5197",
-      "capture": "porte_F.jpg"
+      "capture": "porte_F.jpg",
+      "sujet": "porte",
+      "rendus": [
+        {
+          "label": "Direction F au scroll",
+          "url": "rendus/porte_F.html"
+        }
+      ]
     }
   ],
   "lecons": [
@@ -398,5 +510,22 @@
     "Claude ne voit que des images fixes : contrôler le mouvement par une série de captures (?p=…), et faire valider la fluidité par Simon sur son écran.",
     "Un mur symétrique de blocs ne fait pas une montagne : varier masses et asymétrie avant les détails.",
     "Garder les images de référence et les phrases exactes de Simon ; noter modèle et effort de chaque essai (ici : non tenu, d'où cette page)."
-  ]
+  ],
+  "sujets": {
+    "tunic": {
+      "titre": "Le prototype Tunic (île et renard)",
+      "intro": "Le point de départ : un premier essai three.js « cartoon / Tunic » (île en blocs, renard, océan, scroll). C'est la référence de ce qui plaît à Simon.",
+      "date": "2026-10-30"
+    },
+    "phare": {
+      "titre": "Le phare dans la tempête",
+      "intro": "Un phare de nuit, un bonhomme sur la passerelle, une grosse vague qui monte. Fabriqué couche par couche (ciel, mer, phare, vague, faisceaux), puis gelé : sujet trop gros pour un premier essai.",
+      "date": "2026-10-30"
+    },
+    "porte": {
+      "titre": "La porte de pierre style Tunic",
+      "intro": "Une porte de pierre qui s'ouvre au scroll sur une lumière dorée, puis la recherche d'un décor crédible : mur, falaise, strates, maçonnerie Tunic, nouvelles directions D, E, F.",
+      "date": "2026-10-31"
+    }
+  }
 }
