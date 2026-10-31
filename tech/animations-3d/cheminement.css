@@ -57,3 +57,16 @@ code{font-size:.86em;background:#0e1530;padding:1px 5px;border-radius:4px}
 #vbar button.on{border-color:var(--lien);background:#1f3a7a}
 #vframe{flex:1;border:1px solid var(--trait);border-radius:8px;background:#000;width:100%}
 #vnote{color:var(--doux);font-size:.82rem;padding-top:6px}
+.nd.par rect{stroke-dasharray:5 3}
+.fourche{border:1px dashed #3b4b82;border-radius:12px;padding:14px 16px 4px;margin:0 0 20px;background:rgba(18,26,51,.35)}
+.fourche>h3{margin:0 0 .2em;font-size:1.15rem}
+.colonnes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin:12px 0 10px}
+.fiche.colonne{margin:0;padding:12px 14px}
+.fiche.colonne h3{font-size:1rem}
+.fiche.colonne dl{margin-top:.6em;font-size:.92rem}
+details{background:#0e1530;border:1px solid var(--trait);border-radius:8px;padding:2px 12px;margin:.7em 0}
+summary{cursor:pointer;color:var(--lien);min-height:40px;display:flex;align-items:center;font-size:.92rem}
+details ul{margin:.2em 0 .6em;padding-left:1.2em}details li{margin:.3em 0}
+details .p{font-style:italic;color:#c9d3f0;margin:.3em 0 .7em}
+.bloc{max-width:70rem;margin:0 0 1.2em}
+.colonne .gk{grid-template-columns:1fr}
