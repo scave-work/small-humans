@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Porte D (massif)</title>
+<style>
+  html,body{margin:0;background:#111}
+  #scroller{height:600vh}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #hud{position:fixed;left:8px;top:8px;font:12px/1.4 monospace;color:#fff;background:#0008;padding:4px 8px;z-index:3;pointer-events:none}
+  #flash{position:fixed;inset:0;background:#ffd98a;opacity:0;pointer-events:none;z-index:2}
+  .serie #scroller{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+</head>
+<body>
+<div id="scroller"></div>
+<div id="flash"></div>
+<div id="hud">p=0 · -- fps</div>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* Variante D « massif asymétrique » (2026-10-31) : la porte d'un sanctuaire enfoui dans une montagne, vue en 3/4.
+   Montagne = grandes masses de roche à facettes (icosaèdres déformés), strates en diagonale par la couleur des faces,
+   mousse posée d'elle-même sur les faces tournées vers le ciel, éboulis au pied. Seul l'encadrement (jambages, linteau) est taillé.
+   Escalier usé en deux volées (lacets) avec un palier. Une seule statue. Repris de index.html?v=B : progression p,
+   planche ?p=…, battants d'or, rayons, éblouissement, statue, ciel, éclairage. Rendu inspiré de Tunic, aucun asset copié. */
+const OR = 0xffd98a;
+const lisse = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const lerp = (a, b, t) => a + (b - a) * t;
+let graine = 11; const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;   // aléa fixe : même image à chaque fois
+const choix = (liste) => liste[Math.floor(alea() * liste.length)];
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setScissorTest(true);
+renderer.setClearColor(0x4a3a7a);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xb08cc0, 45, 190);
+const camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.1, 400);
+
+const mat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true, ...extra });
+const violets = [0x7a68a0, 0x8a78b0, 0x6c5a94, 0x9684ba].map((c) => mat(c));
+const humide = [0x665f78, 0x5c6a58, 0x6a6482].map((c) => mat(c));
+const violetSombre = mat(0x3d2f60), mousse = mat(0x86a24a), mousseSombre = mat(0x5f7d38);
+const taille_ = [0xa49cb8, 0x968eac, 0xb0a8c2].map((c) => mat(c));     // pierre taillée (encadrement, marches)
+const or = mat(0xf2b81c, { emissive: 0x5a3c00 }), orSombre = mat(0xb98512, { emissive: 0x3a2600 }), orClair = mat(0xffd54a, { emissive: 0x6a4a00 });
+
+// lumière : ciel faible, soleil fort et rasant depuis la gauche -> contraste lumière / ombre marqué
+scene.add(new THREE.HemisphereLight(0xc0a0f0, 0x3a2c60, 0.9));
+const soleil = new THREE.DirectionalLight(0xffe2b8, 3.6);
+soleil.position.set(-34, 44, 30);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(2048, 2048);
+Object.assign(soleil.shadow.camera, { left: -55, right: 55, top: 55, bottom: -30, near: 1, far: 160 });
+soleil.shadow.bias = -0.0006;
+scene.add(soleil);
+
+// cotes de la porte (dans le groupe « porte », posé sur le replat à y = DY)
+const LARG = 1.8, SEUIL = 1.0, HAUT = 7.4, EP = 2.4, DY = 6;
+const porte = new THREE.Group(); porte.position.y = DY; scene.add(porte);
+const lumPorte = new THREE.PointLight(OR, 0, 40, 1.1);
+lumPorte.position.set(0, 4.4, 1.5); porte.add(lumPorte);
+
+const bloc = (w, h, d, m, x, y, z, ry = 0, parent = scene) => {
+  const r = Math.min(0.12, w / 4, h / 4, d / 4);
+  const o = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, r), m); o.position.set(x, y, z); o.rotation.y = ry;
+  o.castShadow = o.receiveShadow = true; parent.add(o); return o;
+};
+const texOmbre = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  r.addColorStop(0, 'rgba(30,15,55,0.75)'); r.addColorStop(1, 'rgba(30,15,55,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+const contact = (x, z, rx, rz, y = 0.04) => {
+  const o = new THREE.Mesh(new THREE.PlaneGeometry(rx * 2, rz * 2), new THREE.MeshBasicMaterial({ map: texOmbre, transparent: true, depthWrite: false, fog: false }));
+  o.rotation.x = -Math.PI / 2; o.position.set(x, y, z); scene.add(o);
+};
+const herbe = (x, y, z, s = 1) => {
+  for (let i = 0; i < 3; i++) { const o = new THREE.Mesh(new THREE.ConeGeometry(0.1 * s, (0.35 + alea() * 0.25) * s, 4), alea() < 0.5 ? mousse : mousseSombre);
+    o.position.set(x + (alea() - 0.5) * 0.3, y + 0.15 * s, z + (alea() - 0.5) * 0.3); o.rotation.z = (alea() - 0.5) * 0.4; scene.add(o); }
+};
+
+// ---------- relief : pré devant, pente en deux montées (lacets) avec un replat, replat de la porte ----------
+const pente = (z) => z > 15.5 ? 0 : z > 10.8 ? 2.6 * lisse(15.5, 10.8, z) : z > 9.2 ? 2.6 : z > 4.4 ? lerp(2.6, DY, lisse(9.2, 4.4, z)) : DY;
+const H = (x, z) => pente(z) + lisse(9, 24, Math.abs(x)) * lisse(22, 2, z) * 5 + lisse(28, 80, Math.abs(x)) * 22
+  + 0.18 * Math.sin(x * 0.7 + z * 0.4) * Math.sin(z * 0.9 - x * 0.2) * (z > 15.5 || Math.abs(x) > 8 ? 1 : 0.3);
+{
+  const geo = new THREE.PlaneGeometry(220, 150, 150, 110); geo.rotateX(-Math.PI / 2);
+  const p = geo.attributes.position, col = [], c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i) + 40, y = H(x, z) + (alea() - 0.5) * 0.12; p.setY(i, y);
+    if (z > 15.5 && y < 1.2) c.set(0x6f9a48).lerp(new THREE.Color(0x4f7a3a), alea());                      // pré
+    else c.set(0x7a6c96).lerp(new THREE.Color(0x86a24a), alea() < 0.35 ? 0.7 : alea() * 0.25);              // pente rocheuse, mousse par plaques
+    col.push(c.r, c.g, c.b); }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+  m.position.z = 40; m.receiveShadow = true; scene.add(m);
+}
+// ciel violet-rose
+const ciel = document.createElement('canvas'); ciel.width = 4; ciel.height = 256;
+const gc = ciel.getContext('2d'), gg = gc.createLinearGradient(0, 0, 0, 256);
+gg.addColorStop(0, '#2e2470'); gg.addColorStop(0.5, '#6a50a8'); gg.addColorStop(0.85, '#d898bc'); gg.addColorStop(1, '#f2c0b0');
+gc.fillStyle = gg; gc.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(ciel);
+
+// ---------- la montagne : grandes masses à facettes ----------
+// chaque face reçoit sa couleur : bandes en diagonale (strates), mousse sur les faces tournées vers le ciel, pied verdi
+const cMousse = new THREE.Color(0x8aa646), cMousse2 = new THREE.Color(0x66863a), cPied = new THREE.Color(0x5c6a58);
+const bases = [0x7a68a0, 0x8472a8, 0x6e5c96, 0x8e7cb2].map((c) => new THREE.Color(c));
+const mRoche = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true });
+function masse(x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0, det = 1, bruit = 0.16, base = choix(bases)) {
+  const geo = new THREE.IcosahedronGeometry(1, det), p = geo.attributes.position, dec = new Map();
+  for (let i = 0; i < p.count; i++) {                        // même déformation pour les sommets partagés : pas de trou
+    const k = p.getX(i).toFixed(3) + ',' + p.getY(i).toFixed(3) + ',' + p.getZ(i).toFixed(3);
+    if (!dec.has(k)) dec.set(k, 1 + (alea() - 0.5) * 2 * bruit);
+    const f = dec.get(k); p.setXYZ(i, p.getX(i) * f, p.getY(i) * f, p.getZ(i) * f);
+  }
+  geo.scale(sx, sy, sz); geo.rotateX(rx); geo.rotateY(ry); geo.rotateZ(rz); geo.translate(x, y, z);
+  const col = [], a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3(), cc = new THREE.Color();
+  for (let i = 0; i < p.count; i += 3) {
+    a.fromBufferAttribute(p, i); b.fromBufferAttribute(p, i + 1); c.fromBufferAttribute(p, i + 2);
+    n.subVectors(c, b).cross(a.clone().sub(b)).normalize();
+    const my = (a.y + b.y + c.y) / 3, mx = (a.x + b.x + c.x) / 3;
+    const bande = Math.floor((my - mx * 0.5) / 2.4);        // strates inclinées
+    cc.copy(base).offsetHSL(0, 0, bande % 2 ? 0.04 : -0.025);
+    if (n.y > 0.7 && alea() < 0.85) cc.copy(alea() < 0.5 ? cMousse : cMousse2);
+    else if (my < DY + 0.8) cc.lerp(cPied, 0.35);
+    cc.offsetHSL(0, 0, (alea() - 0.5) * 0.03);
+    for (let k = 0; k < 3; k++) col.push(cc.r, cc.g, cc.b);
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  const o = new THREE.Mesh(geo, mRoche); o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+}
+// silhouette : pic à gauche qui domine, épaule plus basse à droite, aucune symétrie
+[
+  [-11, 34, -16, 11, 20, 10, 0.1, 0.4, 0.22],     // le pic
+  [-4, 25, -10, 8, 13, 8, 0, 1.1, -0.12],
+  [-22, 22, -11, 10, 15, 9, 0.1, 0.3, 0.3],
+  [-35, 9, -6, 12, 10, 10, 0, 0.8, 0.15],
+  [-14, 14, -3, 7, 12, 7, 0.05, 0.5, 0.1],
+  [-10, DY + 2.5, 0.5, 5, 9, 5, 0, 0.3, 0.05],   // contrefort gauche du creux
+  [3.5, 22, -7, 7, 8.5, 7, 0, 0.6, -0.2],
+  [1, DY + 12.6, -1.2, 6.5, 3.2, 5, 0.1, 0.2, -0.08],   // surplomb au-dessus de la porte
+  [8, DY + 1, -1.8, 4, 7.5, 4.2, 0, 0.9, -0.1],  // flanc droit du creux
+  [13, 11, -7, 8, 12, 8, 0, 0.2, -0.25],
+  [8, 16, -12, 7, 8, 7, 0, 1.4, 0.1],
+  [24, 6, -6, 13, 9, 10, 0, 0.5, -0.12],
+  [34, 3, 1, 10, 5, 8, 0, 1.0, 0.05],
+  [-16, 3, 4.5, 6, 4, 5, 0, 0.7, 0],
+  [13, 2.5, 3.5, 5, 3.5, 4, 0, 0.2, 0],
+].forEach((a) => masse(...a));
+// lointain, dans la brume (profondeur)
+masse(-60, 10, -90, 34, 38, 22, 0, 0.4, 0.15, 1, 0.14, new THREE.Color(0x8a78b8));
+masse(52, 4, -110, 40, 26, 24, 0, 1.1, -0.1, 1, 0.14, new THREE.Color(0x9284bc));
+
+// replats en diagonale qui saillent (couche plus dure), mousse sur le dessus
+function corniche(x, y, z, len, rz, ry = 0) {
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.set(0, ry, rz);
+  const r = new THREE.Mesh(new RoundedBoxGeometry(len, 0.55, 2.4, 1, 0.2), choix(violets)); r.castShadow = r.receiveShadow = true; g.add(r);
+  const m = new THREE.Mesh(new RoundedBoxGeometry(len * 0.85, 0.2, 2.0, 1, 0.08), alea() < 0.5 ? mousse : mousseSombre); m.position.y = 0.33; m.receiveShadow = true; g.add(m);
+  scene.add(g);
+}
+corniche(-9, 20, 1, 9, 0.38, 0.3); corniche(-16, 26, -4, 10, 0.42, 0.4); corniche(-5, 32, -5, 8, 0.36, 0.5);
+corniche(11, 14, -1.5, 7, 0.32, -0.2); corniche(20, 9, 1.5, 9, 0.3, -0.3); corniche(-24, 15, -2, 8, 0.4, 0.5);
+
+// ---------- l'entrée : creux sombre, seul l'encadrement est taillé ----------
+const fond = (x0, x1, y0, y1) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, 3), violetSombre); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, -2.6); o.receiveShadow = true; porte.add(o); };
+fond(-9, -LARG, -1, 13); fond(LARG, 9, -1, 13); fond(-LARG, LARG, HAUT, 13);
+for (const cote of [-1, 1]) {
+  bloc(1.5, HAUT + 0.1, EP + 0.4, taille_[1], cote * (LARG + 0.75), HAUT / 2, 0.1, 0, porte);           // jambage
+  bloc(0.5, HAUT - 0.4, EP + 0.6, taille_[2], cote * (LARG + 1.65), (HAUT - 0.4) / 2, 0.1, 0, porte);   // ressaut taillé
+  bloc(1.9, 0.5, EP + 0.8, taille_[0], cote * (LARG + 0.9), 0.25, 0.2, 0, porte);                     // base du jambage
+}
+bloc(2 * LARG + 4.4, 1.5, EP + 0.8, taille_[2], 0, HAUT + 0.75, 0.15, 0, porte);                       // linteau
+bloc(2 * LARG + 3.2, 0.45, EP + 1.0, taille_[0], 0, HAUT + 1.72, 0.2, 0, porte);                       // corniche du linteau
+bloc(1.2, 1.1, 0.3, taille_[1], 0, HAUT + 0.75, 1.5, 0, porte);                                       // clef gravée
+bloc(2.4, 0.18, EP - 0.6, mousse, -0.9, HAUT + 2.03, 0.1, 0, porte);                                  // la mousse a gagné le linteau
+bloc(2 * LARG + 0.2, SEUIL, EP, taille_[0], 0, SEUIL / 2, 0, 0, porte);                               // seuil
+// replat devant la porte : grandes dalles usées, de travers
+[[-1.6, 2.4, 2.8, 2.2, 0.05], [1.4, 2.2, 2.6, 2.4, -0.07], [-0.2, 4.3, 3.4, 1.6, 0.1], [2.8, 4.0, 1.8, 1.6, 0.3]].forEach(([x, z, w, d, r]) =>
+  bloc(w, 0.4, d, choix(taille_), x, DY + 0.08, z, r));
+
+// ---------- escalier : deux volées en lacets taillées dans la pente, un palier au tournant ----------
+const volees = [[[-3.6, 15.6], [4.2, 11.2]], [[4.8, 9.0], [0.8, 4.6]]];
+const PAL = [5.4, 10.1];
+let dernier = 0;
+const marche = (x, z, ry, w, d) => {
+  const top = Math.max(H(x, z) + 0.22, dernier + 0.06); dernier = top;
+  const bas = H(x, z) - 0.9, b = bloc(w, top - bas, d, alea() < 0.3 ? choix(humide) : choix(taille_), x, (top + bas) / 2, z, ry);
+  b.rotation.z = (alea() - 0.5) * 0.06; b.rotation.x = (alea() - 0.5) * 0.04;                     // usure : marches un peu de travers
+  if (alea() < 0.35) bloc(w * (0.3 + alea() * 0.3), 0.08, d * 0.5, mousseSombre, x + (alea() - 0.5) * w * 0.4, top + 0.02, z, ry);
+  if (alea() < 0.5) herbe(x + Math.cos(ry) * (w / 2 + 0.2) * (alea() < 0.5 ? 1 : -1), H(x, z), z - Math.sin(ry) * (w / 2 + 0.2), 1.1);
+};
+volees.forEach(([[x0, z0], [x1, z1]], k) => {
+  const dx = x1 - x0, dz = z1 - z0, L = Math.hypot(dx, dz), ry = Math.atan2(dx, dz), n = Math.round(L / 0.8);
+  for (let i = 0; i <= n; i++) { const t = i / n, perp = (alea() - 0.5) * 0.3;
+    marche(x0 + dx * t + Math.cos(ry) * perp, z0 + dz * t - Math.sin(ry) * perp, ry + (alea() - 0.5) * 0.14, 2.0 + alea() * 0.5, 0.9 + alea() * 0.2); }
+  if (k === 0) { const top = Math.max(H(...PAL) + 0.22, dernier + 0.04); dernier = top;                  // palier
+    bloc(2.9, top - H(...PAL) + 0.9, 2.7, taille_[0], PAL[0], (top + H(...PAL) - 0.9) / 2, PAL[1], 0.5); contact(PAL[0], PAL[1] + 1.2, 2, 1.2, H(...PAL) + 0.05); }
+});
+
+// ---------- éboulis et gros rochers au pied ----------
+const loinDuChemin = (x, z) => {
+  const d = (ax, az, bx, bz) => { const vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / (vx * vx + vz * vz))); return Math.hypot(x - ax - vx * t, z - az - vz * t); };
+  return Math.min(...volees.map(([[a, b], [c, e]]) => d(a, b, c, e)), Math.hypot(x - PAL[0], z - PAL[1]) - 0.6) > 2.2 && !(Math.abs(x) < 4 && z < 5);
+};
+[[-7.5, 16.5, 2.4], [10, 13.5, 2.0], [-12, 8, 2.8], [14, 7, 2.2], [-4, 20, 1.3], [17, 16, 1.6], [-19, 12, 2.0]].forEach(([x, z, s]) => {
+  masse(x, H(x, z) + s * 0.35, z, s * 1.3, s * 0.8, s, 0, alea() * 6, (alea() - 0.5) * 0.3, 0, 0.2); contact(x, z, s * 1.6, s * 1.4, H(x, z) + 0.06); });
+for (let i = 0, n = 0; i < 400 && n < 45; i++) {
+  const x = (alea() - 0.5) * 40, z = 1 + alea() * 16, s = 0.25 + alea() * 0.6;
+  if (!loinDuChemin(x, z) || (Math.abs(x) < 6 && z < 3)) continue;
+  masse(x, H(x, z) + s * 0.3, z, s * 1.2, s * 0.8, s, 0, alea() * 6, 0, 0, 0.22); n++;
+  if (alea() < 0.3) herbe(x + s, H(x, z), z, 1);
+}
+
+// lumière derrière la porte
+const lueur = new THREE.Mesh(new THREE.PlaneGeometry(2 * LARG, HAUT - SEUIL), new THREE.MeshBasicMaterial({ color: 0xfff0b0, fog: false }));
+lueur.position.set(0, (HAUT + SEUIL) / 2, -2.4); porte.add(lueur);
+
+// battants d'or gravés
+function battant(cote) {
+  const g = new THREE.Group(); g.position.set(cote * LARG, SEUIL, -0.1);
+  const h = HAUT - SEUIL - 0.05, l = LARG - 0.04;
+  const add = (w, hh, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), m); o.position.set(-cote * x, y, z); o.castShadow = true; g.add(o); };
+  add(l, h, 0.3, or, l / 2, h / 2, 0);
+  [0.3, 0.75, 1.3].forEach((x) => add(0.07, h * 0.78, 0.05, orSombre, x, h * 0.46, 0.17));
+  add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.14, 0.17); add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.86, 0.17);
+  add(0.62, 0.62, 0.12, orClair, 0.36, h * 0.9 - 0.4, 0.2); add(0.3, 0.3, 0.06, orSombre, 0.36, h * 0.9 - 0.4, 0.28);
+  porte.add(g); return g;
+}
+const gauche = battant(-1), droit = battant(1);
+
+// une seule statue gardienne, à gauche, adossée au contrefort, tournée vers l'arrivée de l'escalier
+function statue(px, pz, ry, s) {
+  contact(px, pz, 3.2 * s, 3.0 * s, DY + 0.32);
+  const g = new THREE.Group(); g.position.set(px, DY + 0.1, pz); g.rotation.y = ry; g.scale.setScalar(s); scene.add(g);
+  const add = (geo, m, x, y, z, ry = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.y = ry; o.castShadow = o.receiveShadow = true; g.add(o); return o; };
+  const B = (w, h, d) => new RoundedBoxGeometry(w, h, d, 2, 0.08);
+  add(B(3.8, 0.5, 3.4), humide[0], 0, 0.25, 0);
+  add(B(3.2, 1.0, 2.8), violets[2], 0, 1.0, 0);
+  add(B(2.2, 3.2, 1.6), violets[1], 0, 3.1, 0);
+  add(B(0.5, 3.0, 0.5), violets[0], -1.2, 3.0, 0.1); add(B(0.5, 3.0, 0.5), violets[0], 1.2, 3.0, 0.1);
+  add(B(2.3, 0.3, 1.7), violetSombre, 0, 3.4, 0);
+  add(B(2.8, 1.0, 1.7), violets[0], 0, 5.0, 0);
+  add(B(1.3, 1.2, 1.2), violets[3], 0, 6.0, 0.05);
+  add(B(0.8, 0.5, 0.7), violets[3], 0, 5.8, 0.8);
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], -0.45, 7.0, 0, 0.7).rotation.z = 0.15;
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], 0.45, 7.0, 0, 0.7).rotation.z = -0.15;
+  add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), -0.32, 6.1, 0.72); add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), 0.32, 6.1, 0.72);
+  add(B(0.6, 0.5, 0.5), violets[2], 0, 4.4, 1.05);
+  add(B(0.36, 5.2, 0.18), mat(0x5a58a8, { emissive: 0x1a1850 }), 0, 2.2, 1.35);
+  add(B(1.2, 0.2, 0.3), violets[2], 0, 4.65, 1.35);
+  add(B(1.3, 0.3, 1.3), mousse, 0.4, 7.2, -0.1); add(B(0.9, 0.2, 0.6), mousse, -0.9, 5.6, 0.3);
+  add(B(2.6, 0.18, 0.8), mousseSombre, 0, 0.55, 1.2);
+}
+statue(-5.2, 2.6, 0.45, 0.62);
+
+// nuages derrière le massif
+[[-30, 40, -60, 6], [22, 34, -70, 7], [44, 26, -50, 5], [-50, 30, -80, 8]].forEach(([x, y, z, r]) => {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(r * (0.55 + alea() * 0.35), 1), mat(0xecd0e0)); b.position.set((i - 1.5) * r * 0.8, alea() * r * 0.3, 0); g.add(b); }
+  scene.add(g);
+});
+
+// rayons en éventail devant la porte
+const c = document.createElement('canvas'); c.width = 256; c.height = 4;
+const g2 = c.getContext('2d'), gr = g2.createLinearGradient(0, 0, 256, 0);
+gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#000'); g2.fillStyle = gr; g2.fillRect(0, 0, 256, 4);
+const alphaMap = new THREE.CanvasTexture(c);
+const rayons = [];
+for (let i = -3; i <= 3; i++) {
+  const geo = new THREE.PlaneGeometry(11, HAUT - SEUIL); geo.translate(5.5, (HAUT + SEUIL) / 2, 0);
+  const m = new THREE.MeshBasicMaterial({ color: OR, transparent: true, opacity: 0, alphaMap, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
+  const r = new THREE.Mesh(geo, m); r.rotation.y = -Math.PI / 2 + i * 0.11; r.position.z = 0.2;
+  porte.add(r); rayons.push(r);
+}
+
+// état de la scène pour une progression p
+function pose(p) {
+  const ouv = lisse(0.08, 0.2, p) * 0.12 + lisse(0.2, 0.45, p) * 1.2;
+  gauche.rotation.y = ouv; droit.rotation.y = -ouv;
+  const eclat = lisse(0.15, 0.7, p);
+  lumPorte.intensity = eclat * 90;
+  rayons.forEach((r, i) => { r.material.opacity = eclat * (0.26 - Math.abs(i - 3) * 0.035); });
+  // caméra : plan large en 3/4 depuis la droite, puis elle se recentre sur l'axe de la porte, avance et passe le seuil
+  const av = lisse(0.4, 0.7, p) * 0.5 + lisse(0.7, 0.95, p) * 0.5, axe = lisse(0.3, 0.72, p);
+  camera.position.set(lerp(16, 0, axe), lerp(DY + 4, DY + 3.9, lisse(0.4, 0.9, p)), lerp(33, -4, av));
+  camera.lookAt(lerp(-4, 0, axe), lerp(DY + 8, DY + 4.4, lisse(0.2, 0.8, p)), lerp(-2, -12, lisse(0.6, 1, p)));
+  return lisse(0.7, 0.92, p) * 0.95 + lisse(0.92, 1, p) * 0.05;
+}
+
+const hud = document.getElementById('hud'), flash = document.getElementById('flash');
+const liste = (new URLSearchParams(location.search).get('p') || '').split(',').filter(Boolean).map(Number);
+
+function taille() { renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', taille); taille();
+
+if (liste.length) {
+  document.body.classList.add('serie'); flash.style.display = 'none';
+  const cols = liste.length > 3 ? 3 : liste.length, lignes = Math.ceil(liste.length / cols);
+  const W = innerWidth, Ht = innerHeight, tw = W / cols, th = Ht / lignes;
+  camera.aspect = tw / th; camera.updateProjectionMatrix();
+  renderer.setScissorTest(true);
+  const sup = document.createElement('div'); sup.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2';
+  document.body.appendChild(sup);
+  liste.forEach((p, k) => {
+    const fl = pose(p), x = (k % cols) * tw, y = Ht - (Math.floor(k / cols) + 1) * th;
+    renderer.setViewport(x, y, tw, th); renderer.setScissor(x, y, tw, th); renderer.render(scene, camera);
+    const t = document.createElement('div');
+    t.style.cssText = `position:absolute;left:${x}px;top:${Ht - y - th}px;width:${tw}px;height:${th}px;background:#ffd98a;opacity:${fl}`;
+    const l = document.createElement('div');
+    l.style.cssText = `position:absolute;left:${x + 6}px;top:${Ht - y - th + 6}px;font:13px monospace;color:#fff;background:#000a;padding:2px 6px`;
+    l.textContent = 'p=' + p; sup.append(t, l);
+  });
+  hud.style.display = 'none';
+  window.__pret = true;
+} else {
+  let cible = 0, cour = 0, prec = performance.now(), n = 0, t0 = prec;
+  const lire = () => { const m = document.documentElement.scrollHeight - innerHeight; cible = m > 0 ? scrollY / m : 0; };
+  addEventListener('scroll', lire); lire();
+  (function boucle(t) {
+    requestAnimationFrame(boucle);
+    const dt = (t - prec) / 1000; prec = t;
+    cour += (cible - cour) * (1 - Math.exp(-dt * 4));
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    flash.style.opacity = pose(cour);
+    renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight);
+    renderer.render(scene, camera);
+    n++; if (t - t0 > 500) { hud.textContent = 'p=' + cour.toFixed(2) + ' · ' + Math.round(n * 1000 / (t - t0)) + ' fps'; n = 0; t0 = t; }
+  })(prec);
+}
+</script>
+</body>
+</html>

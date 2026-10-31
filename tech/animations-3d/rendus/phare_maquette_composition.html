@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette phare : composition tempête (2D)</title>
+<style>
+:root{
+  --ciel-haut:#16306b; --ciel-bas:#0d2150; --mer-loin:#0c1d4a; --mer-pres:#164a8c;
+  --brique:#b8432f; --brique-ombre:#7e2a20; --lumiere:#e6f3ff; --toit:#c8323a;
+  --ecume-bleu:#bcd0f2; --ecume-rose:#f3a07a; --encre:#1a1a1f; --roche:#2a2025;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#07101f;color:#cfe0f5;font:16px/1.5 system-ui,sans-serif;padding:20px 16px}
+h1{font-size:1.15rem;margin:0 0 4px}
+p.note{margin:0 0 14px;opacity:.75;max-width:62ch;font-size:.92rem}
+svg{width:100%;height:auto;display:block;border-radius:6px;max-width:1000px}
+.faisceau{animation:balai 7s ease-in-out infinite alternate;transform-origin:400px 168px}
+@keyframes balai{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.gerbe{transform-box:fill-box;transform-origin:50% 100%;animation:gerbe 6s ease-in-out infinite}
+.gerbe.g2{animation-delay:-2s;animation-duration:7.5s}
+.gerbe.g3{animation-delay:-4s;animation-duration:8.5s}
+@keyframes gerbe{0%,100%{transform:scale(.88)}45%{transform:scale(1.12)}}
+/* grosse vague de premier plan : recouvre le pied du phare puis retombe */
+.devant{transform-box:fill-box;transform-origin:50% 100%;animation:devant 9s ease-in-out infinite}
+@keyframes devant{0%,35%{transform:translateY(40px) scale(.9);opacity:.0}50%{transform:translateY(-6px) scale(1.15);opacity:.95}70%{transform:translateY(16px) scale(1);opacity:.6}100%{transform:translateY(40px) scale(.9);opacity:0}}
+@media (prefers-reduced-motion:reduce){.faisceau,.gerbe,.devant{animation:none}.devant{opacity:0}}
+</style>
+</head>
+<body>
+<h1>Composition « tempête au crépuscule » : phare central, houle et gerbes d'écume</h1>
+<p class="note">Maquette 2D d'après la composition que tu aimes (vue légèrement plongeante, phare centré sur ses rochers, gerbes d'écume rosée, ciel de nuages). Dessinée en code, rien de copié. Le bonhomme est minuscule sur la passerelle du haut.</p>
+
+<svg viewBox="0 0 800 500" role="img" aria-label="Un phare rouge sur des rochers au milieu d'une mer houleuse, gerbes d'écume rosée, ciel bleu nuit avec nuages">
+  <defs>
+    <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--ciel-haut)"/><stop offset="1" stop-color="var(--ciel-bas)"/></linearGradient>
+    <linearGradient id="mer" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--mer-loin)"/><stop offset="1" stop-color="var(--mer-pres)"/></linearGradient>
+    <radialGradient id="halo"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#bcd8ff" stop-opacity="0"/></radialGradient>
+    <filter id="trait" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="b"/>
+      <feDisplacementMap in="SourceGraphic" in2="b" scale="2"/>
+    </filter>
+    <filter id="goo"><feGaussianBlur stdDeviation="3.5"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"/></filter>
+    <pattern id="briques" width="12" height="7" patternUnits="userSpaceOnUse">
+      <rect width="12" height="7" fill="none"/><path d="M0 .5h12M6 .5v6.5M0 7.5" stroke="var(--brique-ombre)" stroke-width=".8" fill="none"/>
+    </pattern>
+    <clipPath id="tour"><polygon points="378,340 422,340 417,200 383,200"/></clipPath>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#ciel)"/>
+  <g id="nuages"></g>
+  <rect y="205" width="800" height="295" fill="url(#mer)"/>
+  <g id="cretes"></g>
+
+  <!-- gerbes derrière le phare -->
+  <g id="gerbe-g" class="gerbe"></g>
+  <g id="gerbe-d" class="gerbe g2"></g>
+
+  <!-- faisceau -->
+  <g class="faisceau"><polygon points="400,168 -100,120 -100,225" fill="#cfe6ff" opacity=".16"/><polygon points="400,168 900,120 900,225" fill="#cfe6ff" opacity=".12"/></g>
+
+  <!-- rochers -->
+  <g fill="var(--roche)" stroke="var(--encre)" stroke-width="1.5" filter="url(#trait)">
+    <polygon points="330,372 352,340 380,330 420,330 452,345 470,372 440,385 360,385"/>
+    <polygon points="300,380 318,362 338,366 342,384 312,392"/>
+    <polygon points="462,370 490,356 512,368 506,386 470,388"/>
+  </g>
+
+  <!-- phare -->
+  <g filter="url(#trait)" stroke="var(--encre)" stroke-width="1.6" stroke-linejoin="round">
+    <polygon points="378,340 422,340 417,200 383,200" fill="var(--brique)"/>
+    <rect x="378" y="195" width="44" height="145" fill="url(#briques)" clip-path="url(#tour)" stroke="none"/>
+    <polygon points="404,200 417,200 422,340 404,340" fill="var(--brique-ombre)" opacity=".45" stroke="none"/>
+    <rect x="391" y="236" width="5" height="8" fill="#eaf4ff"/><rect x="392" y="274" width="5" height="8" fill="#eaf4ff"/><rect x="394" y="312" width="5" height="8" fill="#eaf4ff"/>
+    <rect x="372" y="338" width="56" height="8" fill="var(--brique-ombre)"/>
+    <!-- passerelle du haut, crénelée -->
+    <rect x="374" y="194" width="52" height="8" fill="#5a2a22"/>
+    <path d="M374 194v-6h6v6M386 194v-6h6v6M398 194v-6h6v6M410 194v-6h6v6M420 194v-6h6v6" fill="#5a2a22"/>
+    <!-- lanterne -->
+    <rect x="384" y="150" width="32" height="40" fill="var(--lumiere)"/>
+    <path d="M392 150v40M400 150v40M408 150v40M384 170h32" stroke-width="1" fill="none"/>
+    <polygon points="380,150 420,150 400,126" fill="var(--toit)"/>
+    <line x1="400" y1="126" x2="400" y2="112"/><circle cx="400" cy="111" r="2.5" fill="var(--toit)"/>
+  </g>
+  <circle cx="400" cy="170" r="48" fill="url(#halo)" opacity=".55"/>
+  <!-- bonhomme sur la passerelle -->
+  <g transform="translate(380 177)" stroke="var(--encre)" stroke-width=".8">
+    <rect x="0" y="5" width="5" height="9" rx="1" fill="#e8742c"/><circle cx="2.5" cy="3" r="2.8" fill="#cfc8b4"/><polygon points="0,1 5,1 2.5,-4" fill="#e8742c"/>
+  </g>
+
+  <!-- gerbes devant et grosse vague qui recouvre le pied -->
+  <g id="gerbe-f" class="gerbe g3"></g>
+  <g id="gerbe-v" class="devant"></g>
+</svg>
+
+<script>
+// Génération déterministe : nuages, crêtes de houle, gerbes d'écume (aucun fichier externe).
+(function(){
+  var s=7; function r(){ s=(s*16807)%2147483647; return s/2147483647; }
+  var NS='http://www.w3.org/2000/svg';
+  function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
+  var nu=document.getElementById('nuages');
+  for(var i=0;i<30;i++){var x=r()*820,y=45+r()*95,R=26+r()*30;
+    el('circle',{cx:x,cy:y,r:R,fill:'#f0a070',opacity:.9},nu);
+    el('circle',{cx:x+4,cy:y+6,r:R,fill:'#0f1f55'},nu);}
+  el('rect',{x:0,y:150,width:800,height:60,fill:'#0f1f55'},nu);
+  var cr=document.getElementById('cretes');
+  for(var j=0;j<150;j++){var yy=212+Math.pow(r(),1.4)*280,xx=r()*800,w=8+yy/500*26;
+    el('path',{d:'M'+xx+' '+yy+' q'+(w/2)+' -'+(w/5)+' '+w+' 0',stroke:r()>.45?'#f3a07a':'#6f93d8',fill:'none','stroke-width':1.2+yy/500*2,opacity:.8},cr);}
+  function gerbe(id,cx,cy,rx,ry,n){var g=document.getElementById(id);
+    for(var i=0;i<n;i++){var a=r()*6.283,d=Math.sqrt(r()),x=cx+Math.cos(a)*rx*d,y=cy+Math.sin(a)*ry*d,hi=(y<cy-ry*.15);
+      var c=hi?(r()>.35?'#ffc9a0':'#f3a07a'):(r()>.5?'#e8eefc':(r()>.5?'#bcd0f2':'#7fa3dc'));
+      el('circle',{cx:x,cy:y,r:4+r()*9*(1-d*.5),fill:c,opacity:.95},g);}
+    g.setAttribute('filter','url(#goo)');}
+  gerbe('gerbe-g',270,330,150,85,420);
+  gerbe('gerbe-d',545,320,160,90,420);
+  gerbe('gerbe-f',400,425,260,60,420);
+  gerbe('gerbe-v',400,372,150,40,300);
+})();
+</script>
+</body>
+</html>

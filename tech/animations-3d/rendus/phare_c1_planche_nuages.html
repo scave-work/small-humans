@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choix du style de nuage</title>
+<style>
+  body{margin:0;padding:16px;background:linear-gradient(#2f5fc0,#1b3a80 50%,#0d1f4e);color:#fff;font:15px/1.4 system-ui,sans-serif;min-height:100vh}
+  h1{font-size:1.1rem;margin:0 0 12px}
+  .rangee{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  figure{margin:0}
+  canvas{width:100%;height:auto;display:block}
+  figcaption{padding:4px 2px;font-size:.9rem}
+</style>
+</head>
+<body>
+<h1>Trois styles de nuage à comparer (dis A, B ou C, ou décris ce qui manque)</h1>
+<div class="rangee">
+  <figure><canvas id="a" width="520" height="260"></canvas><figcaption><b>A.</b> Gros nuage doux et clair, façon île flottante de Tunic (sans contour, bords flous).</figcaption></figure>
+  <figure><canvas id="b" width="520" height="260"></canvas><figcaption><b>B.</b> Cumulus « chou-fleur » de la peinture : corps sombre, sommets éclairés orange.</figcaption></figure>
+  <figure><canvas id="c" width="520" height="260"></canvas><figcaption><b>C.</b> Nuage rond sombre avec halo clair sur le contour (comme les nuages de droite de l'image Tunic).</figcaption></figure>
+</div>
+<script>
+var s = 5;
+function r(){ s = (s * 16807) % 2147483647; return s / 2147483647; }
+
+// Forme : liste de bosses (x, y, rayon) posées sur une base plate.
+function bosses(n, W, base, rmin, rmax) {
+  var b = [];
+  for (var i = 0; i < n; i++) {
+    var t = i / (n - 1), k = Math.sin(t * Math.PI);
+    var rad = rmin + k * (rmax - rmin) * (0.7 + r() * 0.3);
+    b.push([50 + t * (W - 100) + (r() - .5) * 14, base - rad * (0.7 + r() * 0.3), rad]);
+  }
+  return b;
+}
+function chemin(x, b, dx, dy, W, base) {
+  x.beginPath();
+  b.forEach(function (p) { x.moveTo(p[0] + dx + p[2], p[1] + dy); x.arc(p[0] + dx, p[1] + dy, p[2], 0, 6.283); });
+  x.rect(60 + dx, base - 26 + dy, W - 120, 26);
+}
+function nuage(id, mode) {
+  var c = document.getElementById(id), x = c.getContext('2d'), W = c.width, base = 215, b;
+  if (mode === 'a') {
+    b = bosses(5, W, base, 40, 78);
+    var g = x.createLinearGradient(0, 40, 0, base);
+    g.addColorStop(0, '#eef2ff'); g.addColorStop(.55, '#a9b9f0'); g.addColorStop(1, '#6a7fd0');
+    x.filter = 'blur(5px)'; x.fillStyle = g; chemin(x, b, 0, 0, W, base); x.fill();
+    x.filter = 'blur(10px)'; x.fillStyle = 'rgba(255,225,205,.55)'; chemin(x, b, -8, -10, W, base);
+    x.globalCompositeOperation = 'source-atop'; x.fill();
+  } else if (mode === 'b') {
+    b = bosses(22, W, base, 16, 52);
+    x.fillStyle = '#ffd9a8'; chemin(x, b, 0, 0, W, base); x.fill();
+    var g2 = x.createLinearGradient(0, 40, 0, base);
+    g2.addColorStop(0, '#3f5bb0'); g2.addColorStop(.6, '#22337c'); g2.addColorStop(1, '#101a52');
+    x.fillStyle = g2; chemin(x, b, 3, 7, W, base); x.fill();
+  } else {
+    b = bosses(6, W, base, 36, 70);
+    x.filter = 'blur(4px)'; x.strokeStyle = 'rgba(205,220,255,.95)'; x.lineWidth = 12;
+    chemin(x, b, 0, 0, W, base); x.stroke();
+    x.filter = 'none';
+    var g3 = x.createLinearGradient(0, 40, 0, base);
+    g3.addColorStop(0, '#6a7fd0'); g3.addColorStop(1, '#2c3d92');
+    x.fillStyle = g3; chemin(x, b, 0, 0, W, base); x.fill();
+  }
+}
+nuage('a', 'a'); nuage('b', 'b'); nuage('c', 'c');
+</script>
+</body>
+</html>

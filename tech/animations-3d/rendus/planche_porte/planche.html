@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planche : 3 directions de décor</title>
+<style>
+ body{margin:0;background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif}
+ .g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px}
+ figure{margin:0}figcaption{padding:4px 2px}iframe{width:100%;aspect-ratio:16/9;border:0;display:block;background:#222}
+ @media(max-width:800px){.g{grid-template-columns:1fr}}
+</style></head><body>
+<div class="g">
+ <figure><iframe src="index.html?v=A&p=0"></iframe><figcaption><b>A</b> ruine usée, de face</figcaption></figure>
+ <figure><iframe src="index.html?v=B&p=0"></iframe><figcaption><b>B</b> portique dans la falaise</figcaption></figure>
+ <figure><iframe src="index.html?v=C&p=0"></iframe><figcaption><b>C</b> terrasse vue d'en haut (la caméra descend ensuite)</figcaption></figure>
+ <figure><iframe src="index.html?v=A&p=0.45"></iframe><figcaption>A, porte ouverte</figcaption></figure>
+ <figure><iframe src="index.html?v=B&p=0.45"></iframe><figcaption>B, porte ouverte</figcaption></figure>
+ <figure><iframe src="index.html?v=C&p=0.45"></iframe><figcaption>C, porte ouverte</figcaption></figure>
+</div>
+<p style="padding:0 8px">Chaque variante en direct : <code>index.html?v=A</code>, <code>?v=B</code>, <code>?v=C</code> (scroll).</p>
+</body></html>

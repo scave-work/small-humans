@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Porte, variante E (faille)</title>
+<style>
+  html,body{margin:0;background:#111}
+  #scroller{height:600vh}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #hud{position:fixed;left:8px;top:8px;font:12px/1.4 monospace;color:#fff;background:#0008;padding:4px 8px;z-index:3;pointer-events:none}
+  #flash{position:fixed;inset:0;background:#ffd98a;opacity:0;pointer-events:none;z-index:2}
+  .serie #scroller{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+</head>
+<body>
+<div id="scroller"></div>
+<div id="flash"></div>
+<div id="hud">p=0 · -- fps</div>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* Variante E « faille / gorge » (rendu inspiré de Tunic : aplats, relief par la lumière, sans contours, aucun asset copié).
+   La porte d'or est au fond d'une faille étroite : deux parois hautes, irrégulières et différentes (la gauche avance en surplomb,
+   la droite recule puis se referme en haut), grandes facettes inclinées, strates obliques, fissures ; fente de ciel au-dessus.
+   Au sol : ruisseau sinueux né au pied de la roche, gués de pierres plates, rives de mousse, herbes, racines, rochers tombés ; une seule statue.
+   Repris de index.html (?v=B) : progression p au scroll, planche ?p=0,0.2,0.45,0.7,0.9,1, battants, rayons, éblouissement, statue, éclairage. */
+const OR = 0xffd98a;
+const lisse = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const fract = (x) => x - Math.floor(x);
+const cloche = (x, c, l) => Math.exp(-(((x - c) / l) ** 2));
+let graine = 11; const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;   // aléa fixe : même image à chaque fois
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setScissorTest(true);
+renderer.setClearColor(0x4a3a7a);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x7a5a9a, 22, 90);
+const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 260);
+
+const mat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true, ...extra });
+const violets = [0x8a78a8, 0x7a6898, 0x9a88b6, 0x6e5e8c].map((c) => mat(c));
+const humide = [0x665f78, 0x5c6a58, 0x6a6482].map((c) => mat(c));
+const violetSombre = mat(0x3d2f60), mousse = mat(0x86a24a), mousseSombre = mat(0x5f7d38);
+const dalle = [0x9a8eac, 0x8c80a0, 0xa498b4].map((c) => mat(c));
+const or = mat(0xf2b81c, { emissive: 0x5a3c00 }), orSombre = mat(0xb98512, { emissive: 0x3a2600 }), orClair = mat(0xffd54a, { emissive: 0x6a4a00 });
+const choix = (liste) => liste[Math.floor(alea() * liste.length)];
+
+// éclairage : peu de lumière ambiante (contraste fort), soleil rasant qui tombe par la fente et n'éclaire qu'une paroi
+scene.add(new THREE.HemisphereLight(0xc0a8f0, 0x4a3a68, 1.5));
+const soleil = new THREE.DirectionalLight(0xffdcc0, 4.5);
+soleil.target.position.set(0, 0, 9); scene.add(soleil.target);
+soleil.position.set(12, 44, 8);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(2048, 2048);
+Object.assign(soleil.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 1, far: 120 });
+soleil.shadow.bias = -0.0005; soleil.shadow.normalBias = 0.04;
+scene.add(soleil);
+const lumPorte = new THREE.PointLight(OR, 0, 40, 1.1);           // la lumière des battants qui lèche les parois
+lumPorte.position.set(0, 4.4, 1.8);
+scene.add(lumPorte);
+
+// cotes de la porte (identiques à index.html) : ouverture 3,6 de large, seuil à y=1, haut à y=7,4
+const LARG = 1.8, SEUIL = 1.0, HAUT = 7.4, EP = 2.4;
+
+const bloc = (w, h, d, m, x, y, z, ry = 0) => {
+  const r = Math.min(0.09, w / 4, h / 4, d / 4);
+  const o = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, r), m); o.position.set(x, y, z); o.rotation.y = ry;
+  o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+};
+const texOmbre = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  r.addColorStop(0, 'rgba(30,15,55,0.75)'); r.addColorStop(1, 'rgba(30,15,55,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+const contact = (x, z, rx, rz, y = 0.04) => {
+  const o = new THREE.Mesh(new THREE.PlaneGeometry(rx * 2, rz * 2), new THREE.MeshBasicMaterial({ map: texOmbre, transparent: true, depthWrite: false, fog: false }));
+  o.rotation.x = -Math.PI / 2; o.position.set(x, y, z); scene.add(o);
+};
+const herbe = (x, y, z, s = 1) => {
+  for (let i = 0; i < 3; i++) { const o = new THREE.Mesh(new THREE.ConeGeometry(0.1 * s, (0.35 + alea() * 0.25) * s, 4), alea() < 0.5 ? mousse : mousseSombre);
+    o.position.set(x + (alea() - 0.5) * 0.3, y + 0.15 * s, z + (alea() - 0.5) * 0.3); o.rotation.z = (alea() - 0.5) * 0.4; scene.add(o); }
+};
+function terrain({ w, d, cx, cz, seg, haut, couleur }) {
+  const geo = new THREE.PlaneGeometry(w, d, seg[0], seg[1]); geo.rotateX(-Math.PI / 2);
+  const p = geo.attributes.position, col = [], c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i) + cx, z = p.getZ(i) + cz; p.setY(i, haut(x, z)); col.push(...couleur(x, z, c).toArray()); }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+  m.position.set(cx, 0, cz); m.receiveShadow = true; scene.add(m); return m;
+}
+
+// ciel : seule une fente se voit, entre les deux parois
+const ciel = document.createElement('canvas'); ciel.width = 4; ciel.height = 256;
+const gc = ciel.getContext('2d'), gg = gc.createLinearGradient(0, 0, 0, 256);
+gg.addColorStop(0, '#2e2470'); gg.addColorStop(0.5, '#7a54a8'); gg.addColorStop(1, '#f0a6b6');
+gc.fillStyle = gg; gc.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(ciel);
+
+/* ---------- paroi de roche : grille grossière déformée, une couleur par facette ----------
+   pos(i, j) -> [x, y, z] ; trou(i, j) -> true pour ne pas fermer la case ; dedans : sens de la face visible (pour repérer les replats) */
+const cRoche = [0x9a88b8, 0x8a7aaa, 0xa694c2, 0x7e6ea0, 0x9e8aae].map((c) => new THREE.Color(c));
+const cFente = new THREE.Color(0x35284f), cMousse = new THREE.Color(0x8aa246), cMousse2 = new THREE.Color(0x667f3a), cPied = new THREE.Color(0x5c6458);
+function paroi(nu, nv, pos, trou, dedans, strate) {
+  const P = [];
+  for (let i = 0; i <= nu; i++) { P.push([]); for (let j = 0; j <= nv; j++) P[i].push(new THREE.Vector3(...pos(i, j))); }
+  const fissures = new Set(); for (let k = 0; k < Math.round(nu / 4); k++) fissures.add(1 + Math.floor(alea() * (nu - 2)));   // colonnes fendues
+  const v = [], col = [], a = new THREE.Vector3(), b = new THREE.Vector3(), n = new THREE.Vector3(), m = new THREE.Vector3(), c = new THREE.Color();
+  for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) {
+    if (trou && trou(i, j)) continue;
+    const q = [P[i][j], P[i + 1][j], P[i + 1][j + 1], P[i][j + 1]];
+    for (const t of (alea() < 0.5 ? [[0, 1, 2], [0, 2, 3]] : [[0, 1, 3], [1, 2, 3]])) {
+      const [A, B, C] = t.map((k) => q[k]);
+      a.subVectors(B, A); b.subVectors(C, A); n.crossVectors(a, b).normalize(); if (n.dot(dedans) < 0) n.negate();
+      m.copy(A).add(B).add(C).multiplyScalar(1 / 3);
+      const s = strate(m), k = Math.floor(s);
+      c.copy(cRoche[((k % 5) + 5) % 5]).lerp(cRoche[(((k * 3 + 7) % 5) + 5) % 5], 0.3);
+      if (fract(s) < 0.16) c.lerp(cFente, 0.75);                                    // joint de strate oblique : fente d'ombre
+      if (fissures.has(i) && m.y > 1.5 && m.y < 9 + (i % 5) * 3) c.lerp(cFente, 0.8);   // fissure verticale
+      if (n.y > 0.45) c.copy(alea() < 0.6 ? cMousse : cMousse2);                    // replat : la mousse a gagné
+      if (m.y < 1.4) c.lerp(cPied, 0.6);                                            // pied humide, verdi
+      c.offsetHSL(0, 0, (alea() - 0.5) * 0.03);
+      for (const P0 of [A, B, C]) { v.push(P0.x, P0.y, P0.z); col.push(c.r, c.g, c.b); }
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const o = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, side: THREE.DoubleSide }));
+  o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+}
+
+// demi-largeur de la faille selon la paroi (s=-1 gauche, s=1 droite), la profondeur z et la hauteur y : deux profils différents
+function demi(s, z, y) {
+  if (s < 0) return 4.0 + 0.17 * z + 1.4 * Math.sin(z * 0.33 + 1)
+    - 1.3 * lisse(9, 28, y)                                  // la paroi se penche vers l'autre en montant
+    - 2.0 * cloche(z, 12, 4.5) * lisse(3, 8, y)               // grand surplomb : la gauche avance
+    - 0.65 * fract((y - 0.4 * z) / 2.6);                      // strates obliques qui descendent vers la porte
+  return 4.9 + 0.21 * z + 1.1 * Math.sin(z * 0.25 + 3)
+    + 1.1 * lisse(1.5, 6, y) * cloche(z, 17, 4.5)             // la droite recule : un abri creusé au pied
+    - 0.6 * lisse(12, 26, y)
+    - 1.6 * cloche(z, 7, 3.5) * lisse(13, 19, y)             // lèvre haute au-dessus de la porte
+    - 0.5 * fract((y + 0.25 * z) / 3.4);                      // strates obliques dans l'autre sens
+}
+const strateG = (m) => (m.y - 0.4 * m.z) / 2.6, strateD = (m) => (m.y + 0.25 * m.z) / 3.4;
+for (const s of [-1, 1]) {
+  const nu = 27, nv = 20, z0 = -4, z1 = 38, haut = s < 0 ? 27 : 22;
+  const bruit = []; for (let i = 0; i <= nu; i++) { bruit.push([]); for (let j = 0; j <= nv; j++) bruit[i].push([(alea() - 0.5) * 0.8, (alea() - 0.5) * 0.5, (alea() - 0.5) * 0.6]); }
+  paroi(nu, nv, (i, j) => {
+    const z = lerp(z0, z1, i / nu) + bruit[i][j][2], y0 = lerp(-1, haut, j / nv);
+    const y = j === nv ? y0 - alea() * 6 : y0 + (j ? bruit[i][j][1] : 0);    // crête déchiquetée
+    return [s * (demi(s, z, y) + bruit[i][j][0]), y, z];
+  }, null, new THREE.Vector3(-s, 0, 0), s < 0 ? strateG : strateD);
+}
+
+// fond de la faille : la roche dans laquelle la porte est taillée ; elle penche en arrière en montant, crête biaisée
+{
+  const nu = 25, nv = 20, bruit = [];
+  for (let i = 0; i <= nu; i++) { bruit.push([]); for (let j = 0; j <= nv; j++) bruit[i].push([(alea() - 0.5) * 0.5, (alea() - 0.5) * 0.5, (alea() - 0.5) * 0.9]); }
+  paroi(nu, nv, (i, j) => {
+    const x = -15 + i * 1.2, y = j * 0.9, k = Math.max(lisse(3.3, 5.5, Math.abs(x)), lisse(9.4, 11.5, y));   // k=0 : bords nets autour de l'encadrement
+    const yy = j === nv ? 13.5 + x * 0.18 + alea() * 2.5 : y + k * bruit[i][j][1];
+    return [x + k * bruit[i][j][0], yy, 1.2 - lisse(9, 18, y) * 1.8 + k * (bruit[i][j][2] + 0.5 * Math.sin(x * 0.6 + y * 0.3))];
+  }, (i, j) => Math.abs(-15 + (i + 0.5) * 1.2) < 3 && (j + 0.5) * 0.9 < 9, new THREE.Vector3(0, 0, 1), (m) => (m.y + 0.3 * m.x) / 2.8);
+  const fond = (x0, x1, y0, y1) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, 4), violetSombre); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, -4.2); scene.add(o); };
+  fond(-20, -LARG, 0, 20); fond(LARG, 20, 0, 20); fond(-LARG, LARG, HAUT, 20);       // aucun jour derrière l'ouverture
+}
+// encadrement simple, taillé : deux montants et un linteau à peine usés, mousse dessus
+const taille = [mat(0x9a8ab6), mat(0x8c7caa)];
+for (const cote of [-1, 1]) bloc(1.4, 9.2, 2.8, taille[cote < 0 ? 0 : 1], cote * 2.5, 4.6, 0.3, cote * 0.01);
+bloc(6.6, 1.9, 2.9, taille[0], 0.05, 8.35, 0.35).rotation.z = 0.012;
+bloc(4.2, 0.2, 1.2, mousse, -0.6, 9.36, 1.0); bloc(1.6, 0.16, 0.8, mousseSombre, 2.0, 9.34, 1.2);
+bloc(2 * LARG + 0.2, SEUIL, EP, dalle[0], 0, SEUIL / 2, 0);
+// marches usées, de travers, pas tout à fait de la même largeur
+[[1.0, 4.1, 0.34, 6.0, 0.04], [1.0, 3.1, 0.67, 5.4, -0.03], [1.0, 2.1, 1.0, 4.8, 0.02]].forEach(([d, z, h, l, r], k) => {
+  bloc(l, h, d, choix(dalle), (k - 1) * 0.12, h / 2, z, r); contact(0, z + 0.7, l / 2 + 0.3, 0.8, 0.06);
+  herbe(-l / 2 + 0.1, h, z + 0.3, 0.9); if (k !== 1) herbe(l / 2 - 0.2, h, z + 0.2, 0.8);
+});
+
+/* ---------- sol : roche et mousse, ruisseau sinueux né au pied de la paroi gauche ---------- */
+const rx = (z) => 2.2 * Math.sin((z - 2) * 0.28 - 1.2) - 1.5 + 0.08 * z;          // axe du ruisseau
+const rl = (z) => 0.6 + 0.025 * z;                                                   // demi-largeur
+const lit = (x, z) => (1 - lisse(rl(z) * 0.5, rl(z) + 0.45, Math.abs(x - rx(z)))) * lisse(1.2, 2.8, z);
+const hSol = (x, z) => 0.1 * Math.sin(x * 0.8 + z * 0.35) + 0.06 * Math.sin(z * 1.3 - x) + lisse(3, 7.5, Math.abs(x)) * 0.7 - 0.7 * lit(x, z);
+const EAU = -0.24;
+terrain({ w: 32, d: 46, cx: 0, cz: 18, seg: [80, 115], haut: (x, z) => hSol(x, z) + (alea() - 0.5) * 0.06,
+  couleur: (x, z, c) => {
+    const d = Math.abs(x - rx(z)) - rl(z), l = lit(x, z);
+    if (l > 0.55) return c.set(0x4a4a62).lerp(new THREE.Color(0x3a4a50), alea() * 0.5);            // fond du lit
+    c.set(0x6c5e84).lerp(new THREE.Color(0x5a4e72), alea() * 0.6);                                   // sol de roche
+    const rive = z > 2 ? 1 - lisse(0.2, 1.6 + 0.6 * Math.sin(z * 0.9), d) : 0;
+    const pied = lisse(3.6, 5.5, Math.abs(x)) * (0.5 + 0.5 * Math.sin(z * 0.7 + x));
+    const m = Math.max(rive, pied * 0.8, z > 5 && alea() < 0.12 ? 0.7 : 0);
+    return m > 0 ? c.lerp(new THREE.Color(alea() < 0.5 ? 0x7f9c44 : 0x5f7d38), m) : c; } });
+const eau = new THREE.Mesh(new THREE.PlaneGeometry(32, 46), mat(0x3a6aa8, { roughness: 0.25, flatShading: false }));
+eau.rotation.x = -Math.PI / 2; eau.position.set(0, EAU, 18); eau.receiveShadow = true; scene.add(eau);
+
+// gués : grosses pierres plates irrégulières en travers du courant (prismes bas à 6-7 côtés, posés de travers)
+const pierrePlate = (x, z, r, m) => {
+  const o = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.08, 0.32, 6 + Math.floor(alea() * 2)), m);
+  o.position.set(x, EAU + 0.12 + alea() * 0.06, z); o.scale.set(1, 1, 0.65 + alea() * 0.35);
+  o.rotation.set((alea() - 0.5) * 0.08, alea() * 6, (alea() - 0.5) * 0.08); o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+};
+for (const [z0, nb] of [[6.6, 4], [17.5, 3]]) {
+  const pente = (rx(z0 + 0.1) - rx(z0 - 0.1)) / 0.2, nl = Math.hypot(1, pente), nx = 1 / nl, nz = -pente / nl;
+  for (let k = 0; k < nb; k++) { const t = (k - (nb - 1) / 2) * 0.95 + (alea() - 0.5) * 0.2;
+    pierrePlate(rx(z0) + nx * t, z0 + nz * t + (alea() - 0.5) * 0.3, 0.42 + alea() * 0.18, choix(dalle)); }
+}
+// rochers tombés : au pied des parois, un gros dans le ruisseau
+const rocher = (x, z, s, m = choix(violets)) => {
+  const o = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), m); o.position.set(x, hSol(x, z) + s * 0.3, z);
+  o.scale.set(1.25, 0.65 + alea() * 0.35, 1.05); o.rotation.set(alea(), alea() * 6, alea() * 0.4); o.castShadow = o.receiveShadow = true; scene.add(o);
+  contact(x, z, s * 1.5, s * 1.4, hSol(x, z) + 0.06); if (alea() < 0.6) herbe(x + s * 0.9, hSol(x, z), z + s * 0.5);
+};
+rocher(rx(13.5) + 0.3, 13.5, 1.1, violets[3]);
+[[-1, 8.5, 1.3], [-1, 20, 0.9], [-1, 26, 1.6], [1, 11, 0.8], [1, 15, 1.0], [1, 23, 1.4], [-1, 3.2, 0.6], [1, 28, 0.7]].forEach(([s, z, r]) => {
+  const x = s * (demi(s, z, 0.5) - r * 0.8); rocher(x, z, r);
+  if (r > 1) rocher(x - s * r * 1.2, z + r * 0.9, r * 0.4);   // éclat à côté
+});
+// herbes sur les rives
+for (let n = 0; n < 70; n++) { const z = 2.6 + alea() * 28, side = n % 2 ? 1 : -1, x = rx(z) + side * (rl(z) + 0.25 + alea() * 0.7);
+  if (Math.abs(x) < 3.2 && z < 4.8) continue; herbe(x, hSol(x, z), z, 1 + alea() * 0.4); }
+
+// racines : elles descendent du grand surplomb gauche et du haut de la paroi droite jusqu'au sol
+const brun = mat(0x4e3a44), brun2 = mat(0x5f4650);
+for (const [s, z, y0, n] of [[-1, 10.5, 8.5, 2], [1, 6.5, 11, 1], [1, 18, 6, 1]]) for (let k = 0; k < n; k++) {
+  const zz = z + k * 0.7 + (alea() - 0.5) * 0.4, pts = [];
+  for (let t = 0; t <= 6; t++) { const y = lerp(y0 + alea(), hSol(s * 4, zz) - 0.1, t / 6);
+    pts.push(new THREE.Vector3(s * (demi(s, zz, y) - 0.25 - 0.25 * Math.sin(t * 1.3 + k)), y, zz + Math.sin(t * 0.9 + k) * 0.35)); }
+  const o = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 18, 0.04 + alea() * 0.04, 5), alea() < 0.5 ? brun : brun2);
+  o.castShadow = true; scene.add(o);
+}
+// mousse qui pend sous le surplomb gauche
+for (let i = 0; i < 7; i++) { const z = 9.5 + alea() * 5.5, y = 7.5 + alea() * 2, len = 0.8 + alea() * 1.6, x = -(demi(-1, z, y) - 0.15);
+  const o = new THREE.Mesh(new THREE.BoxGeometry(0.1, len, 0.35 + alea() * 0.3), alea() < 0.5 ? mousse : mousseSombre); o.position.set(x, y - len / 2, z); o.castShadow = true; scene.add(o); }
+
+// sommet lointain dans la brume, vu par la fente (profondeur)
+[[7, -48, 20, 44, 0x5a4884], [-12, -64, 24, 52, 0x6a5890]].forEach(([x, z, r, h, c]) => {
+  const o = new THREE.Mesh(new THREE.ConeGeometry(r, h, 7), mat(c)); o.position.set(x, h / 2 - 2, z); o.rotation.y = alea() * 3; scene.add(o); });
+
+// lumière derrière la porte (plan plein, éclairé de lui-même)
+const lueur = new THREE.Mesh(new THREE.PlaneGeometry(2 * LARG, HAUT - SEUIL), new THREE.MeshBasicMaterial({ color: 0xfff0b0, fog: false }));
+lueur.position.set(0, (HAUT + SEUIL) / 2, -2.6); scene.add(lueur);
+
+// battants d'or gravés (repris tels quels)
+function battant(cote) {
+  const g = new THREE.Group(); g.position.set(cote * LARG, SEUIL, -0.1);
+  const h = HAUT - SEUIL - 0.05, l = LARG - 0.04;
+  const add = (w, hh, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), m); o.position.set(-cote * x, y, z); o.castShadow = true; g.add(o); };
+  add(l, h, 0.3, or, l / 2, h / 2, 0);
+  [0.3, 0.75, 1.3].forEach((x) => add(0.07, h * 0.78, 0.05, orSombre, x, h * 0.46, 0.17));
+  add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.14, 0.17); add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.86, 0.17);
+  add(0.62, 0.62, 0.12, orClair, 0.36, h * 0.9 - 0.4, 0.2); add(0.3, 0.3, 0.06, orSombre, 0.36, h * 0.9 - 0.4, 0.28);
+  scene.add(g); return g;
+}
+const gauche = battant(-1), droit = battant(1);
+
+// une seule statue gardienne, à droite, à demi prise dans la roche et la mousse (reprise de index.html, réduite)
+function statue(px, pz, ry, s) {
+  contact(px, pz, 3.2 * s, 3.0 * s, 0.07);
+  const g = new THREE.Group(); g.position.set(px, 0, pz); g.rotation.y = ry; g.scale.setScalar(s); scene.add(g);
+  const add = (geo, m, x, y, z, r = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.y = r; o.castShadow = o.receiveShadow = true; g.add(o); return o; };
+  const B = (w, h, d) => new RoundedBoxGeometry(w, h, d, 2, 0.08);
+  add(B(3.8, 0.5, 3.4), humide[0], 0, 0.25, 0);
+  add(B(3.2, 1.0, 2.8), violets[2], 0, 1.0, 0);
+  add(B(2.2, 3.2, 1.6), violets[1], 0, 3.1, 0);
+  add(B(0.5, 3.0, 0.5), violets[0], -1.2, 3.0, 0.1); add(B(0.5, 3.0, 0.5), violets[0], 1.2, 3.0, 0.1);
+  add(B(2.3, 0.3, 1.7), violetSombre, 0, 3.4, 0);
+  add(B(2.8, 1.0, 1.7), violets[0], 0, 5.0, 0);
+  add(B(1.3, 1.2, 1.2), violets[3], 0, 6.0, 0.05);
+  add(B(0.8, 0.5, 0.7), violets[3], 0, 5.8, 0.8);
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], -0.45, 7.0, 0, 0.7).rotation.z = 0.15;
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], 0.45, 7.0, 0, 0.7).rotation.z = -0.15;
+  add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), -0.32, 6.1, 0.72); add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), 0.32, 6.1, 0.72);
+  add(B(0.6, 0.5, 0.5), violets[2], 0, 4.4, 1.05);
+  add(B(0.36, 5.2, 0.18), mat(0x5a58a8, { emissive: 0x1a1850 }), 0, 2.2, 1.35);
+  add(B(1.2, 0.2, 0.3), violets[2], 0, 4.65, 1.35);
+  add(B(1.3, 0.3, 1.3), mousse, 0.4, 7.2, -0.1); add(B(0.9, 0.2, 0.6), mousse, -0.9, 5.6, 0.3); add(B(1.6, 1.4, 0.3), mousseSombre, 1.0, 2.4, -0.6);
+  add(B(2.6, 0.18, 0.8), mousseSombre, 0, 0.55, 1.2);
+}
+statue(4.0, 3.4, -0.35, 0.62);
+
+// rayons : plans additifs en éventail devant la porte (repris tels quels)
+const c = document.createElement('canvas'); c.width = 256; c.height = 4;
+const g2 = c.getContext('2d'), gr = g2.createLinearGradient(0, 0, 256, 0);
+gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#000'); g2.fillStyle = gr; g2.fillRect(0, 0, 256, 4);
+const alphaMap = new THREE.CanvasTexture(c);
+const rayons = [];
+for (let i = -3; i <= 3; i++) {
+  const geo = new THREE.PlaneGeometry(11, HAUT - SEUIL); geo.translate(5.5, (HAUT + SEUIL) / 2, 0);
+  const m = new THREE.MeshBasicMaterial({ color: OR, transparent: true, opacity: 0, alphaMap, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
+  const r = new THREE.Mesh(geo, m); r.rotation.y = -Math.PI / 2 + i * 0.11; r.position.z = 0.2;
+  scene.add(r); rayons.push(r);
+}
+
+// état de la scène pour une progression p
+function pose(p) {
+  const ouv = lisse(0.08, 0.2, p) * 0.12 + lisse(0.2, 0.45, p) * 1.2;
+  gauche.rotation.y = ouv; droit.rotation.y = -ouv;
+  const eclat = lisse(0.15, 0.7, p);
+  lumPorte.intensity = eclat * 110;
+  rayons.forEach((r, i) => { r.material.opacity = eclat * (0.26 - Math.abs(i - 3) * 0.035); });
+  // caméra : au milieu de la gorge, légèrement décalée (asymétrie), le regard un peu levé vers la fente ; puis avance et traverse le seuil
+  const av = lisse(0.4, 0.7, p) * 0.5 + lisse(0.7, 0.95, p) * 0.5;
+  const y = lerp(4.6, 3.9, lisse(0.4, 0.9, p)), z = lerp(24, -4, av), cible = lerp(7.2, 4.4, lisse(0, 0.8, p));
+  camera.position.set(lerp(0.8, 0, av), y, z); camera.lookAt(0, cible, -4);
+  return lisse(0.7, 0.92, p) * 0.95 + lisse(0.92, 1, p) * 0.05;       // opacité de l'éblouissement
+}
+
+const hud = document.getElementById('hud'), flash = document.getElementById('flash');
+const liste = (new URLSearchParams(location.search).get('p') || '').split(',').filter(Boolean).map(Number);
+
+function dimension() { renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', dimension); dimension();
+
+if (liste.length) {
+  document.body.classList.add('serie'); flash.style.display = 'none';
+  const cols = liste.length > 3 ? 3 : liste.length, lignes = Math.ceil(liste.length / cols);
+  const W = innerWidth, H = innerHeight, tw = W / cols, th = H / lignes;
+  camera.aspect = tw / th; camera.updateProjectionMatrix();
+  renderer.setScissorTest(true);
+  const sup = document.createElement('div'); sup.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2';
+  document.body.appendChild(sup);
+  liste.forEach((p, k) => {
+    const fl = pose(p), x = (k % cols) * tw, y = H - (Math.floor(k / cols) + 1) * th;
+    renderer.setViewport(x, y, tw, th); renderer.setScissor(x, y, tw, th); renderer.render(scene, camera);
+    const t = document.createElement('div');
+    t.style.cssText = `position:absolute;left:${x}px;top:${H - y - th}px;width:${tw}px;height:${th}px;background:#ffd98a;opacity:${fl}`;
+    const l = document.createElement('div');
+    l.style.cssText = `position:absolute;left:${x + 6}px;top:${H - y - th + 6}px;font:13px monospace;color:#fff;background:#000a;padding:2px 6px`;
+    l.textContent = 'p=' + p; sup.append(t, l);
+  });
+  hud.style.display = 'none';
+  window.__pret = true;
+} else {
+  let cible = 0, cour = 0, dernier = performance.now(), n = 0, t0 = dernier;
+  const lire = () => { const m = document.documentElement.scrollHeight - innerHeight; cible = m > 0 ? scrollY / m : 0; };
+  addEventListener('scroll', lire); lire();
+  (function boucle(t) {
+    requestAnimationFrame(boucle);
+    const dt = (t - dernier) / 1000; dernier = t;
+    cour += (cible - cour) * (1 - Math.exp(-dt * 4));
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    flash.style.opacity = pose(cour);
+    renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight);
+    renderer.render(scene, camera);
+    n++; if (t - t0 > 500) { hud.textContent = 'p=' + cour.toFixed(2) + ' · ' + Math.round(n * 1000 / (t - t0)) + ' fps'; n = 0; t0 = t; }
+  })(dernier);
+}
+</script>
+</body>
+</html>

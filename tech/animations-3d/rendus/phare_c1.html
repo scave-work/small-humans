@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phare 3D : couche 1, ciel et nuages</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(#2f5fc0,#1b3a80 45%,#0d1f4e)}
+  canvas{display:block;width:100%;height:100%}
+  #etat{position:fixed;left:12px;bottom:10px;color:#fff;font:13px/1.4 system-ui,sans-serif;text-shadow:0 1px 3px #0006;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="etat">Couche 1 : ciel et nuages (rendu léger)</div>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+const calme = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Repli sans WebGL : le dégradé CSS reste affiché avec un message.
+let R;
+try {
+  R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+} catch (e) {
+  document.getElementById('etat').textContent = 'WebGL indisponible : image fixe.';
+}
+
+if (R) {
+  R.setPixelRatio(Math.min(devicePixelRatio, 2));
+  R.setSize(innerWidth, innerHeight);
+  document.body.appendChild(R.domElement);
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 400);
+  cam.position.set(0, 6, 95);
+  cam.lookAt(0, 2, 0);
+
+  let graine = 21;
+  const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;
+
+  // Ciel : dégradé bleu nuit (texture 2 x 256, aucun fichier).
+  const cv = document.createElement('canvas');
+  cv.width = 2; cv.height = 256;
+  const g = cv.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, '#3a6ccc'); gr.addColorStop(0.35, '#1d3f88'); gr.addColorStop(1, '#0d1f4e');
+  g.fillStyle = gr; g.fillRect(0, 0, 2, 256);
+  const ciel = new THREE.CanvasTexture(cv);
+  ciel.colorSpace = THREE.SRGBColorSpace;
+  scene.background = ciel;
+
+  // Banc de nuages de la peinture : plusieurs cumulus séparés (du ciel bleu entre eux), sommets
+  // « chou-fleur » éclairés crème/orangé, corps marine, dessous plats bien visibles, petits
+  // lambeaux clairs en dessous, puis une bande sombre d'horizon. Texture qui se raccorde sur elle-même.
+  const W = 2048, H = 512, BASE = 300, DX = 14, DY = 28;
+  const cn = document.createElement('canvas');
+  cn.width = W; cn.height = H;
+  const x = cn.getContext('2d');
+  const NB = 6, masses = [], lambeaux = [];
+  for (let m = 0; m < NB; m++) {
+    const cx = (m + 0.5) * (W / NB) + (alea() - .5) * 50;
+    const larg = 120 + alea() * 40, nb = 5 + Math.floor(alea() * 2);
+    for (let i = 0; i < nb; i++) {
+      const t = (i + .5) / nb, k = Math.sin(t * Math.PI);
+      const r = 24 + k * (26 + alea() * 24);
+      const bx = cx + (t - .5) * 2 * larg, by = BASE - r * (0.8 + alea() * 0.2) - k * 10;
+      masses.push([bx, by, r]);
+      for (let j = 0; j < 3; j++) {   // petites bosses sur le haut de chaque volume
+        const a = -Math.PI * (0.1 + alea() * 0.8), rr = r * (0.3 + alea() * 0.2);
+        masses.push([bx + Math.cos(a) * r * 0.82, by + Math.sin(a) * r * 0.82, rr]);
+      }
+    }
+    for (let j = 0; j < 3; j++)       // lambeaux sous le nuage
+      lambeaux.push([cx + (alea() - .5) * 2 * larg, BASE + DY + 14 + alea() * 26, 26 + alea() * 40]);
+  }
+  const formes = (dx, dy) => {
+    x.beginPath();
+    for (const [bx, by, r] of masses) {
+      for (const o of [-W, 0, W]) { x.moveTo(bx + o + dx + r, by + dy); x.arc(bx + o + dx, by + dy, r, 0, 6.283); }
+    }
+    x.fill();
+  };
+  x.save();                                    // dessous plats : on coupe tout sous la ligne de base
+  x.beginPath(); x.rect(0, 0, W, BASE + DY); x.clip();
+  x.fillStyle = '#ffd9a8'; formes(0, 0);       // sommets éclairés (derrière)
+  const corps = x.createLinearGradient(0, 80, 0, BASE + DY);
+  corps.addColorStop(0, '#4a5f9c'); corps.addColorStop(0.5, '#1f3070'); corps.addColorStop(1, '#14225c');
+  x.fillStyle = corps; formes(DX, DY);         // corps décalé bas-droite
+  x.restore();
+  // lambeaux clairs fins sous les nuages (crème, aplatis)
+  x.fillStyle = 'rgba(255,217,168,.85)';
+  for (const [lx, ly, lw] of lambeaux) {
+    for (const o of [-W, 0, W]) { x.beginPath(); x.ellipse(lx + o, ly, lw, 3.5, 0, 0, 6.283); x.fill(); }
+  }
+  // bande sombre d'horizon sous les nuages
+  const brume = x.createLinearGradient(0, BASE + DY + 8, 0, 450);
+  brume.addColorStop(0, 'rgba(13,31,78,0)'); brume.addColorStop(0.45, 'rgba(13,31,78,.9)'); brume.addColorStop(1, 'rgba(13,31,78,0)');
+  x.fillStyle = brume; x.fillRect(0, BASE + DY + 8, W, 450 - BASE - DY - 8);
+
+  const texNuages = new THREE.CanvasTexture(cn);
+  texNuages.colorSpace = THREE.SRGBColorSpace;
+  texNuages.wrapS = THREE.RepeatWrapping;
+  const matNuages = new THREE.MeshBasicMaterial({ map: texNuages, transparent: true, depthWrite: false });
+  const geoNuages = new THREE.PlaneGeometry(170, 42.5);
+  const banc = new THREE.Mesh(geoNuages, matNuages);
+  banc.position.set(0, 16, -50);
+  scene.add(banc);
+
+  function rendre() { R.render(scene, cam); }
+
+  addEventListener('resize', () => {
+    R.setSize(innerWidth, innerHeight);
+    cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix();
+    rendre();
+  });
+
+  // Libération à la sortie de la page.
+  addEventListener('pagehide', () => {
+    geoNuages.dispose(); matNuages.dispose(); texNuages.dispose(); ciel.dispose(); R.dispose();
+  });
+
+  if (calme) {
+    rendre();                        // image fixe si mouvement réduit
+  } else {
+    let avant = performance.now();
+    const boucle = (maintenant) => {
+      const dt = Math.min((maintenant - avant) / 1000, 0.1);  // pas de saut après un onglet masqué
+      avant = maintenant;
+      texNuages.offset.x = (texNuages.offset.x + dt * 0.004) % 1;   // le banc glisse très lentement
+      rendre();
+      requestAnimationFrame(boucle);
+    };
+    requestAnimationFrame(boucle);   // rAF s'arrête tout seul quand l'onglet est masqué
+  }
+}
+</script>
+</body>
+</html>

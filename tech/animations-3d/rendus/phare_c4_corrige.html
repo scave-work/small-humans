@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phare 3D : couche 1, ciel et nuages</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(#2f5fc0,#1b3a80 45%,#0d1f4e)}
+  canvas{display:block;width:100%;height:100%}
+  #etat{position:fixed;left:12px;bottom:10px;color:#fff;font:13px/1.4 system-ui,sans-serif;text-shadow:0 1px 3px #0006;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="etat">Couches 1-3 : ciel, nuages, mer, phare (rendu léger)</div>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+const calme = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Repli sans WebGL : le dégradé CSS reste affiché avec un message.
+let R;
+try {
+  R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+} catch (e) {
+  document.getElementById('etat').textContent = 'WebGL indisponible : image fixe.';
+}
+
+if (R) {
+  R.setPixelRatio(Math.min(devicePixelRatio, 2));
+  R.setSize(innerWidth, innerHeight);
+  document.body.appendChild(R.domElement);
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 400);
+  cam.position.set(0, 30, 170);       // vue en hauteur, légèrement plongeante ; phare futur en (0,0,0)
+  cam.lookAt(0, 19, 0);
+  scene.fog = new THREE.Fog(0x16296a, 230, 540);   // la mer se fond dans la brume d'horizon
+
+  const LUMIERE = '#ffc796';   // une seule couleur de lumière rasante pour les nuages ET la mer
+  let graine = 21;
+  const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;
+
+  // Ciel : dégradé bleu nuit (texture 2 x 256, aucun fichier).
+  const cv = document.createElement('canvas');
+  cv.width = 2; cv.height = 256;
+  const g = cv.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, '#3a6ccc'); gr.addColorStop(0.35, '#1d3f88'); gr.addColorStop(1, '#0d1f4e');
+  g.fillStyle = gr; g.fillRect(0, 0, 2, 256);
+  const ciel = new THREE.CanvasTexture(cv);
+  ciel.colorSpace = THREE.SRGBColorSpace;
+  scene.background = ciel;
+
+  // Banc de nuages de la peinture : plusieurs cumulus séparés (du ciel bleu entre eux), sommets
+  // « chou-fleur » éclairés crème/orangé, corps marine, dessous plats bien visibles, petits
+  // lambeaux clairs en dessous, puis une bande sombre d'horizon. Texture qui se raccorde sur elle-même.
+  const W = 2048, H = 512, BASE = 300, DX = 14, DY = 28;
+  const cn = document.createElement('canvas');
+  cn.width = W; cn.height = H;
+  const x = cn.getContext('2d');
+  const NB = 11, masses = [], lambeaux = [];
+  for (let m = 0; m < NB; m++) {
+    const cx = (m + 0.5) * (W / NB) + (alea() - .5) * 50;
+    const larg = 55 + alea() * 70, nb = 4 + Math.floor(alea() * 3);
+    for (let i = 0; i < nb; i++) {
+      const t = (i + .5) / nb, k = Math.sin(t * Math.PI);
+      const r = 18 + k * (20 + alea() * 24);
+      const bx = cx + (t - .5) * 2 * larg, by = BASE - r * (0.8 + alea() * 0.2) - k * 10;
+      masses.push([bx, by, r]);
+      for (let j = 0; j < 3; j++) {   // petites bosses sur le haut de chaque volume
+        const a = -Math.PI * (0.1 + alea() * 0.8), rr = r * (0.3 + alea() * 0.2);
+        masses.push([bx + Math.cos(a) * r * 0.82, by + Math.sin(a) * r * 0.82, rr]);
+      }
+    }
+    for (let j = 0; j < 3; j++)       // lambeaux sous le nuage
+      lambeaux.push([cx + (alea() - .5) * 2 * larg, BASE + DY + 14 + alea() * 26, 26 + alea() * 40]);
+  }
+  const formes = (dx, dy) => {
+    x.beginPath();
+    for (const [bx, by, r] of masses) {
+      for (const o of [-W, 0, W]) { x.moveTo(bx + o + dx + r, by + dy); x.arc(bx + o + dx, by + dy, r, 0, 6.283); }
+    }
+    x.fill();
+  };
+  x.save();                                    // dessous plats : on coupe tout sous la ligne de base
+  x.beginPath(); x.rect(0, 0, W, BASE + DY); x.clip();
+  x.fillStyle = LUMIERE; formes(0, 0);      // sommets éclairés (derrière)
+  const corps = x.createLinearGradient(0, 80, 0, BASE + DY);
+  corps.addColorStop(0, '#4a5f9c'); corps.addColorStop(0.5, '#1f3070'); corps.addColorStop(1, '#14225c');
+  x.fillStyle = corps; formes(DX, DY);         // corps décalé bas-droite
+  x.restore();
+  // lambeaux clairs fins sous les nuages (crème, aplatis)
+  x.fillStyle = LUMIERE;
+  for (const [lx, ly, lw] of lambeaux) {
+    for (const o of [-W, 0, W]) { x.beginPath(); x.ellipse(lx + o, ly, lw, 3.5, 0, 0, 6.283); x.fill(); }
+  }
+  // bande sombre d'horizon sous les nuages
+  const brume = x.createLinearGradient(0, BASE + DY + 8, 0, 450);
+  brume.addColorStop(0, 'rgba(13,31,78,0)'); brume.addColorStop(0.45, 'rgba(13,31,78,.9)'); brume.addColorStop(1, 'rgba(13,31,78,0)');
+  x.fillStyle = brume; x.fillRect(0, BASE + DY + 8, W, 450 - BASE - DY - 8);
+
+  const texNuages = new THREE.CanvasTexture(cn);
+  texNuages.colorSpace = THREE.SRGBColorSpace;
+  texNuages.wrapS = THREE.RepeatWrapping;
+  const matNuages = new THREE.MeshBasicMaterial({ map: texNuages, transparent: true, depthWrite: false });
+  const geoNuages = new THREE.PlaneGeometry(298, 74.5);
+  const banc = new THREE.Mesh(geoNuages, matNuages);
+  banc.position.set(0, 55, -80);
+  scene.add(banc);
+
+  // ---- Couche 2 : mer facettée (blocs triangulaires, couleurs de la peinture) ----
+  // Grille non indexée : chaque triangle a sa couleur (creux marine, crêtes bleu-blanc,
+  // faces tournées vers le soleil teintées d'orange). Hauteurs et couleurs recalculées à chaque image.
+  const SEG_X = 117, SEG_Z = 72;
+  const g0 = new THREE.PlaneGeometry(700, 430, SEG_X, SEG_Z);
+  g0.rotateX(-Math.PI / 2);
+  const geoMer = g0.toNonIndexed();
+  g0.dispose();
+  const pos = geoMer.attributes.position, nv = pos.count;
+  const px = new Float32Array(nv), pz = new Float32Array(nv);
+  for (let i = 0; i < nv; i++) { px[i] = pos.getX(i); pz[i] = pos.getZ(i); }
+  const col = new Float32Array(nv * 3);
+  geoMer.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const jit = new Float32Array(nv / 3).map(() => 0.88 + alea() * 0.24);   // légère variation par facette
+  const matMer = new THREE.MeshBasicMaterial({ vertexColors: true });
+  const mer = new THREE.Mesh(geoMer, matMer);
+  mer.position.set(0, 0, -115);
+  scene.add(mer);
+
+  const rampe = [[-1, '#0a1743'], [-0.25, '#12306f'], [0.25, '#1d4a96'], [0.6, '#7ea3e0'], [1, '#e8eefc']]
+    .map(([h, c]) => [h, new THREE.Color(c)]);
+  const orange = new THREE.Color(LUMIERE);
+  const lum = new THREE.Vector3(-0.5, 0.55, 0.65).normalize();
+  const AMP = 14;  // hauteur max approximative des vagues (échelle de la scène : phare ~ 40 de haut)
+  // Trains de houle : longues crêtes parallèles qui avancent vers le phare (comme dans la vidéo de
+  // référence), vers (0,0,0) depuis la caméra. [angle, longueur d'onde, amplitude, vitesse]
+  const SENS = Math.atan2(0.3, -0.95);   // direction de marche : s'éloigne de la caméra, légèrement vers la droite
+  const trains = [[0, 95, 7, 15], [-0.35, 62, 4.5, 12], [0.5, 40, 2.6, 10], [0.15, 22, 1.2, 8]].map(([da, lg, am, v]) =>
+    ({ dx: Math.sin(SENS + da), dz: -Math.cos(SENS + da), k: 6.283 / lg, am, w: 6.283 * v / lg }));
+  // Grosse vague qui monte sur le pied du phare, retombe, puis recommence (cycle de T_VAGUE secondes).
+  const T_VAGUE = 9;
+  const surge = (t) => { const tl = t % T_VAGUE; return lisse(0, 1.4, tl) * (1 - lisse(2.5, 5.5, tl)); };
+  let surgeNow = 0;
+  const hauteur = (x, z, t) => {
+    let h = surgeNow * 17 * Math.exp(-(x * x + (z - 115) * (z - 115)) / 578);   // bosse centrée sur le phare (la mer est décalée de -115 en z)
+    for (const tr of trains) {
+      const ph = tr.k * (tr.dx * x + tr.dz * z) - tr.w * t;
+      const s = 0.5 + 0.5 * Math.sin(ph);                  // crêtes plus pointues, creux plus larges
+      const mod = 0.75 + 0.25 * Math.sin(tr.k * 0.35 * (-tr.dz * x + tr.dx * z));   // la crête varie le long de sa ligne
+      h += tr.am * mod * (2.2 * s * s - 0.75);
+    }
+    return h;
+  };
+  const lisse = (a, b, v) => { const u = Math.min(Math.max((v - a) / (b - a), 0), 1); return u * u * (3 - 2 * u); };
+  const A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3(), N = new THREE.Vector3();
+  const tmp = new THREE.Color();
+  function actualiserMer(t) {
+    surgeNow = surge(t);
+    for (let i = 0; i < nv; i++) pos.setY(i, hauteur(px[i], pz[i], t));
+    for (let f = 0; f < nv; f += 3) {
+      A.fromBufferAttribute(pos, f); B.fromBufferAttribute(pos, f + 1); C.fromBufferAttribute(pos, f + 2);
+      N.crossVectors(B.sub(A), C.sub(A)).normalize();
+      if (N.y < 0) N.negate();
+      N.x *= 2.6; N.z *= 2.6; N.normalize();       // pentes exagérées : facettes plus contrastées
+      const hn = Math.min(Math.max(((A.y + B.y + C.y) / 3) / AMP, -1), 1);
+      let k = 0; while (k < rampe.length - 2 && hn > rampe[k + 1][0]) k++;
+      const u = Math.min(Math.max((hn - rampe[k][0]) / (rampe[k + 1][0] - rampe[k][0]), 0), 1);
+      tmp.copy(rampe[k][1]).lerp(rampe[k + 1][1], u);
+      const eclairee = Math.max(N.dot(lum), 0);
+      tmp.multiplyScalar((0.25 + 0.8 * eclairee) * jit[f / 3]);
+      tmp.lerp(orange, lisse(0.65, 0.93, eclairee) * lisse(0.05, 0.55, hn));   // seules les crêtes éclairées prennent la même pêche que les nuages
+      for (let j = 0; j < 3; j++) { col[(f + j) * 3] = tmp.r; col[(f + j) * 3 + 1] = tmp.g; col[(f + j) * 3 + 2] = tmp.b; }
+    }
+    pos.needsUpdate = true; geoMer.attributes.color.needsUpdate = true;
+  }
+
+  // ---- Couche 3 : phare en blocs sur rochers (formes Tunic, couleurs de la peinture) ----
+  // Facettes plates (géométries non indexées), matériau toon à 3 tons, lumière pêche rasante
+  // (même couleur que les nuages et les crêtes), bonhomme minuscule sur la passerelle du haut.
+  const jetables = [];                      // tout ce qui doit être libéré à la sortie
+  const ton3 = new THREE.DataTexture(new Uint8Array([70, 150, 255]), 3, 1, THREE.RedFormat);
+  ton3.minFilter = ton3.magFilter = THREE.NearestFilter; ton3.needsUpdate = true; jetables.push(ton3);
+  scene.add(new THREE.HemisphereLight(0x7f9be8, 0x1a2a66, 1.1));
+  const soleilPhare = new THREE.DirectionalLight(LUMIERE, 2.4);
+  soleilPhare.position.copy(lum).multiplyScalar(120);
+  scene.add(soleilPhare);
+
+  const matieresPhare = {};
+  const toon = (couleur) => matieresPhare[couleur] ||= (jetables.push(matieresPhare[couleur] = new THREE.MeshToonMaterial({ color: couleur, gradientMap: ton3 })), matieresPhare[couleur]);
+  const facette = (geo) => { const g = geo.toNonIndexed(); g.computeVertexNormals(); geo.dispose(); jetables.push(g); return g; };
+  const bloc = (geo, couleur, x, y, z, parent) => { const m = new THREE.Mesh(facette(geo), toon(couleur)); m.position.set(x, y, z); parent.add(m); return m; };
+
+  const phare = new THREE.Group();
+  phare.position.set(0, 12, 0);
+  phare.scale.set(0.68, 1.0, 0.68);        // plus élancé, comme le phare de la peinture
+  scene.add(phare);
+
+  // rochers (autour de la base, sommets plus hauts que les creux de la houle)
+  const rochers = new THREE.Group(); scene.add(rochers);
+  [[0, 2, 0, 12, '#2b2230'], [-11, 0, 3, 8, '#3a2630'], [10, 0, 4, 9, '#2b2230'], [3, -1, 10, 8, '#4a2a2e'],
+   [-6, -2, -9, 7, '#2b2230'], [12, -2, -7, 6, '#3a2630'], [-15, -3, -2, 6, '#4a2a2e']].forEach(([x, y, z, r, c], i) => {
+    const m = bloc(new THREE.IcosahedronGeometry(r, 0), c, x, y + 4, z, rochers);
+    m.scale.set(1, 0.8 + (i % 3) * 0.12, 0.9); m.rotation.set(i * 0.7, i * 1.3, 0);
+  });
+
+  const BR = '#c0452f', BR2 = '#8a2f24', BR3 = '#a63a2a';
+  bloc(new THREE.CylinderGeometry(8.2, 9.2, 6, 8), BR2, 0, 3, 0, phare);                 // soubassement
+  bloc(new THREE.CylinderGeometry(5.3, 7.6, 24, 8), BR, 0, 18, 0, phare);                // fût
+  for (const y of [12, 20, 28]) bloc(new THREE.CylinderGeometry(7.6 - (y - 6) / 24 * 2.3 + 0.6, 7.6 - (y - 6) / 24 * 2.3 + 0.6, 0.9, 8), BR3, 0, y, 0, phare);   // ceintures
+  bloc(new THREE.BoxGeometry(9, 10, 9), BR3, -10.5, 5, 1, phare);                        // petit bâtiment accolé
+  bloc(new THREE.CylinderGeometry(6.6, 6.0, 1.6, 8), '#5a2a22', 0, 30.8, 0, phare);     // passerelle
+  for (let i = 0; i < 8; i++) {                                                          // créneaux
+    const a = i / 8 * 6.283 + 0.39;
+    bloc(new THREE.BoxGeometry(1.6, 1.6, 1.6), '#5a2a22', Math.sin(a) * 6.2, 32.4, Math.cos(a) * 6.2, phare);
+  }
+  const verre = new THREE.MeshBasicMaterial({ color: 0xeaf4ff }); jetables.push(verre);
+  const lanterne = new THREE.Mesh(facette(new THREE.CylinderGeometry(3, 3.3, 5, 8)), verre);
+  lanterne.position.set(0, 34.1, 0); phare.add(lanterne);
+  bloc(new THREE.ConeGeometry(4.4, 3.6, 8), '#c8323a', 0, 38.4, 0, phare);               // toit
+  bloc(new THREE.ConeGeometry(0.5, 2, 6), '#c8323a', 0, 41, 0, phare);                   // pointe
+  for (const y of [11, 17, 23, 28]) {                                                    // petites fenêtres allumées
+    const f = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.9, 0.7), verre);
+    f.position.set(0, y, 7.6 - (y - 6) / 24 * 2.3 - 0.1); jetables.push(f.geometry); phare.add(f);
+  }
+  // halo de la lanterne (sprite additif, texture dessinée en code)
+  const cg = document.createElement('canvas'); cg.width = cg.height = 128;
+  const gg = cg.getContext('2d'), rg = gg.createRadialGradient(64, 64, 0, 64, 64, 64);
+  rg.addColorStop(0, 'rgba(234,244,255,.95)'); rg.addColorStop(0.35, 'rgba(190,215,255,.4)'); rg.addColorStop(1, 'rgba(190,215,255,0)');
+  gg.fillStyle = rg; gg.fillRect(0, 0, 128, 128);
+  const texHalo = new THREE.CanvasTexture(cg); jetables.push(texHalo);
+  const matHalo = new THREE.SpriteMaterial({ map: texHalo, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }); jetables.push(matHalo);
+  const halo = new THREE.Sprite(matHalo); halo.scale.set(26, 26, 1); halo.position.set(0, 34.1, 0); phare.add(halo);
+  // bonhomme sur la passerelle du haut
+  const homme = new THREE.Group(); homme.position.set(-3.2, 31.6, 4.6); homme.scale.set(1 / 0.68, 1, 1 / 0.68); phare.add(homme);   // annule l'étirement du phare
+  bloc(new THREE.BoxGeometry(1.6, 2.4, 1.2), '#e8742c', 0, 1.2, 0, homme);
+  bloc(new THREE.IcosahedronGeometry(0.85, 0), '#e6d9c2', 0, 3.2, 0, homme);
+  bloc(new THREE.ConeGeometry(0.95, 1.6, 5), '#e8742c', 0, 4.5, 0, homme);
+
+  // ---- Couche 4 : gerbes d'écume (blocs blancs-bleus et pêche) lancées à chaque grosse vague ----
+  const NP = 1100;
+  const geoMousse = facette(new THREE.IcosahedronGeometry(1, 0));
+  const matMousse = new THREE.MeshBasicMaterial({ color: 0xffffff }); jetables.push(matMousse);
+  const mousse = new THREE.InstancedMesh(geoMousse, matMousse, NP);
+  mousse.frustumCulled = false;
+  const palette = ['#e8f0ff', '#cfe0ff', '#a9c4ee', LUMIERE].map(c => new THREE.Color(c));
+  for (let i = 0; i < NP; i++) mousse.setColorAt(i, palette[i % 4]);
+  scene.add(mousse);
+  const hash = (a, b, c) => { const v = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return v - Math.floor(v); };
+  const pantin = new THREE.Object3D();
+  function actualiserMousse(t) {
+    const cyc = Math.floor(t / T_VAGUE), tl = t - cyc * T_VAGUE;
+    for (let i = 0; i < NP; i++) {
+      const age = tl - (0.3 + hash(i, cyc, 1) * 1.8), vie = 2.2 + hash(i, cyc, 2) * 1.8;
+      let taille = 0;
+      if (age >= 0 && age <= vie) {
+        const ang = (hash(i, cyc, 3) - 0.5) * 5.0 + 0.3;                  // plutôt côté caméra
+        const rayon = 6 + hash(i, cyc, 4) * 5 + (5 + hash(i, cyc, 5) * 9) * age;
+        const y = 14 + (14 + hash(i, cyc, 6) * 24) * age - 11 * age * age;
+        if (y > 12) {
+          pantin.position.set(Math.sin(ang) * rayon, y, Math.cos(ang) * rayon);
+          pantin.rotation.set(i, age * 2, 0);
+          taille = (0.45 + hash(i, cyc, 7) * 1.0) * Math.sqrt(Math.sin(Math.PI * age / vie));
+        }
+      }
+      pantin.scale.setScalar(taille);
+      pantin.updateMatrix();
+      mousse.setMatrixAt(i, pantin.matrix);
+    }
+    mousse.instanceMatrix.needsUpdate = true;
+  }
+  jetables.push(geoMousse);
+
+  function rendre() { R.render(scene, cam); }
+
+  addEventListener('resize', () => {
+    R.setSize(innerWidth, innerHeight);
+    cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix();
+    rendre();
+  });
+
+  // Libération à la sortie de la page.
+  addEventListener('pagehide', () => {
+    geoNuages.dispose(); matNuages.dispose(); texNuages.dispose(); ciel.dispose();
+    geoMer.dispose(); matMer.dispose(); jetables.forEach(o => o.dispose()); R.dispose();
+  });
+
+  if (calme) {
+    actualiserMer(3.2); actualiserMousse(3.2);   // image fixe prise pendant la grosse vague
+    rendre();                    // image fixe si mouvement réduit
+  } else {
+    let avant = performance.now(), temps = 0;
+    const boucle = (maintenant) => {
+      const dt = Math.min((maintenant - avant) / 1000, 0.1);  // pas de saut après un onglet masqué
+      avant = maintenant; temps += dt;
+      actualiserMer(temps); actualiserMousse(temps);
+      texNuages.offset.x = (texNuages.offset.x + dt * 0.0007) % 1;   // le banc glisse à peine
+      rendre();
+      requestAnimationFrame(boucle);
+    };
+    requestAnimationFrame(boucle);   // rAF s'arrête tout seul quand l'onglet est masqué
+  }
+}
+</script>
+</body>
+</html>

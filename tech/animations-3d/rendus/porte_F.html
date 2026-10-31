@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Porte F (flanc en terrasses)</title>
+<style>
+  html,body{margin:0;background:#0b1f33}
+  #scroller{height:600vh}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #hud{position:fixed;left:8px;top:8px;font:12px/1.4 monospace;color:#fff;background:#0008;padding:4px 8px;z-index:3;pointer-events:none}
+  #flash{position:fixed;inset:0;background:#ffd98a;opacity:0;pointer-events:none;z-index:2}
+  .serie #scroller{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+</head>
+<body>
+<div id="scroller"></div>
+<div id="flash"></div>
+<div id="hud">p=0 · -- fps</div>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* Direction F « flanc en terrasses, vue plongeante » (rendu inspiré de Tunic : aplats, lumière, sans contours, aucun asset copié).
+   Flanc de montagne en terrasses naturelles irrégulières ; la porte d'or est à mi-hauteur, dans une petite paroi ;
+   un escalier usé serpente en zigzag jusqu'à elle ; de l'eau en bas ; un pic au fond.
+   Progression p de 0 à 1 (scroll). ?p=0,0.2,0.45,0.7,0.9,1 -> planche (progression figée, une tuile par valeur).
+   Repris de index.html : progression, planche, battants d'or, rayons, lueur, éblouissement. */
+const OR = 0xffd98a;
+const lisse = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const lerp = (a, b, t) => a + (b - a) * t;
+let graine = 11; const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;   // aléa fixe : même image à chaque fois
+const choix = (l) => l[Math.floor(alea() * l.length)];
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setScissorTest(true);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x35587a, 45, 170);
+const camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 300);
+
+// palette de design/DA_TUNIC_INSPIRE.md : nuit bleutée, pierre beige / ombre de pierre, lumière dorée, mer
+const mat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true, ...extra });
+const pierres = [0xd9cfae, 0xcfc4a2, 0xc4b896, 0xbdb08e].map((c) => mat(c));
+const pierreUsee = [0xb8ad8e, 0xa89e80, 0xc8bd9c].map((c) => mat(c));
+const ombrePierre = mat(0x8f8a78), pierreHumide = mat(0x7a7a6c);
+const herbes = [0x7f9e4a, 0x6c9142, 0x8aa650].map((c) => mat(c));
+const mousse = mat(0x9aa43c), mousseSombre = mat(0x5a7a36);
+const or = mat(0xf2b81c, { emissive: 0x5a3c00 }), orSombre = mat(0xb98512, { emissive: 0x3a2600 }), orClair = mat(0xffd54a, { emissive: 0x6a4a00 });
+
+// lumière : soleil bas et chaud de côté (fort contraste), ciel bleu froid pour les ombres
+scene.add(new THREE.HemisphereLight(0x8aa6d4, 0x4a4a5c, 1.25));
+const soleil = new THREE.DirectionalLight(0xffcf98, 3.6);
+soleil.position.set(-34, 30, 26);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(4096, 4096);
+Object.assign(soleil.shadow.camera, { left: -48, right: 48, top: 42, bottom: -42, near: 1, far: 140 });
+soleil.shadow.bias = -0.0006; soleil.shadow.normalBias = 0.04;
+scene.add(soleil);
+const lumPorte = new THREE.PointLight(OR, 0, 34, 1.1);
+lumPorte.position.set(0, 4.4, 1.8);
+scene.add(lumPorte);
+
+// cotes de la porte (reprises de index.html) : ouverture 3,6 de large, seuil à y=1, haut à y=7,4
+const LARG = 1.8, SEUIL = 1.0, HAUT = 7.4, EP = 2.4;
+
+// ciel : nuit bleutée en haut, bande chaude à l'horizon
+const ciel = document.createElement('canvas'); ciel.width = 4; ciel.height = 256;
+const gc = ciel.getContext('2d'), gg = gc.createLinearGradient(0, 0, 0, 256);
+gg.addColorStop(0, '#0b1f33'); gg.addColorStop(0.45, '#14405a'); gg.addColorStop(0.8, '#4a6a88'); gg.addColorStop(1, '#e8a868');
+gc.fillStyle = gg; gc.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(ciel);
+
+// ---------- terrasses ----------
+// chaque terrasse = un replat herbeux extrudé dont le bord avant est une courbe irrégulière ; la face verticale = falaisette.
+// les bords s'enroulent autour de la montagne (terme en x²) ; hauteurs et largeurs toutes différentes.
+const T = [   // de bas en haut : hauteur du replat, avancée du bord, courbure, phase
+  { y: -8.4, zf: 28, c: 0.004, ph: 0.3 },
+  { y: -6.6, zf: 21, c: 0.005, ph: 2.1 },
+  { y: -4.5, zf: 14.5, c: 0.006, ph: 4.0 },
+  { y: -2.5, zf: 9.5, c: 0.007, ph: 1.2 },
+  { y: 0, zf: 5.8, c: 0.008, ph: 5.1 },          // terrasse de la porte
+  { y: 9.6, zf: -1.2, c: 0.010, ph: 3.3 },       // petite paroi où s'ouvre la porte
+  { y: 13.8, zf: -7.5, c: 0.011, ph: 0.9 },
+  { y: 19.5, zf: -13.5, c: 0.012, ph: 2.6 },
+  { y: 24.0, zf: -21, c: 0.012, ph: 4.4 },
+  { y: 31.0, zf: -29, c: 0.013, ph: 1.7 },
+  { y: 38.0, zf: -38, c: 0.014, ph: 3.9 },
+];
+const PORTE = 4;
+const bord = (k, x) => {
+  const t = T[k], calme = k === PORTE || k === PORTE + 1 ? lisse(3, 9, Math.abs(x)) : 1;   // bord régulier juste autour de la porte
+  return t.zf - t.c * x * x + calme * (2.3 * Math.sin(x * 0.17 + t.ph) + 1.1 * Math.sin(x * 0.47 + t.ph * 2.3) + 0.5 * Math.sin(x * 1.3 + t.ph));
+};
+// hauteur du sol en (x, z) : replat de la terrasse la plus haute dont le bord est devant ce point
+const sol = (x, z) => { let y = -9.6; for (let k = 0; k < T.length; k++) if (z < bord(k, x)) y = T[k].y; return y; };
+
+T.forEach((t, k) => {
+  const pts = [];
+  for (let x = -80; x <= 80.01; x += 1.6) {
+    let z = bord(k, x) + (Math.abs(x) > 4 ? (alea() - 0.5) * 0.9 : 0);
+    if (k === PORTE + 1 && Math.abs(x) < 3.4) {   // entaille de la porte (une seule fois)
+      if (x < -1.6) pts.push([-2.7, bord(k, -2.7)], [-2.7, -9], [2.7, -9], [2.7, bord(k, 2.7)]);
+      continue;
+    }
+    pts.push([x, z]);
+  }
+  const s = new THREE.Shape();
+  s.moveTo(-80, 120); pts.forEach(([x, z]) => s.lineTo(x, -z)); s.lineTo(80, 120); s.closePath();
+  const bas = -10.5, h = t.y - bas;   // chaque terrasse descend jusqu'à l'eau : si deux bords se croisent, la roche se fond, rien ne flotte
+  const geo = new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: true, bevelThickness: 0.22, bevelSize: 0.3, bevelSegments: 1, curveSegments: 1 });
+  geo.rotateX(-Math.PI / 2); geo.translate(0, bas, 0);
+  const m = new THREE.Mesh(geo, [k < PORTE + 2 ? herbes[k % 3] : mat(0x6f8a52), k <= PORTE + 1 ? choix(pierres) : mat(0xa8a08a)]);
+  m.castShadow = m.receiveShadow = true; scene.add(m);
+});
+// eau en bas
+const eau = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), mat(0x0f3550, { roughness: 0.3, metalness: 0.1, flatShading: false }));
+eau.rotation.x = -Math.PI / 2; eau.position.y = -9.3; eau.receiveShadow = true; scene.add(eau);
+// pic au fond, en silhouette
+[[-14, -80, 34, 78, 0x2f4a66], [36, -70, 26, 46, 0x3a5674], [-48, -60, 22, 34, 0x3a5674]].forEach(([x, z, r, h, c]) => {
+  const o = new THREE.Mesh(new THREE.ConeGeometry(r, h, 7, 3), mat(c)); o.position.set(x, h / 2 - 2, z); o.rotation.y = alea() * 3;
+  const p = o.geometry.attributes.position; for (let i = 0; i < p.count; i++) if (p.getY(i) < h / 2 - 0.1) { p.setX(i, p.getX(i) * (0.8 + alea() * 0.4)); p.setZ(i, p.getZ(i) * (0.8 + alea() * 0.4)); }
+  o.geometry.computeVertexNormals(); o.receiveShadow = true; scene.add(o);
+});
+
+// ---------- petits éléments ----------
+const pierre = (w, h, d, m, x, y, z, ry = 0, r = 0.12) => {
+  const o = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 1, Math.min(r, w / 3, h / 3, d / 3)), m);
+  o.position.set(x, y, z); o.rotation.y = ry; o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+};
+const herbe = (x, y, z, s = 1) => {
+  for (let i = 0; i < 3; i++) { const o = new THREE.Mesh(new THREE.ConeGeometry(0.1 * s, (0.35 + alea() * 0.3) * s, 4), alea() < 0.5 ? mousse : mousseSombre);
+    o.position.set(x + (alea() - 0.5) * 0.3 * s, y + 0.15 * s, z + (alea() - 0.5) * 0.3 * s); o.rotation.z = (alea() - 0.5) * 0.4; scene.add(o); }
+};
+const rocher = (x, z, s) => {
+  const o = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), choix(pierreUsee)); o.position.set(x, sol(x, z) + s * 0.3, z);
+  o.scale.set(1.3, 0.6 + alea() * 0.4, 1.1); o.rotation.set(alea(), alea() * 6, alea() * 0.4); o.castShadow = o.receiveShadow = true; scene.add(o);
+};
+
+// escalier usé d'une terrasse k jusqu'à la terrasse k-1, posé contre la falaisette, légèrement de biais
+const chemin = [];   // points de passage (pour la caméra)
+function escalier(k, x, ry) {
+  const haut = T[k].y, bas = T[k - 1].y, ze = bord(k, x);
+  const n = Math.max(3, Math.round((haut - bas) / 0.4)), g = new THREE.Group(); g.position.set(x, 0, ze); g.rotation.y = ry; scene.add(g);
+  const cote = alea() < 0.5 ? -1 : 1;
+  let zc = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const y = haut - (i + 1) * (haut - bas) / n + (alea() - 0.5) * 0.06, d = 0.55 + alea() * 0.3, w = 1.7 + alea() * 0.8;
+    zc += d;
+    const o = new THREE.Mesh(new RoundedBoxGeometry(w, y - bas + 0.4, zc + 0.9, 1, 0.12), choix(pierreUsee));
+    o.position.set((alea() - 0.5) * 0.25, (y + bas - 0.4) / 2, zc / 2 - 0.45); o.rotation.set((alea() - 0.5) * 0.03, (alea() - 0.5) * 0.06, (alea() - 0.5) * 0.04);
+    o.castShadow = o.receiveShadow = true; g.add(o);
+    if (alea() < 0.55) { const t = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.3 + alea() * 0.2, 4), alea() < 0.5 ? mousse : mousseSombre); t.position.set((alea() - 0.5) * w, y + 0.12, zc); g.add(t); }
+    // muret de soutènement bas, à moitié effondré
+    if (alea() < 0.62) { const mh = 0.35 + alea() * 0.45, m = new THREE.Mesh(new RoundedBoxGeometry(0.5, mh, d + 0.05, 1, 0.1), ombrePierre);
+      m.position.set(cote * (w / 2 + 0.25), y + mh / 2 - 0.05, zc - d / 2); m.rotation.z = (alea() - 0.5) * 0.15; m.castShadow = m.receiveShadow = true; g.add(m); }
+  }
+  // pierres tombées du muret, au pied
+  for (let i = 0; i < 3; i++) { const s = 0.25 + alea() * 0.25, m = new THREE.Mesh(new RoundedBoxGeometry(s * 1.8, s, s * 1.3, 1, 0.08), ombrePierre);
+    m.position.set(cote * (1.6 + alea() * 1.2), bas + s / 2, zc - alea() * 1.5); m.rotation.set(alea() * 0.4, alea() * 3, alea() * 0.4); m.castShadow = true; g.add(m); }
+  const pied = new THREE.Vector3(0, bas, zc + 0.6).applyEuler(g.rotation).add(g.position), tete = new THREE.Vector3(0, haut, -0.6).applyEuler(g.rotation).add(g.position);
+  return { pied, tete };
+}
+// pas japonais sur le replat entre deux volées
+function pas(a, b, y) {
+  const n = Math.floor(a.distanceTo(b) / 1.15);
+  for (let i = 1; i < n; i++) { if (alea() < 0.3) continue; const t = i / n, x = lerp(a.x, b.x, t) + (alea() - 0.5) * 0.5, z = lerp(a.z, b.z, t) + (alea() - 0.5) * 0.5, w = 0.6 + alea() * 0.6;
+    pierre(w, 0.14, w * (0.7 + alea() * 0.4), choix(pierreUsee), x, y + 0.04, z, alea() * 3, 0.06); if (alea() < 0.5) herbe(x + w / 2, y, z, 0.9); }
+}
+// zigzag : de l'eau jusqu'à la porte
+const vol = [escalier(1, -2.5, 0.12), escalier(2, 5.5, -0.18), escalier(3, -5, 0.1), escalier(4, 6.5, -0.14)];
+const quai = vol[0].pied; pierre(3.4, 0.5, 2.2, pierreHumide, quai.x, T[0].y + 0.1, quai.z + 1.2, 0.2);   // petit ponton de pierre au bord de l'eau
+for (let i = 0; i < vol.length - 1; i++) pas(vol[i].tete, vol[i + 1].pied, T[i + 1].y);
+const devant = new THREE.Vector3(0.4, 0, 3.4); pas(vol[3].tete, devant, 0);
+
+// ---------- la porte dans la petite paroi ----------
+// seuil, deux marches inégales
+pierre(2 * LARG + 0.4, SEUIL, EP, pierreUsee[2], 0, SEUIL / 2, 0, 0, 0.1);
+pierre(4.6, 0.66, 1.0, pierreUsee[0], 0.15, 0.33, 1.65, 0.03); pierre(3.9, 0.33, 0.9, pierreUsee[1], -0.2, 0.17, 2.55, -0.05);
+// encadrement : gros blocs bruts, différents à gauche et à droite
+pierre(1.9, 4.4, 3.0, pierres[1], -2.75, 2.2, -0.1, 0.06, 0.25).rotation.z = 0.03;
+pierre(1.5, 3.4, 2.7, pierres[2], -2.6, 6.0, -0.2, -0.08, 0.25).rotation.z = -0.05;
+pierre(1.3, 7.8, 2.8, pierres[0], 2.45, 3.9, -0.15, -0.04, 0.2).rotation.z = -0.02;
+pierre(1.6, 1.4, 1.8, pierreUsee[0], 3.6, 0.7, 0.9, 0.5, 0.3);                       // bloc éboulé au pied de la paroi
+const linteau = pierre(6.8, 2.3, 3.2, pierres[3], 0.3, HAUT + 1.1, -0.2, 0.02, 0.3); linteau.rotation.z = 0.035;
+pierre(3.8, 0.25, 1.6, mousse, -0.6, HAUT + 2.3, 0.3, 0.1, 0.1);                    // mousse sur le linteau
+// mousse et lierre qui pendent de la paroi
+for (let i = 0; i < 7; i++) { const x = choix([-1, 1]) * (3.6 + alea() * 9), len = 1.5 + alea() * 3.5, y0 = T[PORTE + 1].y;
+  for (let k = 0; k < 3; k++) { const o = new THREE.Mesh(new THREE.BoxGeometry(0.3 + alea() * 0.2, len / (k + 1), 0.12), alea() < 0.5 ? mousse : mousseSombre);
+    o.position.set(x + (k - 1) * 0.32, y0 - len / (2 * (k + 1)), bord(PORTE + 1, x) + 0.35); o.castShadow = true; scene.add(o); } }
+
+// lumière derrière la porte (plan plein, éclairé de lui-même)
+const lueur = new THREE.Mesh(new THREE.PlaneGeometry(2 * LARG, HAUT - SEUIL), new THREE.MeshBasicMaterial({ color: 0xfff0b0, fog: false }));
+lueur.position.set(0, (HAUT + SEUIL) / 2, -2.6); scene.add(lueur);
+// battants d'or gravés (repris de index.html)
+function battant(cote) {
+  const g = new THREE.Group(); g.position.set(cote * LARG, SEUIL, -0.1);
+  const h = HAUT - SEUIL - 0.05, l = LARG - 0.04;
+  const add = (w, hh, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), m); o.position.set(-cote * x, y, z); o.castShadow = true; g.add(o); };
+  add(l, h, 0.3, or, l / 2, h / 2, 0);
+  [0.3, 0.75, 1.3].forEach((x) => add(0.07, h * 0.78, 0.05, orSombre, x, h * 0.46, 0.17));
+  add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.14, 0.17); add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.86, 0.17);
+  add(0.62, 0.62, 0.12, orClair, 0.36, h * 0.9 - 0.4, 0.2); add(0.3, 0.3, 0.06, orSombre, 0.36, h * 0.9 - 0.4, 0.28);
+  scene.add(g); return g;
+}
+const gauche = battant(-1), droit = battant(1);
+
+// une seule statue gardienne, petite, penchée, à moitié prise par la mousse (formes inspirées seulement)
+{
+  const g = new THREE.Group(); g.position.set(-6.2, -0.15, 1.6); g.rotation.set(0, 0.45, 0.07); g.scale.setScalar(0.62); scene.add(g);
+  const add = (w, h, d, m, x, y, z) => { const o = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, 0.08), m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o); return o; };
+  add(3.2, 1.0, 2.8, pierreUsee[1], 0, 0.5, 0); add(2.2, 3.2, 1.6, pierres[2], 0, 2.6, 0);
+  add(0.5, 3.0, 0.5, pierres[3], -1.2, 2.5, 0.1); add(0.5, 3.0, 0.5, pierres[3], 1.2, 2.5, 0.1);
+  add(2.8, 1.0, 1.7, pierres[1], 0, 4.5, 0); add(1.3, 1.2, 1.2, pierres[0], 0, 5.5, 0.05); add(0.8, 0.5, 0.7, pierres[0], 0, 5.3, 0.8);
+  add(0.6, 0.5, 0.5, pierres[2], 0, 3.9, 1.05); add(0.36, 4.6, 0.18, ombrePierre, 0, 1.9, 1.35);
+  add(1.4, 0.3, 1.3, mousse, 0.3, 6.2, -0.1); add(1.0, 0.25, 0.8, mousseSombre, -0.9, 5.1, 0.3); add(3.0, 0.3, 2.4, mousse, 0.2, 1.05, 0.1);
+}
+
+// rochers, herbes et arbres ronds sur les replats (loin du chemin et de la porte)
+for (let i = 0; i < 70; i++) { const x = (alea() - 0.5) * 70, z = -6 + alea() * 36; if (Math.abs(x) < 8 && z < 6 && z > -3) continue;
+  const k = T.findIndex((t, j) => z < bord(j, x) && (j === T.length - 1 || z >= bord(j + 1, x))); if (k < 0) continue;
+  const prBord = bord(k, x) - z;
+  if (alea() < 0.45 && prBord < 2.5) rocher(x, z, 0.4 + alea() * 0.9); else herbe(x, T[k].y, z, 1 + alea() * 0.5);
+}
+for (const [x, z, s] of [[-14, 6, 1.3], [-11, 3.5, 1.0], [15, 11, 1.4], [19, 4, 1.1], [-19, 15, 1.2], [11, -4, 1.0], [-9, 19, 0.9], [23, 17, 1.3]]) {
+  const y = sol(x, z), g = new THREE.Group(); g.position.set(x, y, z); g.scale.setScalar(s); scene.add(g);
+  const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.25, 1.4, 5), mat(0x6a5a44)); tr.position.y = 0.7; tr.castShadow = true; g.add(tr);
+  for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(0.9 - k * 0.15, 0), choix([mousseSombre, herbes[1], herbes[0]]));
+    b.position.set((alea() - 0.5) * 0.8, 1.8 + k * 0.5, (alea() - 0.5) * 0.8); b.castShadow = b.receiveShadow = true; g.add(b); }
+}
+// nuages ronds et doux
+[[-40, 40, -70, 7], [30, 48, -90, 9], [60, 30, -50, 6]].forEach(([x, y, z, r]) => {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(r * (0.55 + alea() * 0.35), 1), mat(0x8aa4c4)); b.position.set((i - 1.5) * r * 0.8, alea() * r * 0.3, 0); g.add(b); }
+  scene.add(g);
+});
+
+// rayons : plans additifs en éventail devant la porte (repris de index.html)
+const c = document.createElement('canvas'); c.width = 256; c.height = 4;
+const g2 = c.getContext('2d'), gr = g2.createLinearGradient(0, 0, 256, 0);
+gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#000'); g2.fillStyle = gr; g2.fillRect(0, 0, 256, 4);
+const alphaMap = new THREE.CanvasTexture(c);
+const rayons = [];
+for (let i = -3; i <= 3; i++) {
+  const geo = new THREE.PlaneGeometry(9, HAUT - SEUIL); geo.translate(4.5, (HAUT + SEUIL) / 2, 0);
+  const m = new THREE.MeshBasicMaterial({ color: OR, transparent: true, opacity: 0, alphaMap, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
+  const r = new THREE.Mesh(geo, m); r.rotation.y = -Math.PI / 2 + i * 0.11; r.position.z = 0.2;
+  scene.add(r); rayons.push(r);
+}
+
+// trajet de la caméra : vue plongeante 3/4, puis elle descend sur l'escalier, le monte en zigzag et entre dans la porte
+const yeux = 3.2, monte = (v, dx = 0) => new THREE.Vector3(v.x + dx, v.y + yeux, v.z);
+const trajet = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(30, 17, 44),
+  monte(vol[1].pied, 1.5), monte(vol[2].pied, -1), monte(vol[3].pied, 1), monte(vol[3].tete, 0.5),
+  new THREE.Vector3(1.0, 4.3, 4.2), new THREE.Vector3(0, 4.3, 1.2), new THREE.Vector3(0, 4.3, -5),
+], false, 'centripetal');
+const vise0 = new THREE.Vector3(-1, -2, 7), vise = new THREE.Vector3();
+
+function pose(p) {
+  const ouv = lisse(0.08, 0.2, p) * 0.12 + lisse(0.2, 0.45, p) * 1.2;      // rad : ~7° puis ~76°
+  gauche.rotation.y = ouv; droit.rotation.y = -ouv;
+  const eclat = lisse(0.15, 0.7, p);
+  lumPorte.intensity = eclat * 90;
+  rayons.forEach((r, i) => { r.material.opacity = eclat * (0.3 - Math.abs(i - 3) * 0.04); });
+  const av = lisse(0.4, 0.7, p) * 0.55 + lisse(0.7, 0.95, p) * 0.45;
+  trajet.getPointAt(av, camera.position);
+  vise.set(0, 4.3, Math.min(-3, camera.position.z - 5)).lerp(vise0, 1 - lisse(0, 0.3, av));
+  camera.lookAt(vise);
+  return lisse(0.7, 0.92, p) * 0.95 + lisse(0.92, 1, p) * 0.05;       // opacité de l'éblouissement
+}
+
+const hud = document.getElementById('hud'), flash = document.getElementById('flash');
+const liste = (new URLSearchParams(location.search).get('p') || '').split(',').filter(Boolean).map(Number);
+function taille() { renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', taille); taille();
+
+if (liste.length) {
+  // planche : une tuile par valeur de p, éblouissement dessiné par-dessus la tuile
+  document.body.classList.add('serie'); flash.style.display = 'none';
+  const cols = liste.length > 3 ? 3 : liste.length, lignes = Math.ceil(liste.length / cols);
+  const W = innerWidth, H = innerHeight, tw = W / cols, th = H / lignes;
+  camera.aspect = tw / th; camera.updateProjectionMatrix();
+  const sup = document.createElement('div'); sup.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2';
+  document.body.appendChild(sup);
+  liste.forEach((p, k) => {
+    const fl = pose(p), x = (k % cols) * tw, y = H - (Math.floor(k / cols) + 1) * th;
+    renderer.setViewport(x, y, tw, th); renderer.setScissor(x, y, tw, th); renderer.render(scene, camera);
+    const t = document.createElement('div');
+    t.style.cssText = `position:absolute;left:${x}px;top:${H - y - th}px;width:${tw}px;height:${th}px;background:#ffd98a;opacity:${fl}`;
+    const l = document.createElement('div');
+    l.style.cssText = `position:absolute;left:${x + 6}px;top:${H - y - th + 6}px;font:13px monospace;color:#fff;background:#000a;padding:2px 6px`;
+    l.textContent = 'p=' + p; sup.append(t, l);
+  });
+  hud.style.display = 'none';
+  window.__pret = true;
+} else {
+  let cible = 0, cour = 0, dernier = performance.now(), n = 0, t0 = dernier;
+  const lire = () => { const m = document.documentElement.scrollHeight - innerHeight; cible = m > 0 ? scrollY / m : 0; };
+  addEventListener('scroll', lire); lire();
+  (function boucle(t) {
+    requestAnimationFrame(boucle);
+    const dt = (t - dernier) / 1000; dernier = t;
+    cour += (cible - cour) * (1 - Math.exp(-dt * 4));                  // rattrapage doux : mouvement solennel
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    flash.style.opacity = pose(cour);
+    renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight);
+    renderer.render(scene, camera);
+    n++; if (t - t0 > 500) { hud.textContent = 'p=' + cour.toFixed(2) + ' · ' + Math.round(n * 1000 / (t - t0)) + ' fps'; n = 0; t0 = t; }
+  })(dernier);
+}
+</script>
+</body>
+</html>

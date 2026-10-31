@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Porte (rendu Tunic inspiré)</title>
+<style>
+  html,body{margin:0;background:#111}
+  #scroller{height:600vh}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #hud{position:fixed;left:8px;top:8px;font:12px/1.4 monospace;color:#fff;background:#0008;padding:4px 8px;z-index:3;pointer-events:none}
+  #flash{position:fixed;inset:0;background:#ffd98a;opacity:0;pointer-events:none;z-index:2}
+  .serie #scroller{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+</head>
+<body>
+<div id="scroller"></div>
+<div id="flash"></div>
+<div id="hud">p=0 · -- fps</div>
+<script type="module">
+import * as THREE from 'three';
+
+/* Porte dans son décor (version L, rendu « Tunic inspiré » : aplats, blocs à facettes, lumière, sans contours).
+   Progression p de 0 à 1 (scroll). ?p=0,0.2,0.45,0.7,0.9,1 -> planche (progression figée, une tuile par valeur).
+   Références de Simon (2026-10-31) : grande porte dorée gravée dans un mur de blocs violets, statues gardiennes
+   de chaque côté, marches, mousse. Formes réinventées, aucun asset ni motif copié. */
+const OR = 0xffd98a;
+const lisse = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const lerp = (a, b, t) => a + (b - a) * t;
+let graine = 7; const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;   // aléa fixe : même image à chaque fois
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setScissorTest(true);
+renderer.setClearColor(0x4a3a7a);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x7a62a8, 30, 110);
+const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 200);
+
+const mat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true, ...extra });
+const violets = [0x7a68a0, 0x8a78b0, 0x6c5a94, 0x9684ba].map((c) => mat(c));
+const violetSombre = mat(0x4f3f78), mousse = mat(0x86a24a), dalle = [0xa597b4, 0x9a8cab, 0xb0a2bd].map((c) => mat(c));
+const or = mat(0xf2b81c, { emissive: 0x5a3c00 }), orSombre = mat(0xb98512, { emissive: 0x3a2600 }), orClair = mat(0xffd54a, { emissive: 0x6a4a00 });
+
+scene.add(new THREE.HemisphereLight(0xb89cf0, 0x5a4880, 1.5));
+const soleil = new THREE.DirectionalLight(0xffe8c8, 3.0);
+soleil.position.set(-14, 20, 16);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(4096, 4096);
+Object.assign(soleil.shadow.camera, { left: -26, right: 26, top: 22, bottom: -10, near: 1, far: 80 });
+soleil.shadow.bias = -0.0005;
+scene.add(soleil);
+const lumPorte = new THREE.PointLight(OR, 0, 40, 1.1);
+lumPorte.position.set(0, 4.4, 1.5);
+scene.add(lumPorte);
+
+// cotes : ouverture de la porte 3,6 de large, seuil à y=1, haut à y=7,4 ; mur de 2,4 d'épaisseur (z de -1,2 à 1,2)
+const LARG = 1.8, SEUIL = 1.0, HAUT = 7.4, EP = 2.4;
+
+const bloc = (w, h, d, m, x, y, z, ry = 0) => {
+  const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.rotation.y = ry;
+  o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+};
+const choix = (liste) => liste[Math.floor(alea() * liste.length)];
+
+// sol : parvis à facettes, dalles violettes et plaques de mousse (couleurs par sommet)
+{
+  const geo = new THREE.PlaneGeometry(120, 70, 60, 35); geo.rotateX(-Math.PI / 2);
+  const p = geo.attributes.position, col = [];
+  const a = new THREE.Color(0xa597b4), b = new THREE.Color(0x8a7ea0), m = new THREE.Color(0x86a24a), c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), z = p.getZ(i) + 25, loin = Math.max(Math.abs(x) - 12, 0) + Math.max(z - 18, 0) * 0.6;
+    p.setY(i, (alea() - 0.5) * Math.min(loin * 0.1, 0.8));
+    c.copy(a).lerp(b, alea()); if (alea() < 0.16 && z > 4) c.lerp(m, 0.85);
+    col.push(...c.toArray());
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const sol = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+  sol.position.set(0, 0, 25); sol.receiveShadow = true; scene.add(sol);
+}
+// ciel : violet profond vers rose à l'horizon
+const ciel = document.createElement('canvas'); ciel.width = 4; ciel.height = 256;
+const gc = ciel.getContext('2d'), gg = gc.createLinearGradient(0, 0, 0, 256);
+gg.addColorStop(0, '#2c2466'); gg.addColorStop(0.55, '#5a4a9a'); gg.addColorStop(1, '#c79ac0');
+gc.fillStyle = gg; gc.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(ciel);
+
+// mur : rangées de gros blocs décalés, avec un vide pour la porte ; tours plus hautes sur les côtés
+for (let row = 0, y = 0; y < 15; row++) {
+  const h = 1.5 + alea() * 0.5;
+  let x = -17 - alea() * 1.5;
+  while (x < 17) {
+    const w = 2.2 + alea() * 1.3, cx = x + w / 2, haut = Math.abs(cx) > 9 ? 17 : 12.5 + alea() * 1.2;
+    const dansPorte = Math.abs(cx) < LARG + 1.5 && y < HAUT + 1.3;   // piliers et linteau faits à la main
+    if (!dansPorte && y + h <= haut + 0.01) {
+      const m = choix(violets);
+      bloc(w - 0.06, h - 0.06, EP, m, cx, y + h / 2, 0, (alea() - 0.5) * 0.015);
+      if (y + h >= haut - 0.05 && alea() < 0.7) bloc(w - 0.3, 0.16, EP - 0.3, mousse, cx, y + h + 0.05, 0);   // mousse sur le dessus
+    }
+    x += w;
+  }
+  y += h;
+}
+// piliers (3 blocs empilés de chaque côté), linteau et clef
+for (const cote of [-1, 1]) {
+  for (let i = 0, y = 0; y < HAUT - 0.05; i++) {
+    const h = i === 0 ? SEUIL + 1.4 : 2.0;
+    bloc(1.5 + (alea() - 0.5) * 0.1, Math.min(h, HAUT - y) - 0.05, EP + 0.2, choix(violets), cote * (LARG + 0.75), y + Math.min(h, HAUT - y) / 2, 0, (alea() - 0.5) * 0.02);
+    y += h;
+  }
+}
+bloc(2.4, 1.3, EP + 0.2, choix(violets), -1.3, HAUT + 0.65, 0); bloc(2.4, 1.3, EP + 0.2, choix(violets), 1.3, HAUT + 0.65, 0);
+bloc(1.3, 1.7, EP + 0.3, violets[3], 0, HAUT + 0.85, 0.05);
+
+// marches et seuil
+[[1.0, 4.1, 0.34, 11], [1.0, 3.1, 0.67, 10], [1.0, 2.1, 1.0, 9]].forEach(([d, z, h, l]) => bloc(l, h, d, choix(dalle), 0, h / 2, z));
+bloc(2 * LARG + 0.2, SEUIL, EP, dalle[0], 0, SEUIL / 2, 0);
+
+// lumière derrière la porte (plan plein, éclairé de lui-même)
+const lueur = new THREE.Mesh(new THREE.PlaneGeometry(2 * LARG, HAUT - SEUIL), new THREE.MeshBasicMaterial({ color: 0xfff0b0, fog: false }));
+lueur.position.set(0, (HAUT + SEUIL) / 2, -2.6); scene.add(lueur);
+
+// battants d'or gravés : rainures, deux carrés en relief par battant
+function battant(cote) {
+  const g = new THREE.Group(); g.position.set(cote * LARG, SEUIL, -0.1);
+  const h = HAUT - SEUIL - 0.05, l = LARG - 0.04;
+  const add = (w, hh, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), m); o.position.set(-cote * x, y, z); o.castShadow = true; g.add(o); };
+  add(l, h, 0.3, or, l / 2, h / 2, 0);
+  [0.3, 0.75, 1.3].forEach((x) => add(0.07, h * 0.78, 0.05, orSombre, x, h * 0.46, 0.17));        // rainures verticales
+  add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.14, 0.17); add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.86, 0.17);
+  add(0.62, 0.62, 0.12, orClair, 0.36, h * 0.9 - 0.4, 0.2); add(0.3, 0.3, 0.06, orSombre, 0.36, h * 0.9 - 0.4, 0.28);   // carré en relief, intérieur creux
+  g.userData.l = l; scene.add(g); return g;
+}
+const gauche = battant(-1), droit = battant(1);
+
+// statues gardiennes : socle, corps de blocs, tête à oreilles, épée plantée devant (formes simplifiées, inspirées seulement)
+function statue(cote) {
+  const g = new THREE.Group(); g.position.set(cote * 8, 0, 1.0); g.rotation.y = -cote * 0.18; scene.add(g);
+  const add = (geo, m, x, y, z, ry = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.y = ry; o.castShadow = o.receiveShadow = true; g.add(o); return o; };
+  const B = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+  add(B(3.4, 1.2, 3.0), violets[2], 0, 0.6, 0);
+  add(B(2.2, 3.4, 1.6), violets[1], 0, 2.9, 0);                      // robe
+  add(B(2.8, 1.0, 1.7), violets[0], 0, 4.9, 0);                      // épaules
+  add(B(1.3, 1.2, 1.2), violets[3], 0, 5.9, 0.05);                   // tête
+  add(B(0.8, 0.5, 0.7), violets[3], 0, 5.7, 0.8);                    // museau
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], -0.45, 6.9, 0, 0.7).rotation.z = 0.15;
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], 0.45, 6.9, 0, 0.7).rotation.z = -0.15;
+  add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), -0.32, 6.0, 0.72);   // œil violet lumineux
+  add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), 0.32, 6.0, 0.72);
+  add(B(0.6, 0.5, 0.5), violets[2], 0, 4.3, 1.05);                   // mains jointes
+  add(B(0.36, 5.2, 0.18), mat(0x5a58a8, { emissive: 0x1a1850 }), 0, 2.1, 1.35);       // lame
+  add(B(1.2, 0.2, 0.3), violets[2], 0, 4.55, 1.35);                  // garde
+  add(B(1.3, 0.3, 1.3), mousse, 0.4, 7.0, -0.1);                     // touffe de mousse sur la tête
+}
+statue(-1); statue(1);
+
+// pointes de pierre devant les statues et quelques rochers sur le parvis
+for (const cote of [-1, 1]) for (let i = 0; i < 4; i++) {
+  const o = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.2, 4), violetSombre); o.position.set(cote * (4.6 + i * 0.9), 0.6, 6 + (i % 2) * 1.2); o.castShadow = true; scene.add(o);
+}
+[[-14, 8, 1.3], [13, 12, 1.6], [-9, 16, 1.0], [10, 20, 1.2], [3, 24, 0.9]].forEach(([x, z, s]) => {
+  const o = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), choix(violets)); o.position.set(x, s * 0.5, z);
+  o.scale.set(1 + alea() * 0.5, 0.7 + alea() * 0.4, 1 + alea() * 0.5); o.rotation.y = alea() * 6; o.castShadow = o.receiveShadow = true; scene.add(o);
+});
+// nuages ronds et doux (boules à facettes) au-dessus du mur
+[[-26, 24, -30, 5], [14, 28, -40, 6], [34, 20, -26, 4.5], [-6, 32, -50, 7]].forEach(([x, y, z, r]) => {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(r * (0.55 + alea() * 0.35), 1), mat(0x9a82c8)); b.position.set((i - 1.5) * r * 0.8, alea() * r * 0.3, 0); g.add(b); }
+  scene.add(g);
+});
+
+// rayons : plans additifs en éventail devant la porte, dégradé d'opacité le long de la longueur
+const c = document.createElement('canvas'); c.width = 256; c.height = 4;
+const g2 = c.getContext('2d'), gr = g2.createLinearGradient(0, 0, 256, 0);
+gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#000'); g2.fillStyle = gr; g2.fillRect(0, 0, 256, 4);
+const alphaMap = new THREE.CanvasTexture(c);
+const rayons = [];
+for (let i = -3; i <= 3; i++) {
+  const geo = new THREE.PlaneGeometry(26, HAUT - SEUIL); geo.translate(13, (HAUT + SEUIL) / 2, 0);
+  const m = new THREE.MeshBasicMaterial({ color: OR, transparent: true, opacity: 0, alphaMap, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
+  const r = new THREE.Mesh(geo, m); r.rotation.y = -Math.PI / 2 + i * 0.11; r.position.z = 0.2;
+  scene.add(r); rayons.push(r);
+}
+
+// état de la scène pour une progression p
+function pose(p) {
+  const ouv = lisse(0.08, 0.2, p) * 0.12 + lisse(0.2, 0.45, p) * 1.2;      // rad : ~7° puis ~76°
+  gauche.rotation.y = ouv; droit.rotation.y = -ouv;
+  const eclat = lisse(0.15, 0.7, p);
+  lumPorte.intensity = eclat * 90;
+  rayons.forEach((r, i) => { r.material.opacity = eclat * (0.26 - Math.abs(i - 3) * 0.035); });
+  // caméra : plan large fixe sur la façade, puis avance (marches) et traversée du seuil
+  const av = lisse(0.4, 0.7, p) * 0.5 + lisse(0.7, 0.95, p) * 0.5;
+  camera.position.set(0, lerp(4.2, 3.9, lisse(0.4, 0.9, p)), lerp(16, -4, av));
+  camera.lookAt(0, lerp(4.6, 4.4, p), -4);
+  return lisse(0.7, 0.92, p) * 0.95 + lisse(0.92, 1, p) * 0.05;       // opacité de l'éblouissement
+}
+
+const hud = document.getElementById('hud'), flash = document.getElementById('flash');
+const liste = (new URLSearchParams(location.search).get('p') || '').split(',').filter(Boolean).map(Number);
+
+function taille() { renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', taille); taille();
+
+if (liste.length) {
+  // planche : une tuile par valeur de p, éblouissement dessiné par-dessus la tuile
+  document.body.classList.add('serie'); flash.style.display = 'none';
+  const cols = liste.length > 3 ? 3 : liste.length, lignes = Math.ceil(liste.length / cols);
+  const W = innerWidth, H = innerHeight, tw = W / cols, th = H / lignes;
+  camera.aspect = tw / th; camera.updateProjectionMatrix();
+  renderer.setScissorTest(true);
+  const sup = document.createElement('div'); sup.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2';
+  document.body.appendChild(sup);
+  liste.forEach((p, k) => {
+    const fl = pose(p), x = (k % cols) * tw, y = H - (Math.floor(k / cols) + 1) * th;
+    renderer.setViewport(x, y, tw, th); renderer.setScissor(x, y, tw, th); renderer.render(scene, camera);
+    const t = document.createElement('div');
+    t.style.cssText = `position:absolute;left:${x}px;top:${H - y - th}px;width:${tw}px;height:${th}px;background:#ffd98a;opacity:${fl}`;
+    const l = document.createElement('div');
+    l.style.cssText = `position:absolute;left:${x + 6}px;top:${H - y - th + 6}px;font:13px monospace;color:#fff;background:#000a;padding:2px 6px`;
+    l.textContent = 'p=' + p; sup.append(t, l);
+  });
+  hud.style.display = 'none';
+  window.__pret = true;
+} else {
+  let cible = 0, cour = 0, dernier = performance.now(), n = 0, t0 = dernier;
+  const lire = () => { const m = document.documentElement.scrollHeight - innerHeight; cible = m > 0 ? scrollY / m : 0; };
+  addEventListener('scroll', lire); lire();
+  (function boucle(t) {
+    requestAnimationFrame(boucle);
+    const dt = (t - dernier) / 1000; dernier = t;
+    cour += (cible - cour) * (1 - Math.exp(-dt * 4));                  // rattrapage doux : mouvement solennel
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    flash.style.opacity = pose(cour);
+    renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight);
+    renderer.render(scene, camera);
+    n++; if (t - t0 > 500) { hud.textContent = 'p=' + cour.toFixed(2) + ' · ' + Math.round(n * 1000 / (t - t0)) + ' fps'; n = 0; t0 = t; }
+  })(dernier);
+}
+</script>
+</body>
+</html>

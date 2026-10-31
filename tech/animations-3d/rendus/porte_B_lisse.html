@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Porte (rendu Tunic inspiré)</title>
+<style>
+  html,body{margin:0;background:#111}
+  #scroller{height:600vh}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #hud{position:fixed;left:8px;top:8px;font:12px/1.4 monospace;color:#fff;background:#0008;padding:4px 8px;z-index:3;pointer-events:none}
+  #flash{position:fixed;inset:0;background:#ffd98a;opacity:0;pointer-events:none;z-index:2}
+  .serie #scroller{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+</head>
+<body>
+<div id="scroller"></div>
+<div id="flash"></div>
+<div id="hud">p=0 · -- fps</div>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* Porte dans son décor, rendu « Tunic inspiré » (aplats, blocs à facettes biseautés, lumière, sans contours).
+   Progression p de 0 à 1 (scroll). ?p=0,0.2,0.45,0.7,0.9,1 -> planche (progression figée, une tuile par valeur).
+   ?v=A|B|C -> trois directions de décor à comparer (planche.html) :
+     A  ruine usée, de face      : mur de blocs délabré, lierre, gravats, dalles et herbe dans les joints
+     B  portique dans la falaise : la porte est taillée dans la roche, colline verte, sapins
+     C  terrasse vue d'en haut   : plate-forme au-dessus de l'eau (comme la 2e référence), caméra qui descend
+   Références de Simon (2026-10-31) : porte dorée dans un mur de blocs violets, statues gardiennes, marches, mousse.
+   Formes réinventées, aucun asset ni motif copié. */
+const V = (new URLSearchParams(location.search).get('v') || 'A').toUpperCase();
+const OR = 0xffd98a;
+const lisse = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const lerp = (a, b, t) => a + (b - a) * t;
+let graine = 7; const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;   // aléa fixe : même image à chaque fois
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setScissorTest(true);
+renderer.setClearColor(0x4a3a7a);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(V === 'B' ? 0x9ab0d0 : 0x7a62a8, 30, 120);
+const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 260);
+
+const mat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true, ...extra });
+const violets = (V === 'B' ? [0x8a84a0, 0x7a7494, 0x9a94b0, 0x6e6888] : [0x7a68a0, 0x8a78b0, 0x6c5a94, 0x9684ba]).map((c) => mat(c));
+const humide = [0x665f78, 0x5c6a58, 0x6a6482].map((c) => mat(c));       // pierres du bas : mouillées, verdies
+const violetSombre = mat(0x3d2f60), mousse = mat(0x86a24a), mousseSombre = mat(0x5f7d38);
+const dalle = (V === 'B' ? [0x9a92a8, 0x8e86a0, 0xa49cb2] : [0xa597b4, 0x9a8cab, 0xb0a2bd]).map((c) => mat(c));
+const or = mat(0xf2b81c, { emissive: 0x5a3c00 }), orSombre = mat(0xb98512, { emissive: 0x3a2600 }), orClair = mat(0xffd54a, { emissive: 0x6a4a00 });
+
+scene.add(new THREE.HemisphereLight(0xb89cf0, 0x5a4880, 1.5));
+const soleil = new THREE.DirectionalLight(0xffe8c8, 3.0);
+soleil.position.set(-14, 20, 16);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(2048, 2048);
+Object.assign(soleil.shadow.camera, { left: -26, right: 26, top: 22, bottom: -12, near: 1, far: 90 });
+soleil.shadow.bias = -0.0005;
+scene.add(soleil);
+const lumPorte = new THREE.PointLight(OR, 0, 40, 1.1);
+lumPorte.position.set(0, 4.4, 1.5);
+scene.add(lumPorte);
+
+// cotes : ouverture de la porte 3,6 de large, seuil à y=1, haut à y=7,4 ; mur de 2,4 d'épaisseur (z de -1,2 à 1,2)
+const LARG = 1.8, SEUIL = 1.0, HAUT = 7.4, EP = 2.4;
+const choix = (liste) => liste[Math.floor(alea() * liste.length)];
+
+// bloc biseauté : l'arête accroche la lumière, ce qui ancre les volumes
+const bloc = (w, h, d, m, x, y, z, ry = 0) => {
+  const r = Math.min(0.09, w / 4, h / 4, d / 4);
+  const o = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, r), m); o.position.set(x, y, z); o.rotation.y = ry;
+  o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+};
+// ombre de contact : tache sombre et floue sous un objet posé, pour qu'il « touche » le sol
+const texOmbre = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  r.addColorStop(0, 'rgba(30,15,55,0.75)'); r.addColorStop(1, 'rgba(30,15,55,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+const contact = (x, z, rx, rz, y = 0.04) => {
+  const o = new THREE.Mesh(new THREE.PlaneGeometry(rx * 2, rz * 2), new THREE.MeshBasicMaterial({ map: texOmbre, transparent: true, depthWrite: false, fog: false }));
+  o.rotation.x = -Math.PI / 2; o.position.set(x, y, z); scene.add(o);
+};
+const herbe = (x, y, z, s = 1) => {
+  for (let i = 0; i < 3; i++) { const o = new THREE.Mesh(new THREE.ConeGeometry(0.1 * s, (0.35 + alea() * 0.25) * s, 4), alea() < 0.5 ? mousse : mousseSombre);
+    o.position.set(x + (alea() - 0.5) * 0.3, y + 0.15 * s, z + (alea() - 0.5) * 0.3); o.rotation.z = (alea() - 0.5) * 0.4; scene.add(o); }
+};
+// terrain à facettes, hauteur et couleur par sommet
+function terrain({ w, d, cx, cz, seg, haut, couleur }) {
+  const geo = new THREE.PlaneGeometry(w, d, seg[0], seg[1]); geo.rotateX(-Math.PI / 2);
+  const p = geo.attributes.position, col = [], c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i) + cx, z = p.getZ(i) + cz; p.setY(i, haut(x, z)); col.push(...couleur(x, z, c).toArray()); }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+  m.position.set(cx, 0, cz); m.receiveShadow = true; scene.add(m); return m;
+}
+// dalles de pierre légèrement inégales, avec de l'herbe dans les joints
+function dalles(x0, x1, z0, z1, pas) {
+  for (let x = x0; x < x1 - 0.01; x += pas) for (let z = z0; z < z1 - 0.01; z += pas) {
+    const h = 0.28 + alea() * 0.1;
+    bloc(pas - 0.1, h, pas - 0.1, choix(dalle), x + pas / 2, h / 2 - 0.04 + (alea() - 0.5) * 0.04, z + pas / 2, (alea() - 0.5) * 0.05);
+    if (alea() < 0.45) herbe(x + (alea() < 0.5 ? 0 : pas), 0.05, z + (alea() < 0.5 ? 0 : pas));
+  }
+}
+// ciel
+const ciel = document.createElement('canvas'); ciel.width = 4; ciel.height = 256;
+const gc = ciel.getContext('2d'), gg = gc.createLinearGradient(0, 0, 0, 256);
+if (V === 'B') { gg.addColorStop(0, '#3a4aa0'); gg.addColorStop(0.6, '#7a92d0'); gg.addColorStop(1, '#e8c8c0'); }
+else { gg.addColorStop(0, '#2c2466'); gg.addColorStop(0.55, '#5a4a9a'); gg.addColorStop(1, '#c79ac0'); }
+gc.fillStyle = gg; gc.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(ciel);
+
+// relief de B : sol rocheux devant la falaise, collines sur les côtés, bassin d'eau au premier plan
+const hautB = (x, z) => {
+  const cote = lisse(14, 34, Math.abs(x)) * (6 + 2.5 * Math.sin(z * 0.28 + x * 0.1)) * lisse(-4, 8, z);
+  return lerp(cote, -1.3, lisse(12.5, 18, z) * (1 - lisse(22, 36, Math.abs(x))));
+};
+// ---------- sol et mur selon la direction ----------
+const SEUIL_Z = 4.1;   // z de la première marche
+if (V === 'A') {
+  terrain({ w: 150, d: 90, cx: 0, cz: 30, seg: [60, 36], haut: (x, z) => (alea() - 0.5) * Math.min(Math.max(Math.abs(x) - 14, 0) * 0.1, 0.6),
+    couleur: (x, z, c) => c.set(0x6c6488).lerp(new THREE.Color(0x86a24a), alea() < 0.3 ? 0.8 : alea() * 0.3) });
+  dalles(-14, 14, 1.2, 30, 2.3);
+} else if (V === 'B') {
+  terrain({ w: 170, d: 110, cx: 0, cz: 35, seg: [85, 55], haut: (x, z) => hautB(x, z) + (alea() - 0.5) * 0.25,
+    couleur: (x, z, c) => { const y = hautB(x, z);
+      if (y < -0.1) return c.set(0x7a7a8a).lerp(new THREE.Color(0x4a4a60), alea() * 0.5);                       // fond du bassin
+      if (z < 9) return c.set(0x7a7490).lerp(new THREE.Color(0x86a24a), alea() * 0.35);                         // sol de pierre au pied de la falaise
+      return c.set(0x6f9a48).lerp(new THREE.Color(0x4f7a3a), alea()); } });
+  dalles(-3.4, 3.4, 5.2, 11.2, 2.3);   // chemin usé jusqu'au bord de l'eau
+  const eau = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), mat(0x2f6a9a, { roughness: 0.35 })); eau.rotation.x = -Math.PI / 2; eau.position.y = -0.5; eau.receiveShadow = true; scene.add(eau);
+} else {
+  terrain({ w: 120, d: 70, cx: 0, cz: 20, seg: [30, 18], haut: () => 0, couleur: (x, z, c) => c.set(0x6c6488) }).visible = false;   // (réservé)
+  bloc(32, 8, 28, violets[2], 0, -4.04, 13.2);                           // plate-forme : bloc massif au-dessus de l'eau
+  for (let z = 1; z < 27; z += 2.6) for (const cote of [-1, 1]) bloc(1.2, 0.7, 2.5, choix(violets), cote * 15.8, 0.3, z + 0.8);   // bordure
+  for (let x = -14; x < 14; x += 2.6) bloc(2.5, 0.7, 1.2, choix(violets), x + 1.3, 0.3, 27);
+  dalles(-14.5, 14.5, 1.2, 26.5, 2.3);
+  const eau = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), mat(0x2f5fe0, { roughness: 0.4 })); eau.rotation.x = -Math.PI / 2; eau.position.y = -10; eau.receiveShadow = true; scene.add(eau);
+  // pont lointain, tours et flèches sur l'eau (repères de profondeur)
+  bloc(34, 0.9, 3.4, violets[1], 36, -1.2, 10); [22, 34, 46].forEach((x) => bloc(2, 10, 3, violets[0], x, -6.2, 10));
+  [[-40, -22, 10], [-24, -34, 14], [30, -30, 12]].forEach(([x, z, h]) => { bloc(7, h, 7, violets[2], x, h / 2 - 10, z);
+    const f = new THREE.Mesh(new THREE.ConeGeometry(4.2, 7, 4), violetSombre); f.position.set(x, h - 10 + 3.5, z); f.rotation.y = 0.8; f.castShadow = true; scene.add(f); });
+}
+
+// mur : noyau sombre (les joints se lisent comme des fentes d'ombre), puis rangées de gros blocs décalés
+const LIM = V === 'B' ? 9.5 : V === 'C' ? 15 : 17;
+const noyau = (x0, x1, y0, y1) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, EP - 0.3), violetSombre); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, 0); o.receiveShadow = true; scene.add(o); };
+const pilierX = LARG + 1.5;
+if (V !== 'B') {
+  noyau(-LIM, -pilierX, 0, V === 'C' ? 11.5 : 17); noyau(pilierX, LIM, 0, V === 'C' ? 11.5 : 17);
+  noyau(-pilierX, pilierX, HAUT + 1.6, V === 'C' ? 11.5 : 15);
+}
+const plafond = V === 'B' ? 10 : V === 'C' ? 11 : 12.5;
+for (let y = 0; V !== 'B' && y < 16;) {
+  const h = 1.3 + alea() * 0.6;
+  let x = -LIM - alea() * 1.2;
+  while (x < LIM) {
+    const w = 1.9 + alea() * 1.5, cx = x + w / 2;
+    let haut = V === 'A' ? (Math.abs(cx) > 9 ? 17 : plafond + alea() * 1.2) : plafond + alea() * 0.9;
+    if (V === 'A' && Math.abs(cx) > 4.5 && alea() < 0.25) haut -= 1.5 + alea() * 3;          // brèches : silhouette de ruine
+    const dansPorte = Math.abs(cx) < pilierX && y < HAUT + 1.6;
+    if (!dansPorte && Math.abs(cx) <= LIM && y + h <= haut + 0.01) {
+      const m = y < 1.6 ? choix(humide) : choix(violets);
+      const b = bloc(w - 0.07, h - 0.07, EP, m, cx, y + h / 2, (alea() - 0.5) * 0.12, (alea() - 0.5) * 0.015);
+      if (alea() < 0.07) b.rotation.z = (alea() - 0.5) * 0.04;                                // un bloc légèrement penché
+      if (y + h >= haut - 0.05 && alea() < 0.75) bloc(w - 0.3, 0.17, EP - 0.3, alea() < 0.5 ? mousse : mousseSombre, cx, y + h + 0.07, 0);
+    }
+    x += w;
+  }
+  y += h;
+}
+// soubassement : un cordon de pierre qui dépasse, le mur « pousse » du sol
+for (let x = -LIM; V !== 'B' && x < LIM; x += 3) if (Math.abs(x + 1.5) > pilierX) bloc(3, 0.55, EP + 0.5, choix(humide), x + 1.5, 0.27, 0.12);
+// piliers (blocs empilés de chaque côté), linteau et clef
+for (const cote of [-1, 1]) for (let i = 0, y = 0; y < HAUT - 0.05; i++) {
+  const hh = Math.min(i === 0 ? SEUIL + 1.4 : 2.0, HAUT - y);
+  bloc(1.5 + (alea() - 0.5) * 0.1, hh - 0.05, EP + 0.2, i === 0 ? choix(humide) : choix(violets), cote * (LARG + 0.75), y + hh / 2, 0, (alea() - 0.5) * 0.02);
+  y += hh;
+}
+bloc(2.4, 1.3, EP + 0.2, choix(violets), -1.3, HAUT + 0.65, 0); bloc(2.4, 1.3, EP + 0.2, choix(violets), 1.3, HAUT + 0.65, 0);
+bloc(1.3, 1.7, EP + 0.3, violets[3], 0, HAUT + 0.85, 0.05);
+
+// marches et seuil
+[[1.0, 4.1, 0.34, 11], [1.0, 3.1, 0.67, 10], [1.0, 2.1, 1.0, 9]].forEach(([d, z, h, l]) => { bloc(l, h, d, choix(dalle), 0, h / 2, z); contact(0, z + 0.7, l / 2 + 0.3, 0.8, 0.05); });
+bloc(2 * LARG + 0.2, SEUIL, EP, dalle[0], 0, SEUIL / 2, 0);
+
+// variantes : décor autour du mur
+if (V === 'A') {
+  // lierre qui pend, gravats au pied du mur
+  for (let i = 0; i < 9; i++) { const x = (i % 2 ? 1 : -1) * (pilierX + 0.6 + alea() * 11), len = 1.5 + alea() * 3.5, y0 = 8 + alea() * 4;
+    for (let k = 0; k < 3; k++) { const o = new THREE.Mesh(new THREE.BoxGeometry(0.28 + alea() * 0.2, len / 2, 0.1), alea() < 0.5 ? mousse : mousseSombre); o.position.set(x + (k - 1) * 0.3, y0 - len / 4 - k * 0.15, EP / 2 + 0.06); o.castShadow = true; scene.add(o); } }
+  for (let i = 0; i < 18; i++) { const cote = i % 2 ? 1 : -1, s = 0.25 + alea() * 0.5;
+    bloc(s * 1.6, s, s * 1.3, choix(violets), cote * (4 + alea() * 11), s / 2 + 0.1, 2.2 + alea() * 2.2, alea() * 3); }
+} else if (V === 'B') {
+  // la falaise : grandes masses de roche irrégulières qui enveloppent l'entrée ; la porte est creusée en retrait (1 à 2 de profondeur)
+  const fond = (x0, x1, y0, y1) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, 4), violetSombre); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, -4.2); scene.add(o); };
+  fond(-70, -LARG, 0, 36); fond(LARG, 70, 0, 36); fond(-LARG, LARG, HAUT, 36);                    // fond sombre : aucun jour entre les blocs
+  // paroi de roche continue : une grille verticale dont chaque strate (bande horizontale) avance ou recule, avec des fractures en x
+  // le trou de la porte et des niches (|x| < 10, y < 9) n'a pas de mailles ; la roche se raccorde à z=2,6 sur son pourtour
+  {
+    const bandes = [0], decal = [];
+    while (bandes[bandes.length - 1] < 38) { const k = bandes.length; bandes.push(bandes[k - 1] + 1.0 + alea() * 1.9); decal.push((k % 2 ? 0.55 : -0.45) * (0.4 + alea()) + (alea() - 0.5) * 0.5); }
+    const bandeDe = (y) => { let k = 0; while (k < bandes.length - 2 && y >= bandes[k + 1]) k++; return k; };
+    const pierresB = [0x7d7894, 0x6e6888, 0x8a84a0, 0x77708f, 0x655f80].map((c) => new THREE.Color(c));
+    const nuance = pierresB.map(() => alea());
+    const bosses = [[-16, 5, 3.2, 1.4], [18, 11, 3.6, 1.6], [-27, 12, 4, 1.8], [30, 4, 3, 1.3], [-12, 15, 3, 1.2], [14, 2, 2.6, 1.0], [-35, 3, 3, 1.2]];   // saillies lisses de la paroi
+    const NX = 120, NY = 64, X0 = -60, DX = 1, DY = 0.6, pos = [], col = [], idx = [], c = new THREE.Color();
+    for (let iy = 0; iy <= NY; iy++) for (let ix = 0; ix <= NX; ix++) {
+      const x = X0 + ix * DX, y = iy * DY, k = bandeDe(y), dist = Math.hypot(Math.max(0, Math.abs(x) - 10), Math.max(0, y - 9));
+      const reliefB = decal[k] + 0.45 * Math.sin(x * 0.3 + k * 1.7) + 0.3 * Math.sin(x * 0.9 + k) + (alea() - 0.5) * 0.07 + bosses.reduce((s, [bx, by, br, ba]) => s + ba * Math.exp(-((x - bx) ** 2 + (y - by) ** 2) / (br * br)), 0);
+      pos.push(x, y, 2.6 + reliefB * lisse(0, 2.5, dist));
+      c.copy(pierresB[(k * 3 + Math.floor(Math.abs(x) / 7)) % 5]).offsetHSL(0, 0, (nuance[k % 5] - 0.5) * 0.06 + (alea() - 0.5) * 0.015);
+      if (y < 1.8) c.lerp(new THREE.Color(0x5c6a58), 0.55 * (1 - y / 1.8));                       // pied humide et verdi
+      if (iy > 0 && y - bandes[k] < DY * 1.01 && alea() < 0.2) c.lerp(new THREE.Color(0x86a24a), 0.55);   // mousse sur le dessus des replats
+      col.push(c.r, c.g, c.b);
+    }
+    for (let iy = 0; iy < NY; iy++) for (let ix = 0; ix < NX; ix++) {
+      const cx = X0 + (ix + 0.5) * DX, cy = (iy + 0.5) * DY;
+      if (Math.abs(cx) < 10 && cy < 9) continue;
+      const a = iy * (NX + 1) + ix, b = a + 1, d = a + NX + 1, e = d + 1;
+      idx.push(a, b, e, a, e, d);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+    const paroi = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: false }));
+    paroi.castShadow = paroi.receiveShadow = true; scene.add(paroi);
+    bloc(9.6, 1.6, 4.4, violets[3], 0, 9.7, 0.7);                                                     // linteau de roche au-dessus de la porte
+  }
+  for (const cote of [-1, 1]) {
+    bloc(1.3, 9.0, 4.4, violets[3], cote * 3.95, 4.5, 0.7);                                       // chambranle : la roche touche les piliers
+    bloc(5.4, 9.0, 1.4, violets[2], cote * 7.3, 4.5, -1.5);                                       // fond de la niche de la statue
+  }
+  for (const cote of [-1, 1]) { const b = bloc(1.3, 1.3, EP - 0.2, humide[2], cote * (LARG - 0.25), HAUT - 0.25, 0); b.rotation.z = Math.PI / 4; }   // angles de l'arche
+  // rochers de la rive, certains à demi dans l'eau
+  for (let i = 0; i < 16; i++) { const cote = i % 2 ? 1 : -1, s = 0.5 + alea() * 1.2, x = cote * (5.5 + alea() * 14), z = 5.5 + alea() * 10;
+    const o = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), choix(violets)); o.position.set(x, hautB(x, z) + s * 0.25, z); o.scale.set(1.3, 0.7 + alea() * 0.4, 1.1); o.rotation.y = alea() * 6; o.castShadow = o.receiveShadow = true; scene.add(o); contact(x, z, s * 1.5, s * 1.4, hautB(x, z) + 0.05); }
+  // sapins sur les collines
+  for (let i = 0; i < 14; i++) { const cote = i % 2 ? 1 : -1, x = cote * (16 + alea() * 16), z = 2 + alea() * 24, s = 1.4 + alea() * 1.2, g = new THREE.Group();
+    g.position.set(x, hautB(x, z), z);
+    for (let k = 0; k < 3; k++) { const cn = new THREE.Mesh(new THREE.ConeGeometry(1.3 - k * 0.3, 1.8, 6), alea() < 0.5 ? mousseSombre : mousse); cn.position.y = 0.9 + k * 1.1; cn.castShadow = true; g.add(cn); }
+    g.scale.setScalar(s); scene.add(g); }
+}
+
+// lumière derrière la porte (plan plein, éclairé de lui-même)
+const lueur = new THREE.Mesh(new THREE.PlaneGeometry(2 * LARG, HAUT - SEUIL), new THREE.MeshBasicMaterial({ color: 0xfff0b0, fog: false }));
+lueur.position.set(0, (HAUT + SEUIL) / 2, -2.6); scene.add(lueur);
+
+// battants d'or gravés : rainures, deux carrés en relief par battant
+function battant(cote) {
+  const g = new THREE.Group(); g.position.set(cote * LARG, SEUIL, -0.1);
+  const h = HAUT - SEUIL - 0.05, l = LARG - 0.04;
+  const add = (w, hh, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), m); o.position.set(-cote * x, y, z); o.castShadow = true; g.add(o); };
+  add(l, h, 0.3, or, l / 2, h / 2, 0);
+  [0.3, 0.75, 1.3].forEach((x) => add(0.07, h * 0.78, 0.05, orSombre, x, h * 0.46, 0.17));
+  add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.14, 0.17); add(l - 0.2, 0.07, 0.05, orSombre, l / 2, h * 0.86, 0.17);
+  add(0.62, 0.62, 0.12, orClair, 0.36, h * 0.9 - 0.4, 0.2); add(0.3, 0.3, 0.06, orSombre, 0.36, h * 0.9 - 0.4, 0.28);
+  scene.add(g); return g;
+}
+const gauche = battant(-1), droit = battant(1);
+
+// statues gardiennes (formes simplifiées, inspirées seulement), avec ombre de contact, socle large et mousse
+function statue(cote) {
+  const px = cote * (V === 'B' ? 7.2 : 8);
+  contact(px, 1.0, 3.2, 3.0);
+  const g = new THREE.Group(); g.position.set(px, 0, 1.0); g.rotation.y = -cote * 0.18; scene.add(g);
+  const add = (geo, m, x, y, z, ry = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.y = ry; o.castShadow = o.receiveShadow = true; g.add(o); return o; };
+  const B = (w, h, d) => new RoundedBoxGeometry(w, h, d, 2, 0.08);
+  add(B(3.8, 0.5, 3.4), humide[0], 0, 0.25, 0);                      // dalle de base
+  add(B(3.2, 1.0, 2.8), violets[2], 0, 1.0, 0);                      // socle
+  add(B(2.2, 3.2, 1.6), violets[1], 0, 3.1, 0);                      // robe
+  add(B(0.5, 3.0, 0.5), violets[0], -1.2, 3.0, 0.1); add(B(0.5, 3.0, 0.5), violets[0], 1.2, 3.0, 0.1);   // plis latéraux
+  add(B(2.3, 0.3, 1.7), violetSombre, 0, 3.4, 0);                    // ceinture
+  add(B(2.8, 1.0, 1.7), violets[0], 0, 5.0, 0);                      // épaules
+  add(B(1.3, 1.2, 1.2), violets[3], 0, 6.0, 0.05);                   // tête
+  add(B(0.8, 0.5, 0.7), violets[3], 0, 5.8, 0.8);                    // museau
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], -0.45, 7.0, 0, 0.7).rotation.z = 0.15;
+  add(new THREE.ConeGeometry(0.34, 1.1, 4), violets[3], 0.45, 7.0, 0, 0.7).rotation.z = -0.15;
+  add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), -0.32, 6.1, 0.72); add(B(0.22, 0.12, 0.1), mat(0xc070ff, { emissive: 0xb050ff }), 0.32, 6.1, 0.72);
+  add(B(0.6, 0.5, 0.5), violets[2], 0, 4.4, 1.05);                   // mains jointes
+  add(B(0.36, 5.2, 0.18), mat(0x5a58a8, { emissive: 0x1a1850 }), 0, 2.2, 1.35);        // lame
+  add(B(1.2, 0.2, 0.3), violets[2], 0, 4.65, 1.35);                  // garde
+  add(B(1.3, 0.3, 1.3), mousse, 0.4, 7.2, -0.1); add(B(0.9, 0.2, 0.6), mousse, -0.9, 5.6, 0.3);   // mousse sur la tête et l'épaule
+  add(B(2.6, 0.18, 0.8), mousseSombre, 0, 0.55, 1.2);                // mousse au pied
+}
+statue(-1); statue(1);
+
+// pointes de pierre devant les statues et quelques rochers
+if (V !== 'B') {
+  for (const cote of [-1, 1]) for (let i = 0; i < 4; i++) {
+    const o = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.2, 4), violetSombre); o.position.set(cote * (4.6 + i * 0.9), 0.6, 6 + (i % 2) * 1.2); o.castShadow = true; scene.add(o); contact(o.position.x, o.position.z, 0.6, 0.6);
+  }
+}
+// nuages ronds et doux (boules à facettes)
+[[-26, 26, -34, 5], [14, 30, -44, 6], [34, 22, -30, 4.5], [-6, 34, -56, 7]].forEach(([x, y, z, r]) => {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(r * (0.55 + alea() * 0.35), 1), mat(V === 'B' ? 0xe8d8e8 : 0x9a82c8)); b.position.set((i - 1.5) * r * 0.8, alea() * r * 0.3, 0); g.add(b); }
+  scene.add(g);
+});
+
+// rayons : plans additifs en éventail devant la porte, dégradé d'opacité le long de la longueur
+const c = document.createElement('canvas'); c.width = 256; c.height = 4;
+const g2 = c.getContext('2d'), gr = g2.createLinearGradient(0, 0, 256, 0);
+gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#000'); g2.fillStyle = gr; g2.fillRect(0, 0, 256, 4);
+const alphaMap = new THREE.CanvasTexture(c);
+const rayons = [];
+for (let i = -3; i <= 3; i++) {
+  const geo = new THREE.PlaneGeometry(11, HAUT - SEUIL); geo.translate(5.5, (HAUT + SEUIL) / 2, 0);
+  const m = new THREE.MeshBasicMaterial({ color: OR, transparent: true, opacity: 0, alphaMap, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
+  const r = new THREE.Mesh(geo, m); r.rotation.y = -Math.PI / 2 + i * 0.11; r.position.z = 0.2;
+  scene.add(r); rayons.push(r);
+}
+
+// état de la scène pour une progression p
+function pose(p) {
+  const ouv = lisse(0.08, 0.2, p) * 0.12 + lisse(0.2, 0.45, p) * 1.2;      // rad : ~7° puis ~76°
+  gauche.rotation.y = ouv; droit.rotation.y = -ouv;
+  const eclat = lisse(0.15, 0.7, p);
+  lumPorte.intensity = eclat * 90;
+  rayons.forEach((r, i) => { r.material.opacity = eclat * (0.26 - Math.abs(i - 3) * 0.035); });
+  // caméra : plan large sur la façade, puis avance (marches) et traversée du seuil ; en C elle descend de haut d'abord
+  const av = lisse(0.4, 0.7, p) * 0.5 + lisse(0.7, 0.95, p) * 0.5;
+  let y = lerp(V === 'B' ? 6.2 : 4.2, 3.9, lisse(0.4, 0.9, p)), z = lerp(V === 'B' ? 29 : 16, -4, av), cible = lerp(V === 'B' ? 5.4 : 4.6, 4.4, p);
+  if (V === 'C') { const d = 1 - lisse(0.02, 0.4, p); y += 11 * d; z += 12 * d; cible -= 3.2 * d; }
+  camera.position.set(0, y, z); camera.lookAt(0, cible, -4);
+  return lisse(0.7, 0.92, p) * 0.95 + lisse(0.92, 1, p) * 0.05;       // opacité de l'éblouissement
+}
+
+const hud = document.getElementById('hud'), flash = document.getElementById('flash');
+const liste = (new URLSearchParams(location.search).get('p') || '').split(',').filter(Boolean).map(Number);
+
+function taille() { renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', taille); taille();
+
+if (liste.length) {
+  // planche : une tuile par valeur de p, éblouissement dessiné par-dessus la tuile
+  document.body.classList.add('serie'); flash.style.display = 'none';
+  const cols = liste.length > 3 ? 3 : liste.length, lignes = Math.ceil(liste.length / cols);
+  const W = innerWidth, H = innerHeight, tw = W / cols, th = H / lignes;
+  camera.aspect = tw / th; camera.updateProjectionMatrix();
+  renderer.setScissorTest(true);
+  const sup = document.createElement('div'); sup.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2';
+  document.body.appendChild(sup);
+  liste.forEach((p, k) => {
+    const fl = pose(p), x = (k % cols) * tw, y = H - (Math.floor(k / cols) + 1) * th;
+    renderer.setViewport(x, y, tw, th); renderer.setScissor(x, y, tw, th); renderer.render(scene, camera);
+    const t = document.createElement('div');
+    t.style.cssText = `position:absolute;left:${x}px;top:${H - y - th}px;width:${tw}px;height:${th}px;background:#ffd98a;opacity:${fl}`;
+    const l = document.createElement('div');
+    l.style.cssText = `position:absolute;left:${x + 6}px;top:${H - y - th + 6}px;font:13px monospace;color:#fff;background:#000a;padding:2px 6px`;
+    l.textContent = 'p=' + p; sup.append(t, l);
+  });
+  hud.style.display = 'none';
+  window.__pret = true;
+} else {
+  let cible = 0, cour = 0, dernier = performance.now(), n = 0, t0 = dernier;
+  const lire = () => { const m = document.documentElement.scrollHeight - innerHeight; cible = m > 0 ? scrollY / m : 0; };
+  addEventListener('scroll', lire); lire();
+  (function boucle(t) {
+    requestAnimationFrame(boucle);
+    const dt = (t - dernier) / 1000; dernier = t;
+    cour += (cible - cour) * (1 - Math.exp(-dt * 4));                  // rattrapage doux : mouvement solennel
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    flash.style.opacity = pose(cour);
+    renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight);
+    renderer.render(scene, camera);
+    n++; if (t - t0 > 500) { hud.textContent = 'p=' + cour.toFixed(2) + ' · ' + Math.round(n * 1000 / (t - t0)) + ' fps'; n = 0; t0 = t; }
+  })(dernier);
+}
+</script>
+</body>
+</html>

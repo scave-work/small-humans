@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planches de choix : mer et nuages</title>
+<style>
+  body{margin:0;padding:16px;background:#0a1330;color:#e8eefc;font:15px/1.4 system-ui,sans-serif}
+  h1{font-size:1.15rem;margin:0 0 6px} h2{font-size:1rem;margin:22px 0 8px}
+  p{margin:0 0 8px;opacity:.8;max-width:70ch}
+  .rangee{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+  figure{margin:0} canvas{width:100%;height:auto;display:block;border-radius:6px}
+  figcaption{padding:4px 2px;font-size:.88rem}
+</style>
+</head>
+<body>
+<h1>Planches de choix (2D, rien de définitif)</h1>
+<p>Dis une lettre par ligne (par exemple « mer B, nuages C ») ou décris ce qui manque. Même composition partout : horizon, phare rouge au centre, couleurs de la peinture.</p>
+
+<h2>La mer</h2>
+<div class="rangee">
+  <figure><canvas id="mA" width="520" height="300"></canvas><figcaption><b>Mer A.</b> Facettes triangulaires Tunic (ce que fait la scène 3D actuelle, en plus net), crêtes pêche.</figcaption></figure>
+  <figure><canvas id="mB" width="520" height="300"></canvas><figcaption><b>Mer B.</b> Peinte : creux marine, petits traits orange, gros amas d'écume bleu-blanc et rose autour du phare.</figcaption></figure>
+  <figure><canvas id="mC" width="520" height="300"></canvas><figcaption><b>Mer C.</b> Vagues en bandes festonnées façon dessin animé : aplats marine, crête crème nette, volutes.</figcaption></figure>
+</div>
+
+<h2>Les nuages (trois bancs superposés)</h2>
+<div class="rangee">
+  <figure><canvas id="nA" width="520" height="300"></canvas><figcaption><b>Nuages A.</b> Cumulus « chou-fleur » (actuel) : sommets éclairés, bases plates.</figcaption></figure>
+  <figure><canvas id="nB" width="520" height="300"></canvas><figcaption><b>Nuages B.</b> Gros bouffis doux et flous façon Tunic, haut pêche, corps lavande.</figcaption></figure>
+  <figure><canvas id="nC" width="520" height="300"></canvas><figcaption><b>Nuages C.</b> Longs bancs écrasés de la peinture : traits crème fins sur le dessus, base noire, lambeaux.</figcaption></figure>
+</div>
+
+<script>
+var s = 3; function r(){ s = (s * 16807) % 2147483647; return s / 2147483647; }
+var PECHE = '#ffc796', W = 520, H = 300, HZ = 118;
+function mix(a, b, t){ return a.map(function(v, i){ return Math.round(v + (b[i] - v) * t); }); }
+function css(c){ return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
+function ciel(x){ var g = x.createLinearGradient(0, 0, 0, HZ + 10); g.addColorStop(0, '#2f5fc0'); g.addColorStop(1, '#14275f'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+function phare(x){ // silhouette rouge simple, même place partout
+  x.save(); x.fillStyle = '#c0452f'; x.beginPath(); x.moveTo(246, 222); x.lineTo(274, 222); x.lineTo(268, 112); x.lineTo(252, 112); x.fill();
+  x.fillStyle = '#eaf4ff'; x.fillRect(251, 98, 18, 14); x.fillStyle = '#c8323a'; x.beginPath(); x.moveTo(247, 98); x.lineTo(273, 98); x.lineTo(260, 84); x.fill();
+  x.fillStyle = '#2b2230'; x.beginPath(); x.ellipse(260, 226, 34, 12, 0, 0, 6.283); x.fill(); x.restore(); }
+
+// ---------- MER ----------
+function merA(x){ ciel(x);
+  var N = 22, prev = [];
+  for (var k = 0; k < N; k++) {
+    var y0 = HZ + (H - HZ) * Math.pow(k / N, 1.7), y1 = HZ + (H - HZ) * Math.pow((k + 1) / N, 1.7), cw = 10 + k * 3.4;
+    for (var i = -2; i * cw < W + cw; i++) {
+      var xa = i * cw + (k % 2) * cw / 2, v = 0.5 + 0.5 * Math.sin(xa * 0.012 + k * 0.55) * Math.sin(k * 0.4 + 1.3 + xa * 0.004);
+      var jit = 0.85 + r() * 0.3, c = mix([10, 23, 67], [34, 78, 150], Math.min(1, v * jit));
+      if (v * jit > 0.78) c = mix(c, [255, 199, 150], 0.9);
+      x.fillStyle = css(c); x.beginPath(); x.moveTo(xa, y0); x.lineTo(xa + cw, y0); x.lineTo(xa + cw / 2, y1); x.fill();
+      c = mix(c, [10, 23, 67], 0.35); x.fillStyle = css(c); x.beginPath(); x.moveTo(xa + cw, y0); x.lineTo(xa + cw * 1.5, y1); x.lineTo(xa + cw / 2, y1); x.fill();
+    } }
+  phare(x); }
+function merB(x){ ciel(x);
+  var g = x.createLinearGradient(0, HZ, 0, H); g.addColorStop(0, '#0c1d4a'); g.addColorStop(1, '#1a4a90'); x.fillStyle = g; x.fillRect(0, HZ, W, H - HZ);
+  for (var i = 0; i < 260; i++) { var t = r(), y = HZ + 4 + Math.pow(t, 1.3) * (H - HZ), w = 6 + t * 38, xx = r() * W;
+    x.strokeStyle = r() > 0.45 ? '#f0a070' : '#6f93d8'; x.lineWidth = 1 + t * 3; x.beginPath(); x.moveTo(xx, y); x.quadraticCurveTo(xx + w / 2, y - w / 5, xx + w, y); x.stroke(); }
+  phare(x);
+  x.filter = 'blur(1.5px)';
+  [[170, 215, 80, 40], [350, 215, 90, 45], [260, 270, 150, 34]].forEach(function(m){ for (var i = 0; i < 160; i++) { var a = r() * 6.283, d = Math.sqrt(r()), px = m[0] + Math.cos(a) * m[2] * d, py = m[1] + Math.sin(a) * m[3] * d;
+    x.fillStyle = py < m[1] - m[3] * 0.1 ? (r() > 0.4 ? '#ffc796' : '#f3a07a') : (r() > 0.5 ? '#e8eefc' : '#8fb0e8'); x.beginPath(); x.arc(px, py, 3 + r() * 7, 0, 6.283); x.fill(); } });
+  x.filter = 'none'; }
+function merC(x){ ciel(x);
+  x.fillStyle = '#0c1d4a'; x.fillRect(0, HZ, W, H - HZ);
+  for (var k = 0; k < 9; k++) { var y = HZ + 6 + Math.pow(k / 9, 1.5) * (H - HZ - 10), amp = 4 + k * 2.2, per = 40 + k * 14;
+    x.beginPath(); x.moveTo(0, H);
+    for (var xx = 0; xx <= W; xx += 4) x.lineTo(xx, y + Math.sin(xx / per * 6.283 + k * 1.7) * amp);
+    x.lineTo(W, H); x.closePath(); x.fillStyle = css(mix([14, 36, 92], [28, 70, 140], k / 9)); x.fill();
+    x.strokeStyle = PECHE; x.lineWidth = 1.5 + k * 0.5; x.beginPath();
+    for (var xx2 = 0; xx2 <= W; xx2 += 4) { var yy = y + Math.sin(xx2 / per * 6.283 + k * 1.7) * amp; if (xx2 === 0) x.moveTo(xx2, yy); else x.lineTo(xx2, yy); } x.stroke(); }
+  phare(x); }
+
+// ---------- NUAGES ----------
+function bancA(x, base, w, sc, col, alpha){ x.save(); x.globalAlpha = alpha;
+  for (var m = 0; m * 150 * sc < W + 150; m++) { var cx = m * 150 * sc + r() * 40, rs = [];
+    for (var i = 0; i < 5; i++) { var t = i / 4, rad = (14 + Math.sin(t * Math.PI) * 24 + r() * 8) * sc; rs.push([cx + (t - .5) * 120 * sc, base - rad * .85, rad]); }
+    x.fillStyle = PECHE; rs.forEach(function(c){ x.beginPath(); x.arc(c[0], c[1], c[2], 0, 6.283); x.fill(); });
+    x.fillStyle = col; rs.forEach(function(c){ x.beginPath(); x.arc(c[0] + 3, c[1] + 6, c[2], 0, 6.283); x.fill(); });
+    x.fillRect(cx - 62 * sc, base - 10 * sc, 124 * sc, 16 * sc); } x.restore(); }
+function bancB(x, base, w, sc, col, alpha){ x.save(); x.globalAlpha = alpha; x.filter = 'blur(' + (2 + sc * 2) + 'px)';
+  for (var m = 0; m * 190 * sc < W + 190; m++) { var cx = m * 190 * sc + r() * 50;
+    for (var i = 0; i < 4; i++) { var rad = (26 + r() * 22) * sc, px = cx + (i - 1.5) * 50 * sc, py = base - rad * .8;
+      var g = x.createLinearGradient(0, py - rad, 0, py + rad); g.addColorStop(0, '#ffd8bc'); g.addColorStop(.45, '#a9b6ee'); g.addColorStop(1, col);
+      x.fillStyle = g; x.beginPath(); x.arc(px, py, rad, 0, 6.283); x.fill(); } } x.restore(); }
+function bancC(x, base, w, sc, col, alpha){ x.save(); x.globalAlpha = alpha;
+  for (var m = 0; m * 260 * sc < W + 260; m++) { var cx = m * 260 * sc + r() * 60, wd = (90 + r() * 50) * sc;
+    x.fillStyle = col; x.beginPath(); x.ellipse(cx, base - 6 * sc, wd, 15 * sc, 0, 0, 6.283); x.fill();
+    for (var i = 0; i < 3; i++) { x.beginPath(); x.ellipse(cx + (i - 1) * wd * .45, base - 14 * sc - i % 2 * 5 * sc, wd * .42, 14 * sc, 0, 0, 6.283); x.fill(); }
+    x.strokeStyle = PECHE; x.lineWidth = 1.6 * sc; for (var j = 0; j < 7; j++) { var sx = cx - wd * .8 + r() * wd * 1.6, sy = base - (16 + r() * 14) * sc; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + (10 + r() * 16) * sc, sy - 2 * sc); x.stroke(); }
+    x.fillStyle = 'rgba(255,199,150,.75)'; x.beginPath(); x.ellipse(cx + wd * .3, base + 10 * sc, wd * .5, 2.5 * sc, 0, 0, 6.283); x.fill(); } x.restore(); }
+function nuages(x, f){ ciel(x);
+  x.fillStyle = '#1b3a80'; x.fillRect(0, HZ, W, H - HZ);
+  f(x, 118, W, 1.25, '#1b2c6c', .9); f(x, 96, W, 1, '#223a7c', .95); f(x, 76, W, .8, '#2a468f', 1);
+  var g = x.createLinearGradient(0, HZ - 8, 0, HZ + 26); g.addColorStop(0, 'rgba(13,31,78,0)'); g.addColorStop(1, 'rgba(13,31,78,.9)'); x.fillStyle = g; x.fillRect(0, HZ - 8, W, 34);
+  phare(x); }
+
+function dessiner(id, f, extra){ var c = document.getElementById(id), x = c.getContext('2d'); s = 3; extra ? f(x, extra) : f(x); }
+dessiner('mA', merA); dessiner('mB', merB); dessiner('mC', merC);
+dessiner('nA', function(x){ nuages(x, bancA); }); dessiner('nB', function(x){ nuages(x, bancB); }); dessiner('nC', function(x){ nuages(x, bancC); });
+</script>
+</body>
+</html>

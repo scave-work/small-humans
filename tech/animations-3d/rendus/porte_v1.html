@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Porte (rendu Tunic inspiré)</title>
+<style>
+  html,body{margin:0;background:#111}
+  #scroller{height:600vh}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #hud{position:fixed;left:8px;top:8px;font:12px/1.4 monospace;color:#fff;background:#0008;padding:4px 8px;z-index:3;pointer-events:none}
+  #flash{position:fixed;inset:0;background:#ffd98a;opacity:0;pointer-events:none;z-index:2}
+  .serie #scroller{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/tech/animations-3d/lib/three/three.module.js","three/addons/":"/tech/animations-3d/lib/three/addons/"}}</script>
+</head>
+<body>
+<div id="scroller"></div>
+<div id="flash"></div>
+<div id="hud">p=0 · -- fps</div>
+<script type="module">
+import * as THREE from 'three';
+
+/* Porte habillée (rendu « Tunic inspiré » : aplats, blocs à facettes, lumière, sans contours).
+   Progression p de 0 à 1 (scroll). ?p=0,0.2,0.45,0.7,0.9,1 -> planche (progression figée, une tuile par valeur).
+   Palette : design/DA_TUNIC_INSPIRE.md. Aucun asset copié. */
+const OR = 0xffd98a;
+const lisse = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+const lerp = (a, b, t) => a + (b - a) * t;
+let graine = 7; const alea = () => (graine = (graine * 16807) % 2147483647) / 2147483647;   // aléa fixe : même image à chaque fois
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setScissorTest(true);
+renderer.setClearColor(0x14405a);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x2a4f6c, 14, 70);
+const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 140);
+
+const mat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true });
+const pierres = [0xf0e3b8, 0xe2d4a6, 0xf6ebc8, 0xd8c896].map(mat), pierreSombre = mat(0x8f8a78);
+const roche = [0x5a6f80, 0x4d6273, 0x66798a].map(mat);
+
+scene.add(new THREE.HemisphereLight(0x8fb0d8, 0x2a3a4a, 0.95));
+const lune = new THREE.DirectionalLight(0xe6ecff, 2.0);
+lune.position.set(-9, 12, 10);
+lune.castShadow = true;
+lune.shadow.mapSize.set(2048, 2048);
+Object.assign(lune.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 50 });
+lune.shadow.bias = -0.0006;
+scene.add(lune);
+const lumPorte = new THREE.PointLight(OR, 0, 30, 1.2);
+lumPorte.position.set(0, 1.8, 0.6);
+scene.add(lumPorte);
+
+// sol à facettes : plat devant la porte, légèrement vallonné ailleurs, couleurs par sommet
+{
+  const geo = new THREE.PlaneGeometry(90, 50, 45, 25); geo.rotateX(-Math.PI / 2);
+  const p = geo.attributes.position, col = [];
+  const vert = new THREE.Color(0x1f4a52), bleu = new THREE.Color(0x24445c), c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), z = p.getZ(i) + 19.5, loin = Math.max(Math.abs(x) - 4, 0) + Math.max(-z + 1, 0);
+    p.setY(i, (alea() - 0.5) * Math.min(loin * 0.12, 0.9));
+    col.push(...c.copy(vert).lerp(bleu, alea()).toArray());
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const sol = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+  sol.position.set(0, 0, 19.5); sol.receiveShadow = true; scene.add(sol);
+}
+// ciel : dégradé bleu nuit, bande orangée à l'horizon (la lumière dorée n'existe que derrière la porte)
+const ciel = document.createElement('canvas'); ciel.width = 4; ciel.height = 256;
+const gc = ciel.getContext('2d'), gg = gc.createLinearGradient(0, 0, 0, 256);
+gg.addColorStop(0, '#0b1f33'); gg.addColorStop(0.7, '#14405a'); gg.addColorStop(0.95, '#2d5878'); gg.addColorStop(1, '#8a6a58');
+gc.fillStyle = gg; gc.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(ciel);
+
+// porte : blocs de pierre empilés, légèrement décalés (formes Tunic : blocs à facettes)
+const bloc = (w, h, d, m, x, y, z, ry = 0) => {
+  const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.rotation.y = ry;
+  o.castShadow = o.receiveShadow = true; scene.add(o); return o;
+};
+const choix = () => pierres[Math.floor(alea() * pierres.length)];
+for (const cote of [-1, 1]) {
+  [[0, 1.4], [1.4, 1.4], [2.8, 1.4]].forEach(([y0, h], i) =>
+    bloc(0.7 + (alea() - 0.5) * 0.05, h - 0.03, 0.9 + (alea() - 0.5) * 0.12, choix(), cote * (1.55 + (alea() - 0.5) * 0.03), y0 + h / 2, 0, (alea() - 0.5) * 0.04));
+}
+bloc(2.2, 0.7, 0.9, pierres[0], -1.0, 3.95, 0); bloc(2.2, 0.7, 0.9, pierres[1], 1.0, 3.95, 0);
+bloc(0.9, 1.0, 0.95, pierres[2], 0, 4.1, 0.02);          // clef de voûte
+bloc(5.4, 0.35, 1.5, pierreSombre, 0, 0.175, 0.3);       // marche
+bloc(4.6, 0.3, 1.1, pierres[3], 0, 0.5, 0.15);           // seuil
+const lueur = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.0), new THREE.MeshBasicMaterial({ color: OR, fog: false }));
+lueur.position.set(0, 2.15, -0.35); scene.add(lueur);
+function battant(cote) {
+  const g = new THREE.Group(); g.position.set(cote * 1.2, 0.65, 0);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.95, 0.16), pierreSombre);
+  m.position.set(-cote * 0.6, 1.475, 0); m.castShadow = true; g.add(m); scene.add(g); return g;
+}
+const gauche = battant(-1), droit = battant(1);
+
+// rochers, sapins et collines en blocs (formes simples, ombres portées, brume de profondeur)
+const rocher = (x, z, s) => {
+  const o = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), roche[Math.floor(alea() * 3)]);
+  o.position.set(x, s * 0.5, z); o.scale.set(1 + alea() * 0.5, 0.7 + alea() * 0.4, 1 + alea() * 0.5); o.rotation.y = alea() * 6;
+  o.castShadow = o.receiveShadow = true; scene.add(o);
+};
+[[-5, 6, 1.0], [4.5, 9, 1.3], [-3.2, 14, 0.8], [6, 14, 1.1], [-7, 11, 1.5], [2.8, 5, 0.55], [-2.6, 4, 0.4], [9, 6, 0.9], [-10, 7, 1.0]].forEach(([x, z, s]) => rocher(x, z, s));
+const sapin = (x, z, s) => {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  const m = mat(new THREE.Color(0x1b4a4a).lerp(new THREE.Color(0x24566a), alea()));
+  for (let i = 0; i < 3; i++) {
+    const c = new THREE.Mesh(new THREE.ConeGeometry(1.3 - i * 0.3, 1.8, 6), m);
+    c.position.y = (0.9 + i * 1.1) * 1; c.castShadow = true; g.add(c);
+  }
+  g.scale.setScalar(s); scene.add(g);
+};
+[[-8, 2, 1.6], [-11, 8, 2.0], [10, 3, 1.8], [12, 10, 2.2], [-14, 15, 2.2], [14, 17, 2.4], [-6.5, 18, 1.8]].forEach(([x, z, s]) => sapin(x, z, s));
+[[-26, -14, 9], [-6, -20, 12], [16, -16, 10], [32, -12, 8]].forEach(([x, z, r]) => {          // collines lointaines derrière la porte
+  const o = new THREE.Mesh(new THREE.ConeGeometry(r, r * 0.9, 5), mat(0x1c3a52)); o.position.set(x, r * 0.35, z); o.rotation.y = alea() * 3; scene.add(o);
+});
+// nuages ronds et doux (boules à facettes, sombres)
+[[-20, 17, -18, 4], [10, 20, -24, 5], [26, 14, -14, 3.5], [-4, 24, -30, 6]].forEach(([x, y, z, r]) => {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(r * (0.55 + alea() * 0.35), 1), mat(0x35607e)); b.position.set((i - 1.5) * r * 0.8, alea() * r * 0.3, 0); g.add(b); }
+  scene.add(g);
+});
+
+// rayons : plans additifs en éventail devant la porte, dégradé d'opacité le long de la longueur
+const c = document.createElement('canvas'); c.width = 256; c.height = 4;
+const g2 = c.getContext('2d'), gr = g2.createLinearGradient(0, 0, 256, 0);
+gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#000'); g2.fillStyle = gr; g2.fillRect(0, 0, 256, 4);
+const alphaMap = new THREE.CanvasTexture(c);
+const rayons = [];
+for (let i = -3; i <= 3; i++) {
+  const geo = new THREE.PlaneGeometry(16, 3.4); geo.translate(8, 1.8, 0);
+  const mat = new THREE.MeshBasicMaterial({ color: OR, transparent: true, opacity: 0, alphaMap, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
+  const r = new THREE.Mesh(geo, mat); r.rotation.y = -Math.PI / 2 + i * 0.13; r.position.z = 0.2;
+  scene.add(r); rayons.push(r);
+}
+
+// état de la scène pour une progression p
+function pose(p) {
+  const ouv = lisse(0.08, 0.2, p) * 0.14 + lisse(0.2, 0.45, p) * 1.55;   // rad : 8° puis ~100°
+  gauche.rotation.y = ouv; droit.rotation.y = -ouv;
+  const eclat = lisse(0.15, 0.7, p);
+  lumPorte.intensity = eclat * 25;
+  rayons.forEach((r, i) => { r.material.opacity = eclat * (0.28 - Math.abs(i - 3) * 0.04); });
+  // caméra : plan large fixe, puis avance et traversée du seuil
+  const av = lisse(0.4, 0.7, p) * 0.5 + lisse(0.7, 0.95, p) * 0.5;
+  camera.position.set(0, lerp(2.3, 1.7, lisse(0.4, 0.9, p)), lerp(16, -2.5, av));
+  camera.lookAt(0, lerp(1.9, 1.8, p), -4);
+  return lisse(0.7, 0.92, p) * 0.95 + lisse(0.92, 1, p) * 0.05;       // opacité de l'éblouissement
+}
+
+const hud = document.getElementById('hud'), flash = document.getElementById('flash');
+const liste = (new URLSearchParams(location.search).get('p') || '').split(',').filter(Boolean).map(Number);
+
+function taille() { renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', taille); taille();
+
+if (liste.length) {
+  // planche : une tuile par valeur de p, éblouissement dessiné par-dessus la tuile
+  document.body.classList.add('serie'); flash.style.display = 'none';
+  const cols = liste.length > 3 ? 3 : liste.length, lignes = Math.ceil(liste.length / cols);
+  const W = innerWidth, H = innerHeight, tw = W / cols, th = H / lignes;
+  camera.aspect = tw / th; camera.updateProjectionMatrix();
+  renderer.setScissorTest(true);
+  const sup = document.createElement('div'); sup.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2';
+  document.body.appendChild(sup);
+  liste.forEach((p, k) => {
+    const fl = pose(p), x = (k % cols) * tw, y = H - (Math.floor(k / cols) + 1) * th;
+    renderer.setViewport(x, y, tw, th); renderer.setScissor(x, y, tw, th); renderer.render(scene, camera);
+    const t = document.createElement('div');
+    t.style.cssText = `position:absolute;left:${x}px;top:${H - y - th}px;width:${tw}px;height:${th}px;background:#ffd98a;opacity:${fl}`;
+    const l = document.createElement('div');
+    l.style.cssText = `position:absolute;left:${x + 6}px;top:${H - y - th + 6}px;font:13px monospace;color:#fff;background:#000a;padding:2px 6px`;
+    l.textContent = 'p=' + p; sup.append(t, l);
+  });
+  hud.style.display = 'none';
+  window.__pret = true;
+} else {
+  let cible = 0, cour = 0, dernier = performance.now(), n = 0, t0 = dernier;
+  const lire = () => { const m = document.documentElement.scrollHeight - innerHeight; cible = m > 0 ? scrollY / m : 0; };
+  addEventListener('scroll', lire); lire();
+  (function boucle(t) {
+    requestAnimationFrame(boucle);
+    const dt = (t - dernier) / 1000; dernier = t;
+    cour += (cible - cour) * (1 - Math.exp(-dt * 4));                  // rattrapage doux : mouvement solennel
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    flash.style.opacity = pose(cour);
+    renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight);
+    renderer.render(scene, camera);
+    n++; if (t - t0 > 500) { hud.textContent = 'p=' + cour.toFixed(2) + ' · ' + Math.round(n * 1000 / (t - t0)) + ' fps'; n = 0; t0 = t; }
+  })(dernier);
+}
+</script>
+</body>
+</html>

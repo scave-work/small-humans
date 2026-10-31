@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette phare de nuit (storyboard, 2D)</title>
+<style>
+:root{
+  --nuit-haut:#0b1f33; --nuit-bas:#14405a; --mer:#0f3550; --ecume:#bfe6e0; --ecume-chaude:#f3a07a;
+  --pierre:#cfc8b4; --ombre-pierre:#8f8a78; --lumiere:#ffd98a; --accent:#e8742c;
+  --rouge:#c8323a; --blanc:#ece9df; --encre:#1a1a1f; --roche:#2a2530;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#07131f;color:var(--ecume);font:16px/1.5 system-ui,sans-serif;padding:24px 16px}
+h1{font-size:1.2rem;margin:0 0 4px}
+p.note{margin:0 0 20px;opacity:.75;max-width:60ch}
+.rangee{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+figure{margin:0}
+figcaption{padding:8px 2px;font-size:.9rem}
+svg{width:100%;height:auto;display:block;border-radius:6px}
+.faisceau{animation:balai 6s ease-in-out infinite alternate;transform-origin:150px 62px}
+@keyframes balai{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+.vague{animation:houle 4s ease-in-out infinite alternate}
+.vague.b{animation-delay:-2s}
+@keyframes houle{from{transform:translateX(-10px)}to{transform:translateX(10px)}}
+/* grosse houle : monte, recouvre le bas du phare, retombe */
+.deferle{transform:translateY(34px);animation:deferle 7s ease-in-out infinite}
+.deferle.b{animation-delay:-3s;animation-duration:9s}
+@keyframes deferle{
+  0%,30%{transform:translateY(34px)}
+  52%{transform:translateY(-32px)}
+  68%{transform:translateY(-8px)}
+  100%{transform:translateY(34px)}
+}
+@media (prefers-reduced-motion:reduce){.faisceau,.vague,.deferle{animation:none}}
+</style>
+</head>
+<body>
+<h1>Phare dans la nuit : storyboard en 3 plans</h1>
+<p class="note">Maquette 2D légère pour valider l'ambiance (couleurs, formes, lumière, houle). La scène 3D viendra après ton « oui ». Style encre colorée, aucun asset copié.</p>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--nuit-haut)"/><stop offset="1" stop-color="var(--nuit-bas)"/>
+    </linearGradient>
+    <filter id="trait" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="3" result="b"/>
+      <feDisplacementMap in="SourceGraphic" in2="b" scale="2.2"/>
+    </filter>
+    <pattern id="hachures" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="var(--encre)" stroke-width=".7"/>
+    </pattern>
+    <clipPath id="tour"><polygon points="124,200 176,200 168,90 132,90"/></clipPath>
+
+    <g id="phare" filter="url(#trait)" stroke="var(--encre)" stroke-width="1.6" stroke-linejoin="round">
+      <polygon points="124,200 176,200 168,90 132,90" fill="var(--blanc)"/>
+      <g clip-path="url(#tour)" stroke="none">
+        <polygon points="110,190 190,150 190,168 110,208" fill="var(--rouge)"/>
+        <polygon points="110,150 190,110 190,128 110,168" fill="var(--rouge)"/>
+        <polygon points="110,110 190,70 190,88 110,128" fill="var(--rouge)"/>
+        <polygon points="152,80 180,80 180,210 152,210" fill="url(#hachures)" opacity=".55"/>
+      </g>
+      <rect x="114" y="196" width="72" height="24" fill="var(--pierre)"/>
+      <path d="M114 204h72M114 212h72M128 196v8M150 204v8M170 196v8M138 212v8" fill="none" stroke-width="1"/>
+      <rect x="145" y="203" width="10" height="17" rx="2" fill="var(--rouge)"/>
+      <rect x="146" y="165" width="6" height="9" fill="var(--lumiere)"/>
+      <rect x="150" y="125" width="6" height="9" fill="var(--lumiere)"/>
+      <!-- galerie du haut (passerelle) et rambarde -->
+      <rect x="118" y="84" width="64" height="7" fill="var(--ombre-pierre)"/>
+      <path d="M120 84v-11M180 84v-11M120 73h60M140 84v-11M160 84v-11" fill="none" stroke-width="1.2"/>
+      <!-- lanterne -->
+      <rect x="133" y="58" width="34" height="26" fill="var(--lumiere)"/>
+      <path d="M142 58v26M150 58v26M158 58v26M133 71h34" fill="none" stroke-width="1"/>
+      <polygon points="127,58 173,58 150,38" fill="var(--rouge)"/>
+      <line x1="150" y1="38" x2="150" y2="30" stroke-width="1.6"/>
+      <circle cx="150" cy="29" r="2" fill="var(--rouge)"/>
+    </g>
+
+    <g id="roc" fill="var(--roche)" stroke="var(--encre)" stroke-width="1.2">
+      <polygon points="96,226 108,208 122,214 130,222 100,230"/>
+      <polygon points="170,222 182,210 198,208 208,226 176,230"/>
+      <polygon points="120,226 136,218 164,218 180,226 150,232"/>
+    </g>
+
+    <g id="mer">
+      <rect x="0" y="210" width="300" height="90" fill="var(--mer)"/>
+      <path class="vague" d="M-20 232 q20-12 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="var(--ecume)" stroke-width="3"/>
+      <path class="vague b" d="M-20 262 q20-12 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="var(--ecume)" stroke-width="3" opacity=".6"/>
+    </g>
+
+    <!-- houle de premier plan : recouvre par moments le pied du phare -->
+    <g id="houle">
+      <path d="M-30 222 q15-9 30-4 t30-2 t30 4 t30-6 t30 4 t30-4 t30 6 t30-4 t30 2 t30-4 t30 4 t30-4 t30 3 V320 H-30Z" fill="#134566"/>
+      <path d="M-30 222 q15-9 30-4 t30-2 t30 4 t30-6 t30 4 t30-4 t30 6 t30-4 t30 2 t30-4 t30 4 t30-4 t30 3" fill="none" stroke="var(--ecume)" stroke-width="3.5"/>
+      <g fill="var(--ecume-chaude)" opacity=".85">
+        <circle cx="40" cy="212" r="2"/><circle cx="96" cy="208" r="2.4"/><circle cx="148" cy="210" r="1.8"/>
+        <circle cx="205" cy="207" r="2.2"/><circle cx="262" cy="211" r="2"/>
+      </g>
+    </g>
+  </defs>
+</svg>
+
+<div class="rangee">
+  <figure>
+    <svg viewBox="0 0 300 300" role="img" aria-label="Le phare allumé dans la nuit, la houle recouvre son pied">
+      <rect width="300" height="300" fill="url(#ciel)"/>
+      <circle cx="240" cy="50" r="14" fill="var(--pierre)" opacity=".9"/>
+      <polygon class="faisceau" points="150,62 -40,20 -40,110" fill="var(--lumiere)" opacity=".28"/>
+      <use href="#mer"/>
+      <use href="#phare"/><use href="#roc"/>
+      <use href="#houle" class="deferle"/>
+      <use href="#houle" class="deferle b" x="-18" y="14"/>
+    </svg>
+    <figcaption><b>Plan 1.</b> Le phare allumé ; la houle monte et recouvre son pied, puis retombe.</figcaption>
+  </figure>
+
+  <figure>
+    <svg viewBox="0 0 300 300" role="img" aria-label="Un bonhomme sur la passerelle du haut, près de la lanterne">
+      <rect width="300" height="300" fill="url(#ciel)"/>
+      <polygon class="faisceau" points="150,62 -40,20 -40,110" fill="var(--lumiere)" opacity=".28"/>
+      <use href="#mer"/>
+      <use href="#phare"/><use href="#roc"/>
+      <g transform="translate(124 60)">
+        <rect x="0" y="8" width="10" height="16" rx="2" fill="var(--accent)" stroke="var(--encre)" stroke-width="1"/>
+        <circle cx="5" cy="4" r="5" fill="var(--pierre)" stroke="var(--encre)" stroke-width="1"/>
+        <polygon points="0,0 10,0 5,-8" fill="var(--accent)" stroke="var(--encre)" stroke-width="1"/>
+      </g>
+      <use href="#houle" class="deferle"/>
+      <use href="#houle" class="deferle b" x="-18" y="14"/>
+    </svg>
+    <figcaption><b>Plan 2.</b> Le bonhomme marche sur la passerelle du haut, face au vent et aux vagues.</figcaption>
+  </figure>
+
+  <figure>
+    <svg viewBox="0 0 300 300" role="img" aria-label="Le bonhomme rentre dans la lanterne par la porte éclairée">
+      <rect width="300" height="300" fill="url(#ciel)"/>
+      <polygon class="faisceau" points="150,62 -40,20 -40,110" fill="var(--lumiere)" opacity=".28"/>
+      <use href="#mer"/>
+      <use href="#phare"/><use href="#roc"/>
+      <rect x="144" y="66" width="12" height="18" rx="2" fill="#fff3c8" stroke="var(--encre)" stroke-width="1"/>
+      <g transform="translate(147 70) scale(.5)">
+        <rect x="0" y="8" width="10" height="16" rx="2" fill="var(--accent)"/>
+        <circle cx="5" cy="4" r="5" fill="var(--pierre)"/>
+      </g>
+      <use href="#houle" class="deferle"/>
+      <use href="#houle" class="deferle b" x="-18" y="14"/>
+    </svg>
+    <figcaption><b>Plan 3.</b> Il rentre dans la lanterne : la porte s'éclaire, le phare reste allumé.</figcaption>
+  </figure>
+</div>
+</body>
+</html>
