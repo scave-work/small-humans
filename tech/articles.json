@@ -1,13 +1,33 @@
 [
   {
-    "titre": "Cheminement des animations 3D",
+    "titre": "Animation 3D n°3 : la porte de pierre style Tunic",
     "date": "2026-10-31",
     "sujets": [
       "IA",
       "Projets"
     ],
-    "resume": "Du phare à la porte de pierre : chaque version, la consigne, le modèle, le rendu, ce qui a été gardé ou abandonné.",
-    "lien": "animations-3d/"
+    "resume": "Une porte qui s'ouvre au scroll, puis la recherche d'un décor crédible : version par version, rendus en direct.",
+    "lien": "animations-3d/porte/"
+  },
+  {
+    "titre": "Animation 3D n°2 : le phare dans la tempête",
+    "date": "2026-10-30",
+    "sujets": [
+      "IA",
+      "Projets"
+    ],
+    "resume": "Un phare, une grosse vague, construits couche par couche puis abandonnés : chaque étape se revoit en direct.",
+    "lien": "animations-3d/phare/"
+  },
+  {
+    "titre": "Animation 3D n°1 : le prototype Tunic (île et renard)",
+    "date": "2026-10-30",
+    "sujets": [
+      "IA",
+      "Projets"
+    ],
+    "resume": "Le point de départ : un premier essai three.js style Tunic, à revoir en direct.",
+    "lien": "animations-3d/tunic/"
   },
   {
     "titre": "Comment ce site a été fait",
