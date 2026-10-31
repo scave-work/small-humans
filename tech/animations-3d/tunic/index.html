@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cheminement des animations 3D – Small Humans</title>
+<link rel="stylesheet" href="../cheminement.css">
+</head>
+<body data-sujet="tunic">
+<header class="haut">
+<p><a href="../../">← Tech &amp; IA</a></p>
+<h1 id="titre"></h1>
+<p class="date">Cheminement des animations 3D · 30 octobre 2026</p>
+<p class="intro" id="intro"></p>
+<nav class="sujets" id="sujets" aria-label="Les trois sujets"></nav>
+<p class="intro aide">Cliquez une image ou un bouton « ▶ » pour revoir le rendu en direct (le moteur three.js ne se charge qu'à ce moment). Données : <a href="../cheminement.json"><code>cheminement.json</code></a>.</p>
+<div class="lg"><span class="garde"><span class="pt"></span>gardé</span><span class="abandonne"><span class="pt"></span>abandonné</span><span class="en_attente"><span class="pt"></span>en attente de Simon</span></div>
+</header>
+<div class="mise">
+<aside aria-label="Arbre des versions"><h2>Arbre des versions</h2><div id="arbre"></div></aside>
+<main>
+<div id="fiches"></div>
+<h2>Leçons à réutiliser</h2>
+<ul class="lec" id="lecons"></ul>
+<p class="aide">Les captures sont refaites à partir des anciennes versions conservées dans l'atelier ; les rendus en direct sont ces mêmes versions. Le modèle indiqué est celui de la session principale ; l'effort n'est pas lisible dans les traces.</p>
+</main>
+</div>
+<div id="visio" role="dialog" aria-modal="true" aria-label="Rendu en direct">
+<div id="vbar"><span class="tit" id="vtit"></span><span id="vbtn" class="btns"></span><a id="vopen" href="#" target="_blank" rel="noopener">Plein écran ↗</a><button id="vclose">Fermer ✕</button></div>
+<iframe id="vframe" title="Rendu three.js" src="about:blank" allow="fullscreen"></iframe>
+<div id="vnote"></div>
+</div>
+<script src="../cheminement.js"></script>
+</body>
+</html>
