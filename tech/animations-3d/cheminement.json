@@ -24,7 +24,24 @@
           "label": "Prototype en direct",
           "url": "rendus/tunic.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Low-poly par primitives three.js : CylinderGeometry, ConeGeometry, BoxGeometry, DodecahedronGeometry et IcosahedronGeometry, sans modèle importé ; la fonction part() appelle toNonIndexed() puis computeVertexNormals() pour des facettes nettes.",
+        "Matériaux « cartoon » : MeshToonMaterial avec une gradientMap (DataTexture à 3 valeurs 70, 150, 255, filtre Nearest) qui donne 3 tons d'ombre ; les contours sont une coque inversée (MeshBasicMaterial BackSide, couleur 0x1d2a1b, échelle 1.02 à 1.1).",
+        "Éclairage : HemisphereLight (ciel crème, sol vert, intensité 1.25) plus un DirectionalLight « soleil » (intensité 2.6) avec ombres PCFSoft en 2048 px.",
+        "Océan : PlaneGeometry 140 unités, 90 x 90 segments ; à chaque image, le JS recalcule la hauteur de chaque sommet par somme de trois sinusoïdes (position de départ conservée dans w0), puis recalcule les normales. Un anneau d'écume (RingGeometry) pulse en échelle et en opacité.",
+        "Renard : groupe d'objets simples (corps, ceinture, tête, museau et oreilles en cônes, queue en deux cônes, quatre pattes). Les pattes oscillent en sinus et il marche en cercle de rayon 4.6.",
+        "Caméra et scroll : PerspectiveCamera à 26 degrés ; la page fait 500 vh et le scroll (u de 0 à 1) fait varier la distance et la hauteur de l'orbite, puis la caméra se recentre sur le renard à partir de u = 0.6. La légende et une barre de progression suivent le scroll.",
+        "Ambiance : brouillard (Fog 70 à 150) de la même couleur que le fond #f1dcae, lucioles en Points additifs, taches de lumière sous l'île via une texture canvas en alphaMap. Lecture du code, non mesuré à l'œil : palette chaude unique, aplats, contours sombres et brume qui fond le lointain, ce qui pourrait expliquer l'effet voulu.",
+        "Import : l'original chargeait three.js par CDN ; dans cette copie publique, l'importmap pointe vers la copie locale (seule modification). window.setState(t, u) permet de figer une image pour les captures."
+      ],
+      "mecanisme": [
+        "D'après SESSION_CLOUD.md, la session cloud du 2026-10-30 a d'abord fait des recherches (skills communautaires cloudai-x/threejs-skills, MCP Three.js, choix CSS 3D ou WebGL), puis a produit un prototype HTML unique testé en rendu logiciel SwiftShader.",
+        "Le prototype a été construit par couches et corrigé à partir de captures à différents scrolls : flatShading remplacé par toNonIndexed + computeVertexNormals (non supporté par MeshToonMaterial), brume réduite, z-index de la légende, arbres repositionnés devant le personnage.",
+        "Non établi : les références (david.li, zenphoton, dribbble) n'ont pas pu être ouvertes par la session cloud ; aucun tutoriel direct sur le style Tunic n'a été trouvé ; la performance GPU n'a pas été mesurée ; les hypothèses de modèle et d'effort n'ont pas été testées.",
+        "Non établi : le prompt complet de la session d'origine n'est pas recopié dans les notes (seul un résumé de la méthode l'est), et Simon n'a pas dit si le rendu lui plaît."
+      ],
+      "consigne_claude": "J'ai fait le site web https://small-humans.github.io/ avec ton aide avec le repo small-humans-atelier et la prod small-humans. J'ai voulu cette fois-ci partir sur un style différent, plus cartoon / tunique. Regarde tout le transcript et les résultats de cette session cloud / base-methode-ia : animation 3d pour site web. Avant de commencer toute réalisation, relis la discussion et le prompt et résultat du site. Ce que j'aimerais faire : repartir sur un nouveau dépôt privé + 1 publique contenant toutes les idées de génération sur sites web avec de l'animation qu'il est possible de faire avec toi ; j'ai besoin d'apprendre à bien générer des prompts pour arriver aux résultats souhaités sans faire 3000 allers-retours ; j'ai besoin de savoir quand on peut utiliser quel modèle avec quel effort pour réaliser [...]"
     },
     {
       "id": "maquette",
@@ -52,7 +69,20 @@
           "label": "Maquette 2D : composition",
           "url": "rendus/phare_maquette_composition.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Pas de three.js : deux maquettes 2D en SVG. phare_maquette_3plans.html est un storyboard en 3 plans (style encre colorée), phare_maquette_composition.html reprend la composition « tempête au crépuscule ».",
+        "La houle est une polyligne SVG (path avec des commandes q et t répétées, trait couleur écume). Le faisceau est un polygone à opacité 0,28.",
+        "Le côté ombré de la tour utilise un motif de hachures à 45 degrés. La version composition ajoute un motif de briques (pattern 12 x 7).",
+        "Il n'existe pas de version précédente à comparer : c'est le point de départ visuel avant les couches 3D c1 à c5."
+      ],
+      "mecanisme": [
+        "Consigne de Simon à 18:38:27 UTC : une démo 3D d'un phare de nuit qui affronte des vagues, avec un bonhomme sur la passerelle extérieure qui rentre, DA « style le jeu Tunic ». Claude a répondu par une maquette 2D de 3 plans (fichier écrit à 18:39:03 UTC) avant toute 3D.",
+        "D'après le message de 18:39:27 UTC, la maquette montre le phare allumé avec son faisceau, le bonhomme sur la passerelle, puis le retour par la porte éclairée. D'après le message de 18:49:20 UTC, Claude a décrit la 3D comme possible en blocs facettés et éclairage simple, sans la construire.",
+        "Avant d'écrire, Claude a listé le dossier animation3d et lu des notes par commande Bash (18:38:33 UTC), puis a créé le brouillon de profil design/DA_TUNIC_INSPIRE.md (18:38:43 UTC). Il a ouvert la maquette dans le navigateur intégré (message de 18:41:32 UTC). Aucune capture n'apparaît dans le transcript pour la composition (non établi).",
+        "Les corrections sont datées : bonhomme sur la passerelle et bord de vague (18:45:56 UTC), puis composition en crépuscule bleu (18:47:53 UTC). Le message de Simon qui a déclenché la composition n'est pas dans le transcript (non établi)."
+      ],
+      "consigne_claude": "Consigne de Simon (18:38:27 UTC) : « Ce serait une démo pour moi. Ce serait un phare plutôt dans la nuit qui serait allumé, bravant des vagues où l'on y verrait un bonhomme sur la passerelle extérieure du phare et rentrer. DA style le jeu Tunic. Scène 3D ». Règles présentes dans le contexte : CLAUDE.md racine, règle 7 (Simon valide l'esthétique : proposer une maquette avant de généraliser un style) et règle 10 (fiche avant de construire). animation3d/CLAUDE.md lu par Claude à 18:08:40 UTC (contenu non recopié ici)."
     },
     {
       "id": "c1",
@@ -79,7 +109,21 @@
           "label": "Planche : 3 styles de nuage",
           "url": "rendus/phare_c1_planche_nuages.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Renderer : new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true}), setPixelRatio(min(devicePixelRatio, 2)). Caméra PerspectiveCamera(30, aspect, 0.1, 400).",
+        "Ciel : canvas 2 x 256 avec un dégradé vertical #3a6ccc, #1d3f88, #0d1f4e, transformé en CanvasTexture (SRGBColorSpace) puis mis en scene.background.",
+        "Nuages : texture canvas 2048 x 512 dessinée à la main. 6 cumulus séparés, sommets en cercles arc() couleur #ffd9a8, corps en dégradé #4a5f9c vers #14225c décalé de (14, 28) px, dessous coupé net à la ligne de base, lambeaux clairs, bande sombre d'horizon.",
+        "Le banc est un PlaneGeometry 170 x 42,5 en MeshBasicMaterial transparent avec depthWrite false. Aucune lumière, aucun brouillard, aucune géométrie de mer dans cette version.",
+        "Animation : requestAnimationFrame avec dt plafonné à 0,1 s. La texture glisse de 0,004 par seconde (texNuages.offset.x). prefers-reduced-motion rend une seule image."
+      ],
+      "mecanisme": [
+        "Le plan de la couche 1 (ciel et nuages doux) est proposé à 18:51:49 UTC avec la demande de dire « oui ». La réponse de Simon « Oui, couche 1 » est datée 18:51:57 UTC.",
+        "Avant d'écrire, Claude a grepé tunic.html (three, importmap, reduced, webgl) à 18:52:00 UTC pour reprendre sa structure. La page a été ouverte dans le navigateur intégré à 18:52:23 UTC, avec captures d'écran à l'échelle 0,7 et lecture des erreurs console.",
+        "Les nuages ont changé quatre fois après « Le design des nuage est vraiment pas beau » (18:55:55 UTC) et « Encore moche » (18:56:53 UTC) : boules 3D en galets (18:52), sprites dessinés (18:56:43), planche de 3 styles A, B, C (18:57:26), puis banc de cumulus de la photo (18:59:28 et 19:01:01 UTC).",
+        "Claude a écrit « C'est le troisième essai sur les nuages, donc j'arrête d'itérer à l'aveugle » (18:57:26 UTC) : c'est le changement d'approche, de l'essai direct vers une comparaison visuelle. La correspondance phare_c1.html avec le commit 8e570dc (19:01:01 UTC) repose sur le contenu (6 cumulus séparés, dessous plats), pas sur un hash. phare_c1_planche_nuages.html correspond à la planche du 18:57:26 par le nom seulement (contenu non comparé)."
+      ],
+      "consigne_claude": "Consigne de Simon : « Oui, couche 1 » (18:51:57 UTC), après la proposition de Claude de démarrer la couche 1 (ciel et nuages doux) en rendu léger. Retours suivants sur les nuages : « Le design des nuage est vraiment pas beau » (18:55:55 UTC) et « Encore moche » (18:56:53 UTC). Cadre reçu : la scène 3D de la consigne du 18:38:27 UTC, le style Tunic, et le fichier design/DA_TUNIC_INSPIRE.md écrit par Claude comme brouillon à valider (notes de décisions de Simon ajoutées par Claude). Règle 7 du CLAUDE.md racine : valider l'esthétique avant de généraliser."
     },
     {
       "id": "c2",
@@ -102,7 +146,21 @@
           "label": "Couche 2 en direct",
           "url": "rendus/phare_c2.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Brouillard nouveau : scene.fog = THREE.Fog(0x16296a, 230, 540), pour fondre la mer dans l'horizon.",
+        "Mer : PlaneGeometry(700, 430, 117, 72) tourné à plat avec rotateX(-PI/2), puis toNonIndexed() pour avoir une couleur par triangle (facettes). Position z = -115. Matériau MeshBasicMaterial({vertexColors: true}), sans lumière.",
+        "Vagues : 4 trains de houle [angle, longueur d'onde, amplitude, vitesse] = [0, 95, 7, 15], [-0.35, 62, 4.5, 12], [0.5, 40, 2.6, 10], [0.15, 22, 1.2, 8]. Hauteur = somme de am x mod x (2.2 s² - 0.75), avec s = 0.5 + 0.5 sin(phase) et phase = k(dx x + dz z) - w t.",
+        "Couleur : rampe de 5 teintes selon la hauteur (#0a1743 à #e8eefc). Éclairage calculé à la main (N.dot(lum), lum = normalize(-0.5, 0.55, 0.65)), pentes exagérées par 2.6, puis mélange vers #ffc796 sur les crêtes éclairées. Variation de 0.88 à 1.12 par facette.",
+        "Nuages : même canvas qu'en c1 (6 cumulus, sommets pêche, corps marine). Le plan passe de 170 x 42.5 à 298 x 74.5 et la texture glisse à 0.004 par seconde."
+      ],
+      "mecanisme": [
+        "Consigne « Oui, couche 2 » à 19:01:07 UTC. Le plan des couches (1 ciel et nuages, 2 mer, 3 phare, 4 vague et écume, 5 faisceaux et flou) est annoncé dans les messages de 18:51:49 et de 19:17:05 UTC.",
+        "Retour de Simon à 19:05:56 UTC : reflets de couleur différents entre la mer et les nuages, vagues qui vont vers le large mal rendues, et un lien vidéo. Claude a répondu à 19:07:25 UTC qu'il avait regardé la vidéo et décrit une houle en longues lignes parallèles. Ce que la vidéo montre n'est pas vérifiable dans le transcript.",
+        "Changement d'approche : les collines rondes dans toutes les directions, décrites à 19:04:11 UTC, sont remplacées par 4 trains de houle parallèles et une teinte commune #ffc796 (19:07:25 UTC). Claude a relu un extrait du fichier (Read à 19:03:18 UTC) avant de corriger.",
+        "Vérification annoncée : une image fixe en 1280 x 720 sans erreur console (19:04:11 UTC). Le mouvement n'est pas vérifié, comme le dit le même message."
+      ],
+      "consigne_claude": "Consigne de Simon : « Oui, couche 2 » (19:01:07 UTC). Retour du 19:05:56 UTC : « La couleur des reflet de la lumière des vagues de l'eau et des nuage est différent en couleur, c'est pas bon. De plus, le rendu où les vagues vont vers le large est pas bon. Regarde cette vidéo » (lien YouTube non recopié). Cadre : le style final Tunic noté dans design/DA_TUNIC_INSPIRE.md (commit 3803fde à 18:51:39 UTC) et la règle 7 du CLAUDE.md racine (valider l'esthétique)."
     },
     {
       "id": "c3",
@@ -125,7 +183,21 @@
           "label": "Couche 3 en direct",
           "url": "rendus/phare_c3.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Lumières nouvelles : THREE.HemisphereLight(0x7f9be8, 0x1a2a66, 1.1) et THREE.DirectionalLight(#ffc796, 2.4) placée à lum x 120. La lumière rasante a la même couleur que la mer et les nuages.",
+        "Matériau toon : MeshToonMaterial({color, gradientMap}) avec un DataTexture 3 x 1 (valeurs 70, 150, 255, NearestFilter). Un matériau par couleur, mis en cache.",
+        "Facettes plates : facette(geo) = toNonIndexed() puis computeVertexNormals(). Le phare est fait de CylinderGeometry à 8 côtés, BoxGeometry et ConeGeometry. Les rochers sont des IcosahedronGeometry(r, 0).",
+        "Phare : soubassement, fût (CylinderGeometry 5.3 à 7.6, hauteur 24), 3 ceintures à y = 12, 20, 28, petit bâtiment accolé, passerelle avec 8 gardes-corps, lanterne MeshBasic 0xeaf4ff, toit rouge #c8323a, fenêtres allumées.",
+        "Halo : Sprite avec CanvasTexture et AdditiveBlending, échelle 26. Personnage : 3 blocs (corps orange #e8742c, tête icosaèdre, capuche cône) dans un groupe dont l'échelle x et z vaut 1/0.68, pour annuler un étirement du phare (commentaire du code)."
+      ],
+      "mecanisme": [
+        "Consigne « Oui, couche 3 » à 19:08:05 UTC. Claude a commité la couche 3 à 19:09:18 UTC (commit 79cb7c3) : phare en blocs facettés sur rochers, lanterne, halo, bonhomme.",
+        "Le style vient des trois images de Simon, décrites par Claude à 18:49:20 UTC (phare à l'encre, peinture de tempête, « île flottante » Tunic). Claude a retenu une tour rouge brique élancée d'après la peinture (19:09:25 UTC).",
+        "Vérification : une image fixe seulement (message de 19:09:25 UTC). Claude dit ne pas avoir pu juger le bonhomme sur la capture.",
+        "Ce qui change : c3 ajoute lumières et matériaux toon. La mer et les nuages gardent le code de c2 (mêmes lignes de nuage, même plan 298 x 74.5). Le retour « la position des nuages n'est pas bonne » (19:09:59 UTC) mène au commit ef1c660 (19:10:32 UTC), donc c3 précède ce déplacement (la correspondance par numéro de commit est non établie)."
+      ],
+      "consigne_claude": "Consigne de Simon : « Oui, couche 3 » (19:08:05 UTC), puis « la position des nuages n'est pas bonne » (19:09:59 UTC). Cadre : les trois images de référence de Simon (décrites le 18:49:20 UTC), le style Tunic noté dans design/DA_TUNIC_INSPIRE.md, et la règle 7 du CLAUDE.md racine (valider l'esthétique)."
     },
     {
       "id": "c4",
@@ -152,7 +224,21 @@
           "label": "Après correction (écume réduite)",
           "url": "rendus/phare_c4_corrige.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Vague cyclique : surge(t) = lisse(0, 1.4, tl) x (1 - lisse(2.5, 5.5, tl)) sur T_VAGUE = 9 s. La hauteur reçoit surgeNow x 17 x exp(-(x² + (z-115)²) / 578), une bosse centrée sur le phare.",
+        "Écume : THREE.InstancedMesh de 650 instances (NP = 650 dans ce fichier), d'un icosaèdre facetté de rayon 1. MeshBasicMaterial blanc, couleur par instance (setColorAt) avec 4 teintes dont #ffc796.",
+        "Mouvement de l'écume : actualiserMousse(t) recalcule chaque matrice avec un Object3D. Âge = tl - (0.3 à 2.1). Trajectoire y = 14 + (20 à 50) x age - 11 x age². Taille = (2 à 5.8) x sqrt(sin(pi x age / vie)). Les blocs ne sont visibles que si y > 12.",
+        "Pseudo-aléatoire : hash(a, b, c) = fract(sin(...) x 43758.5453), stable pour chaque vague (paramètre cyc).",
+        "Mode calme : actualiserMer(3.2) et actualiserMousse(3.2) pour une image fixe pendant la grosse vague."
+      ],
+      "mecanisme": [
+        "Consigne « elle est pas assez complète mais go couche 4 » à 19:10:57 UTC. Claude a commité la couche 4 à 19:12:26 UTC (0aea345) : vague cyclique et gerbes d'écume.",
+        "Vérification annoncée : deux images fixes en 1280 x 720 sans erreur console. Le cycle complet et la taille des blocs n'ont pas été revus (message de 19:12:26 UTC).",
+        "Retour de Simon à 19:13:33 UTC : nuages qui défilent trop, pas assez nombreux, blocs d'écume énormes. Claude a répondu à 19:14:20 UTC avec des réglages chiffrés (11 nuages au lieu de 6, banc environ six fois plus lent, 1100 blocs au lieu de 650, blocs environ quatre fois plus petits). C'est phare_c4_corrige.html, ce que confirme le diff entre les deux fichiers.",
+        "Après « très très moche » (19:14:59 UTC), Claude a dit à 19:17:05 UTC que c'était un premier jet non validé, avec la mer et les nuages encore loin de la peinture."
+      ],
+      "consigne_claude": "Consigne de Simon : « elle est pas assez complète mais go couche 4 » (19:10:57 UTC). Retour du 19:13:33 UTC : « les nuages défilent trop, pas assez nombreux, plus supposée, les blocs d'écume sont littéralement trop gros, n'importe quoi ». Le mot « supposée » est repris tel quel, Claude ne l'a pas compris (message de 19:14:20 UTC). Cadre : les images de référence de Simon, la DA Tunic notée dans design/DA_TUNIC_INSPIRE.md, la règle 7 du CLAUDE.md racine."
     },
     {
       "id": "c5",
@@ -179,7 +265,21 @@
           "label": "Planches : mer et nuages",
           "url": "rendus/phare_c5_planches.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Faisceaux : 2 x ConeGeometry(9, 140, 16, 1, true), translatés puis tournés (rotateZ PI/2). Couleurs RGBA par sommet, alpha 0.32 qui décroît vers la pointe. MeshBasicMaterial additif, DoubleSide, depthWrite false. Le groupe tourne de dt x 0.7 rad/s (un tour en environ 9 s).",
+        "Flou de profondeur : EffectComposer, RenderPass, un ShaderPass maison et OutputPass. Cible WebGLRenderTarget en HalfFloat avec samples 4 (antialiasing). Le shader moyenne 8 directions x 2 rayons, avec rayon = smoothstep(0.14, 0.5, |uv.y - 0.5|) x 3.2 : flou fort en haut et en bas de l'image.",
+        "Le flou n'est activé que si matchMedia '(min-width: 900px) and (pointer: fine)' et sans mouvement réduit. Les modules three/addons sont chargés à la demande, avec try/catch : en cas d'échec, rendu direct.",
+        "Nuages refaits en puffs : canvas avec filter blur(3px), halo rgba(214, 226, 255, .85) de 7 px, dessus #ffc796, corps en dégradé #a9b8ee vers #34488f. Trois plans superposés : banc à z = -80, banc de fond à z = -140 teinté 0x8a9cd0 (scale 1.45, repeat.x = -1), banc avant à z = -45 (scale 0.8).",
+        "Mer, vague et écume : même code que c4_corrige (grille 117 x 72, 4 trains, rampe, surge, 1100 instances, tailles 0.45 à 1.45). Constantes et formules contrôlées sur les lignes clés, identiques."
+      ],
+      "mecanisme": [
+        "Consigne de Simon à 19:14:59 UTC : « va à la fin des couches ». La couche 5 (faisceaux et flou) est commitée à 19:16:40 UTC (5f8ec3c). Simon demande à 19:17:00 UTC si c'est le rendu final, puis « go les planches » à 19:17:41 UTC.",
+        "Claude a répondu à 19:17:05 UTC que ce n'était pas le rendu final et a listé ce qui manquait : réglages de la mer, des nuages, des rochers, et vérification du mouvement. Il a fait des planches 2D pour choisir mer et nuages avant de coder (19:18:39 UTC, planches.html). phare_c5_planches.html correspond à ces planches par le nom seulement.",
+        "Après les planches, Claude a refait les nuages en puffs flous sur 3 plans « dans le style de ton image », et gardé la mer A (19:21:29 UTC). Le message de Simon qui a validé ce choix n'apparaît pas dans le transcript (non établi). Le message suivant « oui, contexte à 365k » (19:21:50 UTC) ne porte pas sur ce choix.",
+        "Vérification annoncée : une image fixe en 1280 x 720 sans erreur console (19:21:29 UTC). Le mouvement n'est pas vérifié. Aucune capture du flou ni des faisceaux n'apparaît dans le transcript (non établi)."
+      ],
+      "consigne_claude": "Consigne de Simon : « oui, contexte à 365k » (19:21:50 UTC, hors sujet du choix), « go les planches » (19:17:41 UTC) et « va à la fin des couches » (19:14:59 UTC). Retours : « que je comprenne bien, c'est le rendu final ça ? » (19:17:00 UTC). Cadre : design/DA_TUNIC_INSPIRE.md (brouillon de Claude, 18:38:43 UTC, avec les décisions notées), règle 7 du CLAUDE.md racine (valider l'esthétique par une maquette avant de généraliser)."
     },
     {
       "id": "gris",
@@ -208,7 +308,23 @@
           "label": "Les 6 instants à la suite",
           "url": "rendus/porte_gris.html?p=0,0.2,0.45,0.7,0.9,1"
         }
-      ]
+      ],
+      "techniques": [
+        "Mouvement seul sur formes grises : matériau MeshStandardMaterial via la fonction gris(c) (roughness 1, flatShading true) pour le sol, les battants et les rochers.",
+        "Éclairage : HemisphereLight (0x8aa0c0 / 0x30363d, intensité 1.1), DirectionalLight blanche d'intensité 1.2, et une PointLight dorée OR = 0xffd98a dont l'intensité vaut eclat × 25 (c'est la lueur de la porte).",
+        "Brouillard THREE.Fog(0x1c2530, 18, 60) et fond en CanvasTexture (ciel).",
+        "Battants : deux BoxGeometry 1.2 × 3.6 × 0.16 dans des Group, rotation.y = ±ouv, avec ouv = lisse(0.08, 0.2, p) × 0.14 + lisse(0.2, 0.45, p) × 1.55 rad (environ 8 degrés puis 100 degrés).",
+        "Rayons dorés : 5 plans 16 × 3.4 avec alphaMap (CanvasTexture), MeshBasicMaterial additif, opacité = eclat × (0.28 − |i − 3| × 0.04).",
+        "Progression p de 0 à 1 lue au scroll (div de 600vh, p = scrollY / (scrollHeight − innerHeight)), lissée dans la boucle ; le paramètre ?p=0,0.2,… fige une planche de captures.",
+        "Caméra : plan large fixe puis avance de z = 16 à z = −2.5 ; éblouissement final lisse(0.7, 0.92, p) × 0.95. Version de départ : pas d'ombre, pas de décor, pas de couleur."
+      ],
+      "mecanisme": [
+        "Phase 0 du 31/10 à 14:03 UTC : lecture de 00_CONTEXTE.md, animation3d/CLAUDE.md, animation3d/PLAN_ACTION.md, recherche dans docs/METHODE.md (section « Évolution v2 »), lecture de design/DA_TUNIC_INSPIRE.md (60 premières lignes) puis de docs/FICHE_MODELE.md (14:03 à 14:07).",
+        "Avant de coder, deux WebSearch et trois WebFetch sur le rendu Tunic et sur OutlineEffect (14:04). Le message de 14:04 propose trois sujets, dont la porte, et classe chacun en type A (animation) ou B (décor).",
+        "Simon choisit « 3 » (14:07), puis valide la séquence (« S, séquence ok », 14:10) et donne son « Oui » (14:12). Le code n'est écrit qu'après ce « Oui », selon la consigne du projet.",
+        "Vérification : navigation vers la planche ?p=0,0.2,0.45,0.7,0.9,1 (14:13). Le premier jet a un fond doré dès p=0 et un blanc à p=0,7 ; l'assistant les corrige avant commit (message de 14:13). La boucle en direct n'est pas testée (message de 14:14)."
+      ],
+      "consigne_claude": "Consigne de Simon du 31/10 à 14:03 UTC : « Phase 1 : animation 3D, premier test de la méthode v2 (docs/METHODE.md, section « Évolution v2 »). Sujet : propose moi. Rendu tunic. Lis 00_CONTEXTE.md, animation3d/CLAUDE.md et animation3d/PLAN_ACTION.md. Sois force de proposition : 3 approches recherchées (three.js, web), une recommandation, dis si l'idée est de type A (animation) ou B (décor). Ne construis rien avant mon « oui ». » Après « Autre sujet » (14:06), Simon choisit « 3 » (14:07). Fiche écrite dans animation3d/FICHE_PORTE.md, puis « S, séquence ok » (14:10) et « Oui » (14:12). Fichiers lus : 00_CONTEXTE.md, animation3d/CLAUDE.md, animation3d/PLAN_ACTION.md, docs/METHODE.md, design/DA_TUNIC_INSPIRE.md, docs/FICHE_MODELE.md."
     },
     {
       "id": "v1",
@@ -231,7 +347,21 @@
           "label": "Habillage v1 au scroll",
           "url": "rendus/porte_v1.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Habillage Tunic du rendu gris : palette tirée de design/DA_TUNIC_INSPIRE.md (couleurs en hexadécimal dans le code), aucun asset copié.",
+        "Sol PlaneGeometry(90, 50, 45, 25) tourné à plat, couleurs par sommet (vertexColors, bleu-vert) avec computeVertexNormals, MeshStandardMaterial flatShading true.",
+        "Ombres : renderer.shadowMap en PCFSoftShadowMap ; DirectionalLight « lune » 0xe6ecff d'intensité 2.0 en position (−9, 12, 10), shadow.mapSize 2048, boîte d'ombre ±16.",
+        "Décor en blocs : rochers en DodecahedronGeometry, sapins en ConeGeometry (6 côtés) empilés, buissons en IcosahedronGeometry ; positions et tailles tirées d'un générateur à graine fixe (graine = 7, congruence 16807) pour une image identique à chaque chargement.",
+        "Porte : battants BoxGeometry 1.2 × 2.95 × 0.16 en pierreSombre, lueur dorée PlaneGeometry 2.4 × 3.0 en MeshBasicMaterial. Brouillard 0x2a4f6c (14 à 70), caméra en 50 degrés, hauteur qui passe de 2.3 à 1.7 au scroll.",
+        "Ce qui change par rapport à gris : le décor, les ombres et la couleur. Le mouvement (ouverture, rayons, éblouissement) ne change pas, comme l'écrit l'assistant."
+      ],
+      "mecanisme": [
+        "Consigne « Oui, habillage » à 14:16 UTC. Relecture de porte3d/index.html, lignes 24 à 84 (Read à 14:16), puis modification par script Python (14:17).",
+        "Vérification : captures de la planche ?p= en petit format (490 × 276), sans boucle en direct ni mesure de fps. L'assistant le dit lui-même dans son message de 14:17.",
+        "Point de vigilance noté par l'assistant dans le même message : à p=0,7 l'écran est presque tout doré, ce qu'il présente comme voulu (caméra qui arrive au seuil)."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:16 UTC : « Oui, habillage ». L'assistant a repris les règles du projet (décision notée, commit sans push) et la palette de design/DA_TUNIC_INSPIRE.md, lue à 14:04. Aucune autre consigne de style écrite pour cette version."
     },
     {
       "id": "L",
@@ -254,7 +384,21 @@
           "label": "Version L au scroll",
           "url": "rendus/porte_L.html"
         }
-      ]
+      ],
+      "techniques": [
+        "Porte dans son décor : battant(cote) construit en Group avec plusieurs pièces (fonction add), piliers, linteau et clef de voûte ; battants dorés, lueur PointLight OR et lueur PlaneGeometry en 0xfff0b0.",
+        "Mur de blocs violets via bloc(), décalés et plus hauts sur les côtés, avec de la mousse sur le dessus ; deux statues gardiennes (fonction statue, cônes et sphères en violet, socle).",
+        "Sol PlaneGeometry(120, 70, 60, 35) avec couleurs par sommet (violets et vert mousse), ciel en CanvasTexture, brouillard violet 0x7a62a8 (30 à 110).",
+        "Soleil DirectionalLight 0xffe8c8 d'intensité 3.0, ombre 4096 px, HemisphereLight 0xb89cf0 / 0x5a4880 d'intensité 1.5.",
+        "Caméra plus haute et plus lointaine (FOV 50, far 200), z de 16 à −4 ; les rayons passent à une largeur de 26 unités.",
+        "Ce qui change par rapport à v1 : tout le décor et l'ancrage au sol (marches, parvis, pointes de pierre) ; le mouvement est dit inchangé par l'assistant."
+      ],
+      "mecanisme": [
+        "Consigne de Simon à 14:20 UTC : passer à la version L parce qu'une porte posée seule n'est pas crédible, avec deux images de référence jointes.",
+        "Grep sur les marqueurs de scène, puis Read partiel de porte3d/index.html, lignes 131 à 157 (14:21), puis modification scriptée (14:22) et navigation vers ?p=0 et ?p= de la série (14:22).",
+        "Vérification : captures de la planche uniquement. Dans son message de 14:23, l'assistant signale que le cadrage est de face seulement, que les statues sont très simplifiées et qu'il n'a pas mesuré les fps."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:20 UTC : « Passe à la version L, le problème c'est qu'une porte mise nulle part comme ça n'est pas crédible. Il faut qu'elle s'inscrive dans un décors comme ces images ». Deux images de référence jointes (non décrites dans ce travail). Lu : porte3d/index.html (extraits). Consigne de style : « décor » ancré, sans contours, couleurs de DA_TUNIC_INSPIRE.md."
     },
     {
       "id": "A",
@@ -277,12 +421,22 @@
         {
           "label": "Direction A au scroll",
           "url": "rendus/planche_porte/index.html?v=A"
-        },
-        {
-          "label": "La planche A / B / C",
-          "url": "rendus/planche_porte/planche.html"
         }
-      ]
+      ],
+      "comparer": "rendus/planche_porte/planche.html",
+      "techniques": [
+        "Un seul fichier (planche_porte/index.html) produit A, B et C : la variable V lit le paramètre ?v= (valeur par défaut A) et des tests « if (V === ...) » changent le décor, le brouillard et la caméra.",
+        "Commun aux trois : RoundedBoxGeometry (module addons de three) pour des blocs à arêtes arrondies, noyau sombre derrière le mur, cordon de pierre au pied, statues sur dalle de base, taches d'ombre de contact.",
+        "A, ruine usée de face : mur de blocs avec brèches (hauteur réduite au hasard de 1.5 à 4.5), pans hauts de 17 unités au-delà de |x| > 9, lierre, gravats et blocs penchés.",
+        "A utilise le même mouvement que B et C (battants, rayons, éblouissement, progression p au scroll) ; seule la scène change.",
+        "Le paramètre ?p= fige la planche de contrôle, une tuile par valeur, pour comparer les images."
+      ],
+      "mecanisme": [
+        "Message de 14:24 : Simon rejette la version L (statue, porte, mur, sol « pas réalistes »). L'assistant applique la règle du projet citée dans son message : après le deuxième retour sur le même point, une planche de trois variantes (14:26). Cette règle n'a pas été relue dans ce travail.",
+        "Grep importmap (14:26), navigation vers ?v=A, ?v=B et ?v=C à ?p=0 (14:27), puis planche.html (14:28).",
+        "Vérification : captures en 490 × 276, pas de fps, statues encore simples. L'assistant écrit lui-même qu'elles sont le point le plus probable de fausseté."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:24 UTC : « Plus de travail sur le tout, la statue, la porte, le mur, il est pas réaliste, pas ancré dans qqch, le sol, etc etc.. ». Règle de planche citée par l'assistant (non relue ici). Pas d'autre texte de consigne pour cette étape."
     },
     {
       "sujet": "porte",
@@ -305,12 +459,22 @@
         {
           "label": "Direction B au scroll",
           "url": "rendus/planche_porte/index.html?v=B"
-        },
-        {
-          "label": "La planche A / B / C",
-          "url": "rendus/planche_porte/planche.html"
         }
-      ]
+      ],
+      "comparer": "rendus/planche_porte/planche.html",
+      "techniques": [
+        "Variante B = portique dans la falaise (?v=B du même fichier) : la porte est taillée dans une colline verte (couleurs 0x6f9a48 et 0x4f7a3a), avec sapins en ConeGeometry sur les côtés.",
+        "Relief : colline(x, z) = lisse(8, 26, |x|) × (6 + 2.5 sin(z × 0.28 + x × 0.1)) × lisse(−4, 8, z) ; terrain de 150 × 90 segments 75 × 45, chemin de dalles dalles(−3.4, 3.4, 6, 30, 2.3).",
+        "Brouillard bleu 0x9ab0d0, dégradé de ciel bleu vers rose (#3a4aa0 vers #e8c8c0), caméra de départ en y = 6.2, z = 29, cible en 5.4 au lieu de 4.2 et 16.",
+        "Positions des statues : px = cote × 6.6 (en A et C, cote × 8).",
+        "Pas de noyau ni de joints sombres pour B (ces blocs ne sont posés que si V n'est pas B), ce qui distingue B de A et C."
+      ],
+      "mecanisme": [
+        "Simon choisit B à 14:30, mais ajoute : « regarde l'encadré, ça reste pas crédible de pourquoi elle est placée là ». Ce message déclenche un recadrage au lieu d'un correctif (message de 14:30).",
+        "Trois questions AskUserQuestion à 14:31 (lieu, encadrement). Les réponses ne sont pas relues ici ; les commits de 14:33 reprennent « sanctuaire enfoui, encadrement taillé dans la roche, direction B ».",
+        "Vérification : captures uniquement, pas d'essai en direct ; l'assistant le dit dans son message de 14:28."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:30 UTC : « la B mais regarde l'encadré, ça reste pas crédible de pourquoi elle est placée là ». Puis réponses aux trois questions de 14:31 (texte non relu). La fiche FICHE_PORTE.md est recadrée et committée à 14:33."
     },
     {
       "id": "C",
@@ -333,12 +497,22 @@
         {
           "label": "Direction C au scroll",
           "url": "rendus/planche_porte/index.html?v=C"
-        },
-        {
-          "label": "La planche A / B / C",
-          "url": "rendus/planche_porte/planche.html"
         }
-      ]
+      ],
+      "comparer": "rendus/planche_porte/planche.html",
+      "techniques": [
+        "Variante C = terrasse vue d'en haut (?v=C du même fichier) : plate-forme dallée au-dessus de l'eau, avec pont et flèches au loin, d'après le message de l'assistant à 14:28.",
+        "Caméra qui descend : d = 1 − lisse(0.02, 0.4, p), puis y += 11 × d, z += 12 × d et cible −= 3.2 × d ; la vue part haute et se rapproche de la porte avant la séquence validée.",
+        "Paramètres propres à C : LIM = 15, plafond des murs à 11, noyau sombre à 11.5 (A utilise 17 et 12.5 ; B 10 et 10.5).",
+        "Brouillard violet 0x7a62a8 comme en A ; seule la variante B reçoit le brouillard bleu 0x9ab0d0.",
+        "Mouvement identique aux autres variantes (battants, rayons, éblouissement, progression p au scroll, planche ?p=)."
+      ],
+      "mecanisme": [
+        "Même planche de trois variantes que A et B, annoncée à 14:26 et livrée à 14:28 ; navigation vers ?v=C&p=0 à 14:27.",
+        "Simon ne retient pas C : sa réponse de 14:30 est « la B mais regarde l'encadré ». C n'est reprise dans aucun commit ultérieur de la porte.",
+        "Vérification : captures en petit format seulement, comme pour A et B (message de 14:28)."
+      ],
+      "consigne_claude": "Même planche que A et B (consigne de Simon du 14:24 UTC, voir l'entrée A). Retour de Simon à 14:30 UTC sur B seulement : « la B mais regarde l'encadré, ça reste pas crédible de pourquoi elle est placée là ». Pas de consigne écrite spécifique à C."
     },
     {
       "id": "B_moria",
@@ -361,11 +535,24 @@
           "label": "B refaite au scroll",
           "url": "rendus/porte_B_moria.html?v=B"
         }
-      ]
+      ],
+      "techniques": [
+        "Falaise remplacée : hautB(x, z) = lerp(cote, −1.3, …) avec cote = lisse(14, 34, |x|) × (6 + 2.5 sin(…)) × lisse(−4, 8, z), donc un bassin au premier plan et une falaise qui monte depuis l'eau.",
+        "Terrain 170 × 110 (segments 85 × 55), couleurs conditionnées par la hauteur : bassin 0x7a7a8a vers 0x4a4a60, pierre au pied z < 9, prairie plus loin ; plan d'eau 500 × 500 à y = −0.5, MeshStandardMaterial 0x2f6a9a roughness 0.35.",
+        "Parois en rangées de blocs RoundedBox (w 4.5 à 9, hauteur h, profondeur 4.4) avec mousse sur les replats (mousse si r < 4 et alea < 0.4), jeu de rotation.x/rotation.z léger pour casser l'aplomb.",
+        "Chemin de dalles dalles(−3.4, 3.4, 5.2, 11.2, 2.3) qui va jusqu'au bord de l'eau ; 16 rochers de rive en DodecahedronGeometry posés sur hautB, 14 groupes de sapins sur les collines.",
+        "Chambranles de roche touchant les piliers (bloc 1.3 × 9 × 4.4), fond de niche des statues, angles d'arche coupés (rotation.z = π/4). Caméra et brouillard identiques à B."
+      ],
+      "mecanisme": [
+        "Après la référence de Simon (entrée de la Moria, à 14:33), l'assistant annonce un plan en 4 points qui ne reprend que le titre de la vidéo : il dit ne pas l'avoir vue (14:33).",
+        "Simon répond « Oui, refais B » (14:34). Une copie de sauvegarde est faite avant modification (14:36), puis navigations ?v=B&p=… (14:36 à 14:37).",
+        "Vérification : captures ; l'assistant signale que les blocs restent en dalles horizontales (réserve du message de 14:37), ce qui conduit à la version strates."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:33 UTC : référence « l'entrée de la Moria » (vidéo ouverte par WebFetch, résultat non relu dans ce travail), puis « Oui, refais B » (14:34). Les en-têtes des fichiers citent les références de Simon « du 2026-10-31 »."
     },
     {
       "id": "strates",
-      "parent": "B",
+      "parent": "B_moria",
       "statut": "abandonne",
       "date": "2026-10-31 15:40",
       "titre": "Falaise en strates continues",
@@ -384,7 +571,20 @@
           "label": "Strates au scroll",
           "url": "rendus/porte_B_strates.html?v=B"
         }
-      ]
+      ],
+      "techniques": [
+        "Paroi de roche continue : une grille de 121 × 65 sommets (NX = 120, NY = 64), vertexColors et MeshStandardMaterial flatShading true, computeVertexNormals.",
+        "Strates : tableau de hauteurs cumulées de 1 à 2.9 jusqu'à y = 38, avec un décalage horizontal par bande (decal) et un relief sin(x × 0.3 + k × 1.7) ; fractures verticales par x.",
+        "Couleur : cinq teintes gris-violet (0x7d7894, 0x6e6888, 0x8a84a0, 0x77708f, 0x655f80), mousse sur le dessus des replats (vert 0x86a24a à 20 %), pied humide et verdi (0x5c6a58).",
+        "Huit blocs éboulés ou saillants (s entre 1.6 et 3.6) contre la paroi pour casser l'aplomb ; linteau de roche au-dessus de la porte ; niches des statues conservées.",
+        "Ce qui change par rapport à B_moria : la falaise en rangées de blocs est remplacée par cette surface unique ; le reste de la scène est repris."
+      ],
+      "mecanisme": [
+        "Retour de Simon à 14:39 : « les blocs sont encore un peu en dalles horizontales, plutôt que de la vraie roche à strates » ; l'assistant répond « travail sur ça ».",
+        "Modification scriptée et commit 3039635 à 14:40 (message de 14:40). Vérification par captures ; l'assistant signale du moiré sur les facettes et des bandes trop régulières.",
+        "Le commit de 14:40 précise « à valider sur écran réel » : la validation par Simon reste à faire."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:39 UTC : « Falaise : les blocs sont encore un peu en dalles horizontales, plutôt que de la vraie roche à strates » suivi de « travail sur ça »."
     },
     {
       "id": "lisse",
@@ -407,7 +607,20 @@
           "label": "Roche lisse au scroll",
           "url": "rendus/porte_B_lisse.html?v=B"
         }
-      ]
+      ],
+      "techniques": [
+        "Même géométrie de paroi que strates (grille 120 × 64), mais MeshStandardMaterial avec flatShading false : l'ombrage est lisse, sans triangles marqués.",
+        "Les bosses (liste bosses de 7 saillies, rayons de 1.0 à 1.8) remplacent les blocs rapportés : elles sont directement dans la paroi, sans arêtes qui les séparent.",
+        "Rayons de lumière : PlaneGeometry de largeur 11 (au lieu de 26) pour qu'ils ne touchent plus les rochers.",
+        "Rochers de rive (16) et sapins (14) toujours posés sur hautB ; le chemin de dalles n'est pas encore remplacé.",
+        "Ce qui change par rapport à strates : ombrage lisse, saillies intégrées, rayons raccourcis."
+      ],
+      "mecanisme": [
+        "Retour de Simon à 14:42 en trois points : quatre blocs mal intégrés, effet triangle trop prononcé, neuf dalles peu crédibles (avec image 3 jointe).",
+        "Les deux premiers points sont corrigés par des remplacements scriptés, avec contrôle de l'unicité du texte (assert count == 1) ; commit bcc8fd1 (14:43). Une capture de ?v=B&p=0.25 est faite.",
+        "Pour les dalles, l'assistant propose trois options chiffrées (marches taillées, sentier de terre, pavés) et recommande la première, sans rien modifier."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:42 UTC : « les 4 bloc de pierre sont mal intégrer à la pierre | L'effet triangle sur la roche est trop prononcé | Les 9 dalles sont peu crédible devant la porte, propose moi autre chose », avec une image jointe."
     },
     {
       "id": "tunicroche",
@@ -430,7 +643,20 @@
           "label": "Maçonnerie Tunic au scroll",
           "url": "rendus/porte_B_tunic.html?v=B"
         }
-      ]
+      ],
+      "techniques": [
+        "Falaise maçonnée en style Tunic : paliers de hauteur y = [0, 9, 15, 21, 27, 34] qui reculent (recul = n × 1.6), faces planes à arêtes chanfreinées (RoundedBoxGeometry, rayon 0.14), pas de bruit sur les faces.",
+        "Pilastres en saillie, panneaux emboîtés gravés et corniches moussues (mousse 0x86a24a ou ocre), le relief venant de la lumière et non de la forme.",
+        "Sol en terrain 170 × 110 segments 170 × 110, bruit de hauteur réduit (alea − 0.5) × 0.18 ; sentier de terre battue : axe cheminX = sin((z − 5) × 0.5) × 1.3, largeur cheminL de 3.2 à 1.3 ; couleurs 0x8a7458 et 0x6e5c46.",
+        "Pierres plates posées de travers sur le sentier (bloc choix(dalle), environ 70 % des emplacements tirés) et 40 touffes d'herbe sur les bords ; les 9 dalles droites sont supprimées.",
+        "Ce qui change par rapport à lisse : la paroi à strates devient une falaise maçonnée à paliers, et le chemin devient un sentier naturel."
+      ],
+      "mecanisme": [
+        "Retour de Simon à 14:47 : « reviens sur un style tunic pour la roche, analyse comment c'est fait et applique », et « 2 sentier plus naturel » (option 2 choisie), avec trois images de référence jointes.",
+        "L'assistant analyse les images dans sa réponse (14:50) : paliers qui reculent, arêtes chanfreinées, pilastres, panneaux, corniches. Il ne lit aucun fichier de référence supplémentaire.",
+        "Une passation vers une nouvelle session a été refusée par le système à 14:49 ; l'assistant ne tente pas de contournement. Vérification par captures seulement, fps non mesurés."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:47 UTC : « reviens sur un style tunic pour la roche, analyse comment c'est fait et applique | 2 sentier plus naturel », avec trois images de référence. Lues : FICHE_PORTE.md et animation3d/CLAUDE.md à la reprise de 14:50 (sections « Direction B choisie » et « Roche : retour au style Tunic »)."
     },
     {
       "id": "D",
@@ -439,8 +665,8 @@
       "date": "2026-10-31 16:13",
       "titre": "Direction D : massif asymétrique",
       "cherche": "Variante « massif asymétrique » : une montagne qui n'est pas un mur.",
-      "prompt": "Brief écrit par Claude à un sous-agent (non relu ici).",
-      "modele": "Sous-agent Opus (d'après le titre du commit) ; modèle de la session principale non vérifié",
+      "prompt": "Brief écrit par Claude à un sous-agent, après ton message « on tourne un peu en rond avec ce mur » : voir « Ce que Claude a reçu ».",
+      "modele": "Sous-agent Opus (lancé à 14:54 UTC, confirmé dans la session) ; session principale : Sonnet 5.5",
       "techno": "Fichier séparé var_D.html",
       "retour": "Non validée par Simon à ce jour.",
       "garde": "À décider.",
@@ -453,7 +679,21 @@
           "label": "Direction D au scroll",
           "url": "rendus/porte_D.html"
         }
-      ]
+      ],
+      "comparer": "rendus/planche_def.html",
+      "techniques": [
+        "Massif asymétrique : chaque masse est un polyèdre déformé par une fonction masse(...) qui applique un bruit par sommet (facteur 1 ± bruit), puis une rotation et une translation, sans symétrie.",
+        "Couleur par face : bande = floor((y − x × 0.5) / 2.4) pour des strates inclinées, mousse sur les faces dont la normale n.y > 0.7 (85 % des cas), pied plus sombre (cPied, mélange 0.35).",
+        "Sol PlaneGeometry 220 × 150 (150 × 110 segments), couleurs par sommet : pré vert près de z > 15.5, pente rocheuse violette sinon.",
+        "Caméra en 3/4 : FOV 55, position x = lerp(16, 0, axe), brouillard 0xb08cc0 (45 à 190), soleil 3.6, HemisphereLight 0xc0a0f0 / 0x3a2c60 d'intensité 0.9.",
+        "Escalier en deux volées avec palier (marches en RoundedBoxGeometry), une seule statue, encadrement taillé (jambages et linteau) ; pose(p) reprise de B à l'identique : ouv = lisse(0.08, 0.2, p) × 0.12 + lisse(0.2, 0.45, p) × 1.2."
+      ],
+      "mecanisme": [
+        "Simon demande à 14:53 de nouvelles idées de design et des sous-agents de modèle plus élevé, car « on tourne un peu en rond avec ce mur ». La session lance trois sous-agents Opus en parallèle à 14:54 (un par variante).",
+        "Chaque sous-agent lit porte3d/index.html (Read), une partie de FICHE_PORTE.md et de DA_TUNIC_INSPIRE.md (Grep), puis écrit son fichier (Write à 14:59) et l'ouvre en navigateur avec ?p=0,0.45,1 (captures et console). D est écrit par le sous-agent, qui juge lui-même que la montagne reste « un tas de rochers ronds ».",
+        "Rapport du sous-agent D reçu à 15:00 : le fichier est seul modifié (pas de git), la séquence passe, aucune erreur console. Fluidité et rendu en grand non vérifiés (message de l'assistant à 15:00)."
+      ],
+      "consigne_claude": "Consigne de Simon à 14:53 UTC : « la roche est pas terrible du tout, tout est symétrique, on n'est plus du tout dans l'idée de la montage et le sentier est pas du tout crédible. à partir de ce que tu as déjà produit, relance tout ça, suggère de nouvelle idée desig, utilise des sous agent en modele plus élevé ou autre, là, j'ai l'impression qu'on tourne un peu en rond avec ce mur depuis un moment et on avance pas ». Brief du sous-agent (modèle opus, type general-purpose, lancé à 14:54 UTC, chemin de dossier remplacé par « atelier/ ») : « Projet perso (atelier Small Humans), dossier atelier/animation3d/porte3d/. Réponds en français, court. Ne touche à AUCUN autre fichier que celui que tu crées ; pas de git. Contexte : démo three.js 0.170.0 (CDN), style « inspiré de Tunic » (aplats, lumière pour le relief, sans contours, aucun asset copié). Une porte d'or s'ouvre au scroll sur une lumière dorée, la caméra avance et on entre dans la lumière (séquence p=0..1 : voir animation3d/FICHE_PORTE.md, tableau « Séquence »). Lis animation3d/porte3d/index.html (variante ?v=B) : réutilise tel quel ce qui marche (progression p au scroll, ?p= planche de contrôle, battants d'or, rayons, éblouissement, statues, ciel, éclairage, garde-fous) et copie-le dans un NOUVEAU fichier animation3d/porte3d/var_D.html (ne modifie pas index.html). Garde l'option ?p=0,0.2,0.45,0.7,0.9,1. PROBLÈME à résoudre : Simon juge la roche actuelle (mur de panneaux/pilastres/paliers rectangulaires) « symétrique, une façade de bâtiment, plus du tout une montagne » et le sentier « pas crédible ». Le lieu : entrée d'un sanctuaire enfoui dans une montagne, la roche a gagné. DIRECTION D « Massif asymétrique » : une vraie montagne vue en 3/4 (caméra décalée, pas de face). Silhouette en pic irrégulière qui domine le cadre ; gros pans de roche en facettes larges et inclinées (pas de grille, pas de panneaux répétés, pas de symétrie), strates en diagonale, éboulis et gros rochers au pied, un peu de mousse sur les replats. Porte décentrée dans un creux de la paroi, seul l'encadrement (linteau, jambages) est taillé. Au lieu du sentier : escalier de pierre usé, irrégulier, taillé dans la pente, qui monte en lacets jusqu'à la porte, avec un petit palier. Une seule statue (ou aucune) pour casser la symétrie. Couleurs : palette de design/DA_TUNIC_INSPIRE.md (violet, or, mousse, ciel violet-rose). Contraste lumière/ombre fort. Vérification : le serveur de test tourne sur http://localhost:8767 (preview_start « atelier-animation3d » si besoin) ; ouvre http://localhost:8767/porte3d/var_D.html?p=0,0.45,1 et regarde 1 ou 2 captures (pas plus), vérifie la console sans erreur. Livre : le fichier, et 3 lignes : ce qui est fait, ce que tu n'as pas pu vérifier, ce que tu ferais ensuite. »"
     },
     {
       "id": "E",
@@ -462,8 +702,8 @@
       "date": "2026-10-31 16:13",
       "titre": "Direction E : faille",
       "cherche": "Variante « faille » du décor (d'après le titre du commit).",
-      "prompt": "Brief écrit par Claude à un sous-agent (non relu ici).",
-      "modele": "Sous-agent Opus (d'après le titre du commit) ; modèle de la session principale non vérifié",
+      "prompt": "Brief écrit par Claude à un sous-agent, après ton message « on tourne un peu en rond avec ce mur » : voir « Ce que Claude a reçu ».",
+      "modele": "Sous-agent Opus (lancé à 14:54 UTC, confirmé dans la session) ; session principale : Sonnet 5.5",
       "techno": "Fichier séparé var_E.html",
       "retour": "Non validée par Simon à ce jour.",
       "garde": "À décider.",
@@ -476,7 +716,21 @@
           "label": "Direction E au scroll",
           "url": "rendus/porte_E.html"
         }
-      ]
+      ],
+      "comparer": "rendus/planche_def.html",
+      "techniques": [
+        "Deux parois irrégulières et différentes : fonction paroi(nu, nv, pos, trou, dedans, strate) qui génère une grille déformée, couleurs par sommet dans une palette de 5 violets-gris (cRoche), MeshStandardMaterial flatShading true, DoubleSide.",
+        "Fente étroite : couleur d'ombre cFente 0x35284f, fente de ciel au-dessus ; la paroi gauche avance en surplomb, la droite recule puis se referme.",
+        "Ruisseau : plan d'eau PlaneGeometry 32 × 46 en MeshStandardMaterial 0x3a6aa8 (roughness 0.25) ; fond de lit 0x4a4a62 ; gués en CylinderGeometry à 6 ou 7 côtés (pierres plates) ; racines en TubeGeometry le long d'une CatmullRomCurve3 (18 segments, rayon 0.04 à 0.08).",
+        "Brouillard 0x7a5a9a (22 à 90), DirectionalLight 0xffdcc0 d'intensité 4.5 avec ombre 2048 px ; lumière dorée PointLight (OR) près des parois pour les éclairer.",
+        "Caméra : position x = lerp(0.8, 0, av), av piloté par le scroll ; correction de l'erreur console « reading r » par un indice rendu positif sur cRoche (k × 3 + 7 modulo 5, Edit du sous-agent à 15:00)."
+      ],
+      "mecanisme": [
+        "Même lancement que D à 14:54 (sous-agent Opus), même lecture de porte3d/index.html et de FICHE_PORTE.md. Le fichier var_E.html est écrit à 14:59, puis ouvert en navigateur avec ?p=0,0.45,1 et capture d'écran.",
+        "Le sous-agent trouve une erreur console (« Cannot read properties of undefined (reading 'r') », ligne 122) et la corrige par un Edit à 15:00 (message de l'assistant de 15:00).",
+        "Rapport final : la fente de ciel est à peine visible et la fin de la séquence (p = 0,7 à 1) n'est pas revue après correction (message de 15:01). La vérification se limite à 2 captures."
+      ],
+      "consigne_claude": "Même consigne de Simon que D (message de 14:53 UTC, voir l'entrée D). Brief du sous-agent (modèle opus, type general-purpose, lancé à 14:54 UTC, chemin remplacé par « atelier/ ») : « Projet perso (atelier Small Humans), dossier atelier/animation3d/porte3d/. Réponds en français, court. Ne touche à AUCUN autre fichier que celui que tu crées ; pas de git. Contexte : démo three.js 0.170.0 (CDN), style « inspiré de Tunic » (aplats, lumière pour le relief, sans contours, aucun asset copié). Une porte d'or s'ouvre au scroll sur une lumière dorée, la caméra avance et on entre dans la lumière (séquence p=0..1 : voir animation3d/FICHE_PORTE.md, tableau « Séquence »). Lis animation3d/porte3d/index.html (variante ?v=B) : réutilise tel quel ce qui marche (progression p au scroll, ?p= planche de contrôle, battants d'or, rayons, éblouissement, statues, ciel, éclairage, garde-fous) et copie-le dans un NOUVEAU fichier animation3d/porte3d/var_E.html (ne modifie pas index.html). Garde l'option ?p=0,0.2,0.45,0.7,0.9,1. PROBLÈME à résoudre : Simon juge la roche actuelle (mur de panneaux/pilastres/paliers rectangulaires) « symétrique, une façade de bâtiment, plus du tout une montagne » et le sentier « pas crédible ». Le lieu : entrée d'un sanctuaire enfoui dans la roche, la nature a gagné. DIRECTION E « Faille / gorge » : la porte est au fond d'une faille étroite de la montagne. Deux parois hautes, irrégulières et DIFFÉRENTES (pas de symétrie, l'une avance, l'autre recule, surplombs) qui se resserrent vers le haut ; fente de ciel violet-rose au-dessus ; la porte au bout, en retrait, encadrement simple taillé ; la lumière dorée des battants éclaire les parois. Au sol : un petit ruisseau sinueux avec gués de grosses pierres plates irrégulières, rives de mousse, racines ou herbes, quelques rochers tombés. Pas de mur de blocs, pas de grille de panneaux : roche en grandes facettes inclinées, strates obliques, fissures. Statue : une seule ou aucune (asymétrie). Couleurs : palette de design/DA_TUNIC_INSPIRE.md. Contraste lumière/ombre fort, profondeur par la lumière. Vérification : le serveur de test tourne sur http://localhost:8767 (preview_start « atelier-animation3d » si besoin) ; ouvre http://localhost:8767/porte3d/var_E.html?p=0,0.45,1 et regarde 1 ou 2 captures (pas plus), vérifie la console sans erreur. Livre : le fichier, et 3 lignes : ce qui est fait, ce que tu n'as pas pu vérifier, ce que tu ferais ensuite. »"
     },
     {
       "id": "F",
@@ -485,8 +739,8 @@
       "date": "2026-10-31 16:13",
       "titre": "Direction F : flanc en terrasses",
       "cherche": "Variante « flanc en terrasses » du décor (d'après le titre du commit).",
-      "prompt": "Brief écrit par Claude à un sous-agent (non relu ici).",
-      "modele": "Sous-agent Opus (d'après le titre du commit) ; modèle de la session principale non vérifié",
+      "prompt": "Brief écrit par Claude à un sous-agent, après ton message « on tourne un peu en rond avec ce mur » : voir « Ce que Claude a reçu ».",
+      "modele": "Sous-agent Opus (lancé à 14:54 UTC, confirmé dans la session) ; session principale : Sonnet 5.5",
       "techno": "Fichier séparé var_F.html",
       "retour": "Non validée par Simon à ce jour.",
       "garde": "À décider.",
@@ -499,33 +753,68 @@
           "label": "Direction F au scroll",
           "url": "rendus/porte_F.html"
         }
-      ]
+      ],
+      "comparer": "rendus/planche_def.html",
+      "techniques": [
+        "Flanc en terrasses : tableau T de replats (hauteur, avancée du bord, courbure, phase) ; fonction bord(k, x) qui calcule le bord de chaque terrasse ; PORTE = 4 désigne la terrasse de la porte, à mi-hauteur.",
+        "Caméra qui suit une trajectoire : trajet = CatmullRomCurve3 ; camera.position = trajet.getPointAt(av) et la cible vise (0, 4.3, …) puis se relâche avec lisse(0, 0.3, av).",
+        "Escalier en zigzag : marches en RoundedBoxGeometry (rayon 0.08) de largeur et hauteur variables ; murets de soutènement en RoundedBoxGeometry (rayon 0.12) à moitié effondrés ; herbe dans les joints (herbes[k % 3]).",
+        "Eau : PlaneGeometry 600 × 600 en MeshStandardMaterial 0x0f3550 (roughness 0.3, metalness 0.1) ; brouillard 0x35587a (45 à 170) ; FOV 42 ; soleil 3.6 avec ombre 4096 px ; HemisphereLight 0x8aa6d4 / 0x4a4a5c.",
+        "Une statue petite et penchée, à moitié prise par la mousse (formes inspirées, pas copiées, d'après le rapport du sous-agent)."
+      ],
+      "mecanisme": [
+        "Même lancement que D et E à 14:54 (sous-agent Opus), avec lecture de porte3d/index.html (variantes B et C) et de FICHE_PORTE.md. Le fichier var_F.html est écrit à 14:58, puis corrigé par plusieurs Edit à 14:59 (ondulation des bords, base des terrasses, lumière d'hémisphère).",
+        "Vérification : navigation vers ?p=0,0.45,1, lecture des erreurs console et capture (14:58). Le rapport du sous-agent indique deux captures seulement et une fluidité non vérifiée (message de 15:00).",
+        "L'assistant transmet à Simon les limites du rapport : facettes verticales qui rappellent des colonnes, eau peu visible (message de 15:01)."
+      ],
+      "consigne_claude": "Même consigne de Simon que D (message de 14:53 UTC, voir l'entrée D). Brief du sous-agent (modèle opus, type general-purpose, lancé à 14:54 UTC, chemin remplacé par « atelier/ ») : « Projet perso (atelier Small Humans), dossier atelier/animation3d/porte3d/. Réponds en français, court. Ne touche à AUCUN autre fichier que celui que tu crées ; pas de git. Contexte : démo three.js 0.170.0 (CDN), style « inspiré de Tunic » (aplats, lumière pour le relief, sans contours, aucun asset copié). Une porte d'or s'ouvre au scroll sur une lumière dorée, la caméra avance et on entre dans la lumière (séquence p=0..1 : voir animation3d/FICHE_PORTE.md, tableau « Séquence »). Lis animation3d/porte3d/index.html (variantes ?v=B et ?v=C) : réutilise tel quel ce qui marche (progression p au scroll, ?p= planche de contrôle, battants d'or, rayons, éblouissement, statues, ciel, éclairage, garde-fous) et copie-le dans un NOUVEAU fichier animation3d/porte3d/var_F.html (ne modifie pas index.html). Garde l'option ?p=0,0.2,0.45,0.7,0.9,1. PROBLÈME à résoudre : Simon juge la roche actuelle (mur de panneaux/pilastres/paliers rectangulaires) « symétrique, une façade de bâtiment, plus du tout une montagne » et le sentier « pas crédible ». Le lieu : entrée d'un sanctuaire enfoui dans une montagne, la nature a gagné. DIRECTION F « Flanc en terrasses, vue plongeante » : caméra en hauteur, vue en plongée 3/4 sur le flanc d'une montagne en terrasses naturelles irrégulières (replats herbeux/mousse, falaisettes basses de hauteurs variées, rochers). La porte est à mi-hauteur, décentrée, dans une petite paroi. Un escalier de pierre usé, irrégulier, serpente en zigzag sur les terrasses jusqu'à la porte (marches de largeurs et hauteurs variables, murets de soutènement bas à moitié effondrés, herbe dans les joints). En bas, un peu d'eau. Au fond, la montagne continue vers le haut en silhouette de pic. Pendant la séquence la caméra monte l'escalier puis entre dans la porte. Aucune symétrie, aucune grille de panneaux. Statue : une seule ou aucune. Couleurs : palette de design/DA_TUNIC_INSPIRE.md. Contraste lumière/ombre fort. Vérification : le serveur de test tourne sur http://localhost:8767 (preview_start « atelier-animation3d » si besoin) ; ouvre http://localhost:8767/porte3d/var_F.html?p=0,0.45,1 et regarde 1 ou 2 captures (pas plus), vérifie la console sans erreur. Livre : le fichier, et 3 lignes : ce qui est fait, ce que tu n'as pas pu vérifier, ce que tu ferais ensuite. »"
     }
-  ],
-  "lecons": [
-    "Un sujet trop gros (eau qui s'écrase) coule le premier essai : commencer par un mouvement simple sur formes grises.",
-    "Valider le mouvement avant l'habillage, et le sens du lieu avant le décor (« pourquoi la porte est là ? »).",
-    "Au 2e retour sur le même point, proposer 3 directions sous forme de planche ; au 3e, recadrer par une fiche.",
-    "Pour copier un style, analyser d'abord des images de référence (ce que Tunic fait vraiment : aplats, paliers, lumière) puis appliquer.",
-    "Claude ne voit que des images fixes : contrôler le mouvement par une série de captures (?p=…), et faire valider la fluidité par Simon sur son écran.",
-    "Un mur symétrique de blocs ne fait pas une montagne : varier masses et asymétrie avant les détails.",
-    "Garder les images de référence et les phrases exactes de Simon ; noter modèle et effort de chaque essai (ici : non tenu, d'où cette page)."
   ],
   "sujets": {
     "tunic": {
       "titre": "Le prototype Tunic (île et renard)",
       "intro": "Le point de départ : un premier essai three.js « cartoon / Tunic » (île en blocs, renard, océan, scroll). C'est la référence de ce qui plaît à Simon.",
-      "date": "2026-10-30"
+      "date": "2026-10-30",
+      "lecons": [
+        "Un sujet petit et cadré (une île, un renard, un océan) a donné le rendu qui plaît le plus à Simon : à garder comme étalon pour juger les essais suivants.",
+        "Le style Tunic fonctionne en « petit monde vu de haut » (ambiance : palette, lumière, aplats). Il ne fonctionne pas en matière (roche, végétation) faite à la main par des artistes : on l'a vu ensuite avec le phare et la porte.",
+        "Un seul fichier HTML avec three.js sans étape de fabrication : simple à relancer, à relire et à publier.",
+        "La session d'origine citait des références jamais ouvertes et des hypothèses non testées (voir ses notes) : un rendu qui plaît ne prouve pas que sa méthode est fiable. À refaire avec des références réellement vues."
+      ]
     },
     "phare": {
       "titre": "Le phare dans la tempête",
       "intro": "Un phare de nuit, un bonhomme sur la passerelle, une grosse vague qui monte. Fabriqué couche par couche (ciel, mer, phare, vague, faisceaux), puis gelé : sujet trop gros pour un premier essai.",
-      "date": "2026-10-30"
+      "date": "2026-10-30",
+      "lecons": [
+        "Le sujet était trop gros : de l'eau, une vague qui se brise, de l'écume. Le plan d'action le classait déjà « difficile, déjà échoué ». Commencer par un sujet simple.",
+        "Le style a changé 3 fois en 15 minutes avant la 3D (encre colorée, Tunic, puis formes Tunic + couleurs d'une peinture) : on est parti d'un mélange de deux références qui vont mal ensemble. Fixer UNE référence avant de coder.",
+        "Cinq couches et une vingtaine de commits en 30 minutes : à ce rythme on ajuste des chiffres, on ne repense pas les formes. La planche de choix (nuages, mer) est arrivée après trois essais au lieu du deuxième retour.",
+        "On a jugé sur des images fixes : le mouvement n'a jamais été vu par Claude. Une mer de facettes animée en JavaScript ne donne pas l'eau stylisée des jeux, qui repose sur des shaders et des textures peintes.",
+        "Ce qui a marché : les planches de choix (« mer A » tranchée en un mot) et une seule couleur de lumière partagée entre nuages et mer.",
+        "Coût : la session a relu jusqu'à 37 millions de jetons de contexte pour 168 000 de sortie ; des sessions courtes par essai coûtent moins cher."
+      ]
     },
     "porte": {
       "titre": "La porte de pierre style Tunic",
       "intro": "Une porte de pierre qui s'ouvre au scroll sur une lumière dorée, puis la recherche d'un décor crédible : mur, falaise, strates, maçonnerie Tunic, nouvelles directions D, E, F.",
-      "date": "2026-10-31"
+      "date": "2026-10-31",
+      "lecons": [
+        "Le mouvement d'abord, sur formes grises, a marché : validé en 13 minutes et 2 messages. Le décor, lui, a pris 7 retours et 10 commits en 41 minutes.",
+        "Le plafond vient de l'outil, pas de l'effort : le décor n'est fait que de formes de base (boîtes, cônes, dodécaèdres), sans texture ni bruit de relief, souvent en miroir gauche/droite (la boucle [-1, 1] revient 6 fois dans le code). Changer de modèle d'IA n'a pas changé ce plafond.",
+        "Le sens du lieu (« pourquoi la porte est là ? ») n'a été posé qu'au 3e retour alors que Simon le disait dès le premier : poser le sens et l'échelle (un personnage) avant la forme.",
+        "Des références vues avant de construire : la Moria n'a jamais été vue (titre de vidéo lu seulement) ; les images de Tunic de Simon ont été bien analysées, mais au 6e retour.",
+        "Juger une matière sur de petites tuiles (environ 430 px) ne marche pas : plein écran 1920 px pour la roche, tuiles seulement pour la séquence.",
+        "Les trois sous-agents Opus (D, E, F) ont reçu l'ordre de reprendre le code tel quel et aucune image de référence : ils ont refait la même symétrie. Un modèle plus fort n'aide pas si on lui laisse les mêmes contraintes.",
+        "Pistes évaluées pour la suite : bruit de relief en code pur, modèles glTF libres de droits, fond peint en 2,5D, Blender, ou une direction artistique que le code sait faire."
+      ]
     }
-  }
+  },
+  "procede": [
+    "Elle reçoit ta consigne, et le projet lui charge automatiquement ses règles (CLAUDE.md) ; elle lit ensuite les fichiers de contexte et la fiche avant de proposer quoi que ce soit.",
+    "Elle ne « voit » pas : elle lit du texte et du code. Pour un rendu, elle ouvre la page dans un navigateur intégré, prend des captures, et décrit ce qu'elle y lit. Le mouvement se contrôle par des séries d'images à instants fixes (paramètre ?p=) ; la fluidité, seul Simon la juge sur son écran.",
+    "Elle code par couches ou par version, commit chaque étape, puis attend ton retour : ton retour devient la consigne suivante. Au 2e retour sur le même point, la méthode impose une planche de plusieurs directions.",
+    "Elle peut lancer des sous-agents (autres instances avec un contexte vierge) : un modèle léger (Haiku) pour lire et résumer, un modèle plus fort (Opus) pour inventer. Ce qu'ils ne reçoivent pas dans leur consigne, ils ne le savent pas.",
+    "Limites : pas de mémoire d'une session à l'autre en dehors des fichiers ; chaque réponse relit tout le contexte (c'est le vrai coût) ; son raisonnement interne n'est pas conservé dans les traces, seulement ses messages, ses outils et son code."
+  ]
 }
