@@ -1,5 +1,15 @@
 [
   {
+    "titre": "Cheminement des animations 3D",
+    "date": "2026-10-31",
+    "sujets": [
+      "IA",
+      "Projets"
+    ],
+    "resume": "Du phare à la porte de pierre : chaque version, la consigne, le modèle, le rendu, ce qui a été gardé ou abandonné.",
+    "lien": "animations-3d/"
+  },
+  {
     "titre": "Comment ce site a été fait",
     "date": "2026-10-25",
     "sujets": [
