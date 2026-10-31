@@ -1,0 +1,3 @@
+three.js r170 (0.170.0), licence MIT (© les auteurs de three.js, voir l'en-tête de three.module.js).
+Copie locale prise sur https://cdn.jsdelivr.net/npm/three@0.170.0/ : build/three.module.js et quelques addons (RoundedBoxGeometry, post-traitement) dans addons/.
+Les pages de rendus/ pointent ici par une importmap (chemin absolu depuis la racine du site).
